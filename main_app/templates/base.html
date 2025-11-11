@@ -20,9 +20,9 @@
           <ul class="right">
             {% if user.is_authenticated %}
 
-            {% comment %} <li>
+            <li>
               <a href="{% url 'profile' %}">Profile</a>
-            </li> {% endcomment %}
+            </li>
             <li>
               <form action="{% url 'logout' %}" method="post">
                 {% csrf_token %}
