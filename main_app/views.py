@@ -43,7 +43,8 @@ class RestaurantCreate(CreateView):
     success_url = "/"
 @login_required
 def profile(request):
-    return render(request, "users/profile.html")
+    profile = Profile.objects.get(user_id=request.user.id)
+    return render(request, "users/profile.html", {"profile": profile})
 
 
 class ProfileCreate(LoginRequiredMixin, CreateView):
