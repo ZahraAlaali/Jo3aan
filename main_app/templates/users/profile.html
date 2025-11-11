@@ -1,8 +1,11 @@
-{% extends "base.html" %}
-{% block title %}Profile Page{% endblock title %}
-{% block content %}
-    <div class="row my-3 p-3">
-        <h1>This is the profile page for {{user.username}}</h1>
-    </div>
+{% extends "base.html" %}{% block content %}
+<div class="row my-3 p-3">
+  {% load static %}
+  <img src="{% static profile.profileImage|cut:'main_app/static/' %}" alt="" />
+  <h1>{{user.username}}</h1>
+  <h3>Email: {{user.email}}</h3>
+  <h3>Phone Number: {{profile.phone}}</h3>
+  <h3>Role: {{profile.role}}</h3>
+</div>
 
-{% endblock content %}
+{% endblock %}

@@ -33,7 +33,8 @@ def signup(request):
 
 @login_required
 def profile(request):
-    return render(request, "users/profile.html")
+    profile = Profile.objects.get(id=request.user.id)
+    return render(request, "users/profile.html", {"profile": profile})
 
 
 class ProfileCreate(LoginRequiredMixin, CreateView):
