@@ -20,7 +20,7 @@ def signup(request):
         if form.is_valid():
             user = form.save()
             login(request, user)
-            return redirect("index")
+            return redirect("/")
         else:
             error_message = "Invalid Sign Up, Try Again Later..."
 

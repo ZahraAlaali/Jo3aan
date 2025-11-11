@@ -18,21 +18,21 @@
             </li>
           </ul>
           <ul class="right">
-            {% comment %} {% if user.is_authenticated %} {% endcomment %}
+            {% if user.is_authenticated %}
 
             {% comment %} <li>
               <a href="{% url 'profile' %}">Profile</a>
             </li> {% endcomment %}
-            {% comment %} <li>
+            <li>
               <form action="{% url 'logout' %}" method="post">
                 {% csrf_token %}
                 <button type="submit">Logout</button>
               </form>
-            </li> {% endcomment %}
-            {% comment %} {% else %} {% endcomment %}
+            </li>
+            {% else %}
             <li><a href="{% url 'login' %}">Login</a></li>
             <li><a href="{% url 'signup' %}">Sign Up</a></li>
-            {% comment %} {% endif %} {% endcomment %}
+            {% endif %}
           </ul>
         </div>
       </nav>
