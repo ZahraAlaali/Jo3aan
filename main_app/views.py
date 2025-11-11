@@ -1,4 +1,5 @@
 from django.shortcuts import render, redirect
+from .models import Profile
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.views.generic import ListView, DetailView
 from django.contrib.auth.forms import UserCreationForm
@@ -21,7 +22,7 @@ def signup(request):
         if form.is_valid():
             user = form.save()
             login(request, user)
-            return redirect("/")
+            return redirect("/profile/create/")
         else:
             error_message = "Invalid Sign Up, Try Again Later..."
 
@@ -33,3 +34,18 @@ def signup(request):
 @login_required
 def profile(request):
     return render(request, "users/profile.html")
+
+
+class ProfileCreate(LoginRequiredMixin, CreateView):
+    model = Profile
+    fields = ["phone", "role", "profileImage"]
+    success_url = "/"
+
+    def form_valid(self, form):
+        form.instance.user = self.request.user
+        return super().form_valid(form)
+
+
+class ProfileUpdate(LoginRequiredMixin, UpdateView):
+    model = Profile
+    fields = ["phone", "role", "profileImage"]

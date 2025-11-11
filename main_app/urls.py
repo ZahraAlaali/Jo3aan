@@ -9,5 +9,5 @@ urlpatterns = [
     path("", views.home, name="home"),
     # profile
     path("profile/", views.profile, name="profile"),
-    # path("profile/create/", views.CreateProfile, name="craete_profile"),
+    path("profile/create/", views.ProfileCreate.as_view(), name="craete_profile"),
 ]
