@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block content%}
+<form action="{%url 'home'%}" method="post">
+  <label for="name">Enter the restaurant name</label>
+  <input type="text">
+  <label for="description">Enter the restaurant description</label>
+  <input type="text">
+</form>
+<hr>
+{%endblock%}
