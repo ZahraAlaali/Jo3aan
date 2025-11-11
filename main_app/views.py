@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from .models import Profile
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.views.generic import ListView, DetailView
@@ -6,8 +6,8 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
-from .models import Restaurant
-from .forms import CustomUserCreationForm
+from .models import Restaurant, User, Profile
+from .forms import CustomUserCreationForm, UpdateProfileForm, UpdateUserForm
 
 # Create your views here.
 
@@ -41,6 +41,8 @@ class RestaurantCreate(CreateView):
     model = Restaurant
     fields = "__all__"
     success_url = "/"
+
+
 @login_required
 def profile(request):
     profile = Profile.objects.get(user_id=request.user.id)
@@ -57,6 +59,25 @@ class ProfileCreate(LoginRequiredMixin, CreateView):
         return super().form_valid(form)
 
 
-class ProfileUpdate(LoginRequiredMixin, UpdateView):
-    model = Profile
-    fields = ["phone", "role", "profileImage"]
+@login_required
+def profile_user_update(request, user_id, profile_id):
+    user = get_object_or_404(User, pk=user_id)
+    profile = get_object_or_404(Profile, pk=profile_id)
+
+    if request.method == "POST":
+        profile_form = UpdateProfileForm(request.POST, request.FILES, instance=profile)
+        user_form = UpdateUserForm(request.POST, instance=user)
+
+        if profile_form.is_valid() and user_form.is_valid():
+            profile_data = profile_form.save()
+            user_data = user_form.save()
+            return redirect("/profile")
+    else:
+        profile_form = UpdateProfileForm(instance=profile)
+        user_form = UpdateUserForm(instance=user)
+
+    return render(
+        request,
+        "users/profile_user_update.html",
+        {"profile_form": profile_form, "user_form": user_form},
+    )
