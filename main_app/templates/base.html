@@ -30,6 +30,7 @@
               </form>
             </li>
             {% else %}
+            <li><a href="{% url 'restaurant_create' %}">Create restaurant</a></li>
             <li><a href="{% url 'login' %}">Login</a></li>
             <li><a href="{% url 'signup' %}">Sign Up</a></li>
             {% endif %}

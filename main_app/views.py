@@ -6,6 +6,7 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
+from .models import Restaurant
 from .forms import CustomUserCreationForm
 
 # Create your views here.
@@ -31,6 +32,15 @@ def signup(request):
     return render(request, "registration/signup.html", context)
 
 
+def restaurants_index(request):
+    restaurants = Restaurant.objects.all
+    return render(request, "restaurants/index.html", {"restaurants": restaurants})
+
+
+class RestaurantCreate(CreateView):
+    model = Restaurant
+    fields = "__all__"
+    success_url = "/"
 @login_required
 def profile(request):
     return render(request, "users/profile.html")

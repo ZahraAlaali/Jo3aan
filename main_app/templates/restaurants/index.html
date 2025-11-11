@@ -1,0 +1,20 @@
+{%extends 'base.html'%} {%block content%}
+<h1>restaurants list</h1>
+{%for restaurant in restaurants%}
+      <h2>{{restaurant.name}}</h2>
+      <p>Description: {{restaurant.description}}</p>
+      <p>category: {{restaurant.category}}</p>
+      <p>city: {{restaurant.city}}</p>
+    </div>
+    <div class="card-action">
+      {% comment %} <a href="{%url 'cats_update' cat.id%}">Update</a>
+      <a href="{%url 'cats_delete' cat.id%}">Delete</a> {% endcomment %}
+    </div>
+    {% comment %} {%load static%}
+    <div class="image">
+      <img src={% static cat.img|cut:'main_app/static/'%} alt="" style="width:
+      200px;">
+    </div></a> {% endcomment %}
+  </div>
+</div>
+{%endfor%} {%endblock%}
