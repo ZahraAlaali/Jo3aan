@@ -68,6 +68,7 @@ CITIES = (
 )
 # Create your models here.
 
+
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     username = models.CharField(max_length=50)
@@ -85,9 +86,9 @@ class Restaurant(models.Model):
     restaurant_name = models.CharField(max_length=50)
     restaurant_description = models.TextField(max_length=250)
     restaurant_image = models.ImageField(
-        upload_to="main_app/static/uploads", default=""
+        upload_to="main_app/static/uploads", null=True, blank=True
     )
     city = models.CharField(max_length=20, choices=CITIES, default="")
     category = models.CharField(max_length=20, choices=CATEGORIES, default="")
-    close_at=models.TimeField()
-    open_at=models.TimeField()
+    close_at = models.TimeField()
+    open_at = models.TimeField()
