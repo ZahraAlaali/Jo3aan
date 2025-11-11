@@ -16,4 +16,9 @@ urlpatterns = [
     # profile
     path("profile/", views.profile, name="profile"),
     path("profile/create/", views.ProfileCreate.as_view(), name="craete_profile"),
+    path(
+        "profile/update/<int:user_id>/<int:profile_id>/",
+        views.profile_user_update,
+        name="profile_update",
+    ),
 ]
