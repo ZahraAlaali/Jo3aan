@@ -1,14 +1,23 @@
-{% extends 'base.html' %}
-{% block content %}
-<h1> Item Details </h1>
+{% extends 'base.html' %} {% block content %}
+<h1>Item Details</h1>
 <div>
   <div>
     <h3>{{ item.name }}</h3>
-    <p> {{ item.discription }}</p>
+    <p>{{ item.description }}</p>
+  </div>
+  <div>
+    {% load static %}
+    <img
+      width="100px"
+      height="100px"
+      src="{% static item.image|cut:'main_app/static/' %}"
+      alt="{{ item.name }}"
+    />
   </div>
   <div>
     <a href="{% url 'item_update' item.id %}">Edit</a>
     <a href="{% url 'item_delete' item.id%}">Delete</a>
+    <a href="{% url 'item_list' %}">Back to List</a>
   </div>
 </div>
 {% endblock %}

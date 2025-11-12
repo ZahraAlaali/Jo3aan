@@ -1,7 +1,7 @@
 {% extends 'base.html' %} {% block content %}
 
 <h1>Item List</h1>
-{% for item in items %}
+{% for item in item_list %}
 <div>
   <a href="{% url 'item_detail' item.id %}">
     <div>
@@ -12,7 +12,6 @@
           <img width="100px" height="100px"
           src="{% static item.image|cut:'main_app/static/' %}">
         </div>
-        <!-- <p>{{ item.description }}</p> -->
         <p>{{ item.price }}</p>
       </div>
     </div>

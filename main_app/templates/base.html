@@ -23,6 +23,7 @@
             <li>
               <a href="{% url 'profile' %}">Profile</a>
             </li>
+            <li><a href="{% url 'item_create' %}">Create item</a></li>
             <li>
               <form action="{% url 'logout' %}" method="post">
                 {% csrf_token %}
