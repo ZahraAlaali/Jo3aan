@@ -129,3 +129,8 @@ class CartDetails(models.Model):
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
         self.cart.save()
+
+    def delete(self, *args, **kwargs):
+        cart = self.cart
+        super().delete(*args, **kwargs)
+        cart.save()
