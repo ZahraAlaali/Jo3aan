@@ -67,6 +67,11 @@ CITIES = (
     ("naim", "Al-Naim"),
     ("gudaibiya", "Gudaibiya"),
 )
+STATUS = (
+    ("P", "Pending"),
+    ("R","Ready"),
+)
+
 # Create your models here.
 
 
@@ -93,3 +98,7 @@ class Restaurant(models.Model):
     category = models.CharField(max_length=20, choices=CATEGORIES, default="")
     close_at = models.TimeField()
     open_at = models.TimeField()
+    
+class Order(models.Model):
+        total_amount=models.FloatField()
+        order_status=models.CharField(max_length=1, choices=STATUS, default=STATUS[0][0])
