@@ -7,7 +7,12 @@ from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from .models import Restaurant, User, Profile
-from .forms import CustomUserCreationForm, UpdateProfileForm, UpdateUserForm
+from .forms import (
+    CustomUserCreationForm,
+    UpdateProfileForm,
+    UpdateUserForm,
+    CustomProfileCreationForm,
+)
 
 # Create your views here.
 
@@ -19,17 +24,31 @@ def home(request):
 def signup(request):
     error_message = ""
     if request.method == "POST":
-        form = CustomUserCreationForm(request.POST)
-        if form.is_valid():
-            user = form.save()
+        user_form = CustomUserCreationForm(request.POST)
+        profile_form = CustomProfileCreationForm(request.POST, request.FILES)
+        if user_form.is_valid() and profile_form.is_valid():
+            user = user_form.save()
+            profile = profile_form.save(commit=False)
+            profile.user_id = user.id
+            profile.save()
+
             login(request, user)
-            return redirect("/profile/create/")
+            return redirect("/")
         else:
             error_message = "Invalid Sign Up, Try Again Later..."
+    else:
+        user_form = CustomUserCreationForm()
+        profile_form = CustomProfileCreationForm()
 
-    form = CustomUserCreationForm()
-    context = {"form": form, "error_message": error_message}
-    return render(request, "registration/signup.html", context)
+    return render(
+        request,
+        "registration/signup.html",
+        {
+            "user_form": user_form,
+            "profile_form": profile_form,
+            "error_message": error_message,
+        },
+    )
 
 
 def restaurants_index(request):

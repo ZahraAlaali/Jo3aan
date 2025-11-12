@@ -110,3 +110,10 @@ class Order(models.Model):
         def __str__(self):
             return f"{self.name} {self.order_status_display()}"
 
+class Item(models.Model):
+    name = models.CharField(max_length=50)
+    description = models.TextField(max_length=500)
+    image = models.ImageField( upload_to="main_app/static/uploads", null=True, blank=True
+    )
+    price = models.FloatField()
+
