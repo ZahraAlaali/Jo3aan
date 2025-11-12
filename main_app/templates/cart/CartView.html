@@ -9,10 +9,10 @@
     width="300px"
   />
   <h4>{{item.name}}</h4>
-  <h4>{{item.price}}</h4>
+  <h4>{{total_price}}</h4>
   <div>
     {% if item.quantity == 1 %}
-    <a href="">delete</a>
+    <a href="{% url 'deleteItemFromCart' user.id item.id %}">delete</a>
     {% else %}
     <a href="">-</a>
     {% endif %} {{item.quantity}}

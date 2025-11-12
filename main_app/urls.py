@@ -29,4 +29,9 @@ urlpatterns = [
         name="changeCartStatus",
     ),  # change the status->place order
     path("cart/viewCart/<int:user_id>/", views.viewCart, name="viewCart"),
+    path(
+        "cartDetails/delete/<int:user_id>/<int:item_id>/",
+        views.deleteItemFromCart,
+        name="deleteItemFromCart",
+    ),
 ]
