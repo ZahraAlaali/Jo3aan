@@ -25,7 +25,7 @@ def signup(request):
     error_message = ""
     if request.method == "POST":
         user_form = CustomUserCreationForm(request.POST)
-        profile_form = CustomProfileCreationForm(request.POST)
+        profile_form = CustomProfileCreationForm(request.POST, request.FILES)
         if user_form.is_valid() and profile_form.is_valid():
             user = user_form.save()
             profile = profile_form.save(commit=False)
@@ -37,13 +37,17 @@ def signup(request):
         else:
             error_message = "Invalid Sign Up, Try Again Later..."
     else:
-        user_form = CustomUserCreationForm(request.POST)
-        profile_form = CustomProfileCreationForm(request.POST)
+        user_form = CustomUserCreationForm()
+        profile_form = CustomProfileCreationForm()
 
     return render(
         request,
         "registration/signup.html",
-        {"user_form": user_form, "profile_form": profile_form},
+        {
+            "user_form": user_form,
+            "profile_form": profile_form,
+            "error_message": error_message,
+        },
     )
 
 
