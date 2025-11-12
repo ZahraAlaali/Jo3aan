@@ -6,5 +6,8 @@
     <div class="image">
       <img src={% static restaurant.image|cut:'main_app/static/'%} alt="" style="width:
       200px;">
+      <br>
 <a href="{%url 'restaurant_update' restaurant.id%}">Update {{restaurant.name}} restaurant</a>
+<br>
+<a href="{%url 'restaurant_delete' restaurant.id%}">Delete {{restaurant.name}} restaurant</a>
 {%endblock%}
