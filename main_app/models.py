@@ -6,6 +6,8 @@ from django.contrib.auth.models import User
 
 ROLE = (("customer", "Customer"), ("owner", "Owner"))
 
+STATUS = (("active", "active"), ("ordered", "ordered"))
+
 CATEGORIES = (
     ("bahraini", "Bahraini"),
     ("indian", "Indian"),
@@ -93,3 +95,10 @@ class Restaurant(models.Model):
     category = models.CharField(max_length=20, choices=CATEGORIES, default="")
     close_at = models.TimeField()
     open_at = models.TimeField()
+
+
+class Cart(models.Model):
+    customer_id = models.ForeignKey(User, on_delete=models.CASCADE)
+    total_amount = models.FloatField()
+    cart_status = models.CharField(max_length=50, choices=STATUS, default=STATUS[0][0])
+    # item_id = models.ManyToManyField(Item)
