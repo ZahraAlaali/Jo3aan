@@ -98,7 +98,15 @@ class Restaurant(models.Model):
     category = models.CharField(max_length=20, choices=CATEGORIES, default="")
     close_at = models.TimeField()
     open_at = models.TimeField()
-    
+
 class Order(models.Model):
+        restaurant = models.ForeignKey('Restaurant', on_delete=models.CASCADE)
+        # customer = models.ForeignKey('Customer', on_delete=models.CASCADE)
+        # cart_details = models.ForeignKey('CartDetails', on_delete=models.CASCADE)
+
         total_amount=models.FloatField()
         order_status=models.CharField(max_length=1, choices=STATUS, default=STATUS[0][0])
+
+        def __str__(self):
+            return f"{self.name} {self.order_status_display()}"
+
