@@ -6,7 +6,7 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
-from .models import Restaurant, User, Profile
+from .models import Restaurant, User, Profile, Cart, CartDetails
 from .forms import (
     CustomUserCreationForm,
     UpdateProfileForm,
@@ -100,3 +100,19 @@ def profile_user_update(request, user_id, profile_id):
         "users/profile_user_update.html",
         {"profile_form": profile_form, "user_form": user_form},
     )
+
+
+# Cart
+def addToCart(request, user_id):
+    pass
+
+
+def changeCartStatus(request, user_id, cart_id):
+    pass
+
+
+def viewCart(request, user_id):
+    cart = Cart.objects.filter(customer_id=user_id)
+    cart_details = CartDetails.objects.filter(cart_id=cart.id)
+
+    return render("cart/CartView.html", {"cart": cart, "cart_details": cart_details})
