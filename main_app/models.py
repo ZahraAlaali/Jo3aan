@@ -84,12 +84,17 @@ class Profile(models.Model):
 
 
 class Restaurant(models.Model):
-    restaurant_name = models.CharField(max_length=50)
-    restaurant_description = models.TextField(max_length=250)
-    restaurant_image = models.ImageField(
+    name = models.CharField(max_length=50)
+    description = models.TextField(max_length=250)
+    image = models.ImageField(
         upload_to="main_app/static/uploads", null=True, blank=True
     )
-    city = models.CharField(max_length=20, choices=CITIES, default="")
-    category = models.CharField(max_length=20, choices=CATEGORIES, default="")
+    city = models.CharField(max_length=20, choices=CITIES, default=CITIES[0][0])
+    category = models.CharField(
+        max_length=20, choices=CATEGORIES, default=CATEGORIES[0][0]
+    )
     close_at = models.TimeField()
     open_at = models.TimeField()
+
+    def __str__(self):
+        return self.name
