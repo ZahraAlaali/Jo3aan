@@ -65,3 +65,5 @@ class ProfileUpdate(LoginRequiredMixin, UpdateView):
 class ItemList(LoginRequiredMixin, ListView):
     model = Item
 
+class ItemDetail(LoginRequiredMixin,DetailView):
+    model = Item

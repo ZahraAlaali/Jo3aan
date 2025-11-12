@@ -20,5 +20,5 @@ urlpatterns = [
 
     #item
     path("item/", views.ItemList.as_view(), name='item_index'),
-
+    path('item/<int:pk>/',views.ItemDetail.as_view(), name='item_detail'),
 ]
