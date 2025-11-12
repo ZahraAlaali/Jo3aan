@@ -96,19 +96,24 @@ class Restaurant(models.Model):
     close_at = models.TimeField()
     open_at = models.TimeField()
 
-<<<<<<< HEAD
 
-class Cart(models.Model):
-    customer_id = models.ForeignKey(User, on_delete=models.CASCADE)
-    total_amount = models.FloatField()
-    cart_status = models.CharField(max_length=50, choices=STATUS, default=STATUS[0][0])
-    # item_id = models.ManyToManyField(Item)
-=======
 class Item(models.Model):
     name = models.CharField(max_length=50)
     description = models.TextField(max_length=500)
-    image = models.ImageField( upload_to="main_app/static/uploads", null=True, blank=True
+    image = models.ImageField(
+        upload_to="main_app/static/uploads", null=True, blank=True
     )
     price = models.FloatField()
 
->>>>>>> f77389a4fbe4b6ae681c1efcc9848b959dc46cc6
+
+class Cart(models.Model):
+    customer = models.ForeignKey(User, on_delete=models.CASCADE)
+    total_amount = models.FloatField(default=0.0)
+    cart_status = models.CharField(max_length=50, choices=STATUS, default=STATUS[0][0])
+    items = models.ManyToManyField(Item)
+
+
+class CartDetails(models.Model):
+    cart = models.ForeignKey(Cart, on_delete=models.CASCADE)
+    item = models.ForeignKey(Item, on_delete=models.CASCADE)
+    quantity = models.PositiveIntegerField(default=1)
