@@ -67,3 +67,7 @@ class ItemList(LoginRequiredMixin, ListView):
 
 class ItemDetail(LoginRequiredMixin,DetailView):
     model = Item
+
+class ItemCreat(LoginRequiredMixin,CreateView):
+    model = Item
+    fields = '__all__'
