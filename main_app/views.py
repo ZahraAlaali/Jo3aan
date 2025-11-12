@@ -112,8 +112,8 @@ def changeCartStatus(request, user_id, cart_id):
 
 
 def viewCart(request, user_id):
-    cart = Cart.objects.filter(customer_id=user_id, cart_status="active")
-    cart_details = CartDetails.objects.filter(cart__in=cart).select_related("item")
+    cart = Cart.objects.filter(customer_id=user_id, cart_status="active").first()
+    cart_details = CartDetails.objects.filter(cart=cart).select_related("item")
     for item in cart_details:
         item.name = item.item.name
         item.image = item.item.image
