@@ -51,15 +51,15 @@ def signup(request):
     )
 
 
-# def restaurants_index(request):
-#     restaurants = Restaurant.objects.all
-#     return render(request, "restaurants/index.html", {"restaurants": restaurants})
+def restaurants_index(request):
+    restaurants = Restaurant.objects.all()
+    return render(request, "restaurants/index.html", {"restaurants": restaurants})
 
 
 class RestaurantCreate(CreateView):
     model = Restaurant
     fields = "__all__"
-    success_url = "/"
+    success_url = "/restaurants/"
 
 
 @login_required
@@ -100,3 +100,6 @@ def profile_user_update(request, user_id, profile_id):
         "users/profile_user_update.html",
         {"profile_form": profile_form, "user_form": user_form},
     )
+def restaurant_details(request, restaurant_id):
+    restaurant=Restaurant.objects.get(id=restaurant_id)
+    return render(request, 'restaurants/details.html',{'restaurant':restaurant})

@@ -1,20 +1,19 @@
 {%extends 'base.html'%} {%block content%}
 <h1>restaurants list</h1>
 {%for restaurant in restaurants%}
-      <h2>{{restaurant.name}}</h2>
-      <p>Description: {{restaurant.description}}</p>
-      <p>category: {{restaurant.category}}</p>
-      <p>city: {{restaurant.city}}</p>
-    </div>
-    <div class="card-action">
+<a href="/restaurants/{{restaurant.id}}">
+  <h2>{{restaurant.name}}</h2>
+  <p>Description: {{restaurant.description}}</p>
+  <p>category: {{restaurant.get_category_display}}</p>
+  <p>city: {{restaurant.get_city_display}}</p>
+  <p>open at: {{restaurant.open_at}}</p>
+  <p>close at: {{restaurant.close_at}}</p>
+  <!-- <div class="card-action">
       {% comment %} <a href="{%url 'cats_update' cat.id%}">Update</a>
       <a href="{%url 'cats_delete' cat.id%}">Delete</a> {% endcomment %}
-    </div>
-    {% comment %} {%load static%}
-    <div class="image">
-      <img src={% static cat.img|cut:'main_app/static/'%} alt="" style="width:
-      200px;">
-    </div></a> {% endcomment %}
-  </div>
-</div>
+    </div> -->
+  {%load static%} <img src={% static restaurant.image|cut:'main_app/static/'%}
+  alt="" style="width: 200px;"></a
+>
+
 {%endfor%} {%endblock%}

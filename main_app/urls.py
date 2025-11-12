@@ -21,4 +21,5 @@ urlpatterns = [
         views.profile_user_update,
         name="profile_update",
     ),
+    path('restaurants/<int:restaurant_id>/', views.restaurant_details, name='restaurant_details')
 ]
