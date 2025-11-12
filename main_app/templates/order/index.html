@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<h1>Order</h1>
+{% for order in orders %}
+<tr>
+<td>{{order.restaurant.namr}}</td>
+<tr> {{order.customer.username}}</tr>
+<tr>{{order.total_amount}}</tr>
+<td>
+{% if order.order_status == 'p' %}
+<span> Pending </span>
+{% else %}
+<span> Ready </span>
+{% endif %}
+
+</td>
+</tr>
+
+
+{% endblock %}
