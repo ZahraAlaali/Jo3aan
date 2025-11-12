@@ -75,3 +75,7 @@ class ItemCreat(LoginRequiredMixin,CreateView):
 class ItemUpdate(LoginRequiredMixin, UpdateView):
     model = Item
     fields = ['name', 'description', 'image', 'price' ]
+
+class ItemDelete(LoginRequiredMixin, DeleteView):
+    model = Item
+    success_url = '/item'
