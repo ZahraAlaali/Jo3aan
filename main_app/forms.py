@@ -9,6 +9,12 @@ class CustomUserCreationForm(UserCreationForm):
         fields = ("username", "email")
 
 
+class CustomProfileCreationForm(forms.ModelForm):
+    class Meta:
+        model = Profile
+        fields = ["phone", "profileImage", "role"]
+
+
 class UpdateProfileForm(forms.ModelForm):
     class Meta:
         model = Profile
