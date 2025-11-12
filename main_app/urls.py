@@ -21,4 +21,12 @@ urlpatterns = [
         views.profile_user_update,
         name="profile_update",
     ),
+    # Cart
+    path("cart/add/<int:user_id>/", views.addToCart, name="addToCart"),
+    path(
+        "cart/changeStatus/<int:user_id>/<int:cart_id>/",
+        views.changeCartStatus,
+        name="changeCartStatus",
+    ),  # change the status->place order
+    path("cart/viewCart/<int:user_id>/", views.viewCart, name="viewCart"),
 ]
