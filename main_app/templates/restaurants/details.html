@@ -1,0 +1,10 @@
+{%extends 'base.html'%}
+{%block content%}
+<h1>{{restaurant.name}}</h1>
+<h2>{{restaurant.description}}</h2>
+{%load static%}
+    <div class="image">
+      <img src={% static restaurant.image|cut:'main_app/static/'%} alt="" style="width:
+      200px;">
+<a href="{%url 'restaurant_update' restaurant.id%}">Update {{restaurant.name}} restaurant</a>
+{%endblock%}

@@ -103,3 +103,7 @@ def profile_user_update(request, user_id, profile_id):
 def restaurant_details(request, restaurant_id):
     restaurant=Restaurant.objects.get(id=restaurant_id)
     return render(request, 'restaurants/details.html',{'restaurant':restaurant})
+class RestaurantUpdate(UpdateView):
+    model=Restaurant
+    fields='__all__'
+    success_url='/restaurants/'
