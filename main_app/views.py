@@ -6,7 +6,7 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
-from .models import Restaurant, User, Profile, Cart, CartDetails
+from .models import Restaurant, User, Profile, Cart, CartDetails, Item
 from .forms import (
     CustomUserCreationForm,
     UpdateProfileForm,
@@ -112,7 +112,11 @@ def changeCartStatus(request, user_id, cart_id):
 
 
 def viewCart(request, user_id):
-    cart = Cart.objects.filter(customer_id=user_id)
-    cart_details = CartDetails.objects.filter(cart_id=cart.id)
+    cart = Cart.objects.filter(customer_id=user_id, cart_status="active")
+    cart_details = CartDetails.objects.filter(cart__in=cart).select_related("item")
+    for item in cart_details:
+        item.name = item.item.name
 
-    return render("cart/CartView.html", {"cart": cart, "cart_details": cart_details})
+    return render(
+        request, "cart/CartView.html", {"cart": cart, "cart_details": cart_details}
+    )
