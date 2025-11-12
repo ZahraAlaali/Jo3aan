@@ -6,7 +6,7 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
-from .models import Restaurant
+from .models import Restaurant, Item
 from .forms import CustomUserCreationForm
 
 # Create your views here.
@@ -60,3 +60,8 @@ class ProfileCreate(LoginRequiredMixin, CreateView):
 class ProfileUpdate(LoginRequiredMixin, UpdateView):
     model = Profile
     fields = ["phone", "role", "profileImage"]
+
+
+class ItemList(LoginRequiredMixin, ListView):
+    model = Item
+

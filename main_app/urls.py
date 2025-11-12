@@ -16,4 +16,9 @@ urlpatterns = [
     # profile
     path("profile/", views.profile, name="profile"),
     path("profile/create/", views.ProfileCreate.as_view(), name="craete_profile"),
+
+
+    #item
+    path("item/", views.ItemList.as_view(), name='item_index'),
+
 ]
