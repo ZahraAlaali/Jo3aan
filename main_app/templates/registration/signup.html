@@ -4,8 +4,9 @@
 <p class="red-text">{{error_message}}</p>
 {% endif %}
 
-<form action="{% url 'signup' %}" method="post">
-  {% csrf_token %} {{ form.as_p }}
+<form action="{% url 'signup' %}" method="post" enctype="multipart/form-data">
+  {% csrf_token %} {{ user_form.as_p }}
+  {{ profile_form.as_p }}
   <input type="submit" value="Sign Up" class="btn" />
 </form>
 {% endblock %}
