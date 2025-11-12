@@ -100,4 +100,6 @@ class Item(models.Model):
     image = models.ImageField( upload_to="main_app/static/uploads", null=True, blank=True
     )
     price = models.FloatField()
-
+    
+    def __str__(self):
+        return self.name
