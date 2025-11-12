@@ -110,7 +110,15 @@ class Cart(models.Model):
     customer = models.ForeignKey(User, on_delete=models.CASCADE)
     total_amount = models.FloatField(default=0.0)
     cart_status = models.CharField(max_length=50, choices=STATUS, default=STATUS[0][0])
-    items = models.ManyToManyField(Item)
+    items = models.ManyToManyField(Item, through="CartDetails", related_name="carts")
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        total = 0.0
+        for item in self.cartdetails_set.select_related("item").all():
+            total += item.item.price * item.quantity
+        self.total_amount = total
+        Cart.objects.filter(pk=self.pk).update(total_amount=total)
 
 
 class CartDetails(models.Model):
