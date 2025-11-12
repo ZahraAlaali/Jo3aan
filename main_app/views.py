@@ -116,6 +116,8 @@ def viewCart(request, user_id):
     cart_details = CartDetails.objects.filter(cart__in=cart).select_related("item")
     for item in cart_details:
         item.name = item.item.name
+        item.image = item.item.image
+        item.price = item.item.price
 
     return render(
         request, "cart/CartView.html", {"cart": cart, "cart_details": cart_details}

@@ -1,8 +1,24 @@
 {% extends 'base.html' %} {% block content %}
 
+<h2>CART</h2>
 <div>
-  {% for item in cart_details %}
-  <h5>{{item.name}}</h5>
+  {% for item in cart_details %} {% load static %}
+  <img
+    src="{% static item.image|cut:'main_app/static/' %}"
+    alt=""
+    width="300px"
+  />
+  <h4>{{item.name}}</h4>
+  <h4>{{item.price}}</h4>
+  <div>
+    {% if item.quantity == 1 %}
+    <a href="">delete</a>
+    {% else %}
+    <a href="">-</a>
+    {% endif %} {{item.quantity}}
+    <a href="">+</a>
+  </div>
+
   {% endfor %}
 </div>
 
