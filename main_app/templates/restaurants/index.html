@@ -1,20 +1,19 @@
 {%extends 'base.html'%} {%block content%}
+{{object.name}}
 <h1>restaurants list</h1>
 {%for restaurant in restaurants%}
-      <h2>{{restaurant.name}}</h2>
-      <p>Description: {{restaurant.description}}</p>
-      <p>category: {{restaurant.category}}</p>
-      <p>city: {{restaurant.city}}</p>
-    </div>
-    <div class="card-action">
-      {% comment %} <a href="{%url 'cats_update' cat.id%}">Update</a>
-      <a href="{%url 'cats_delete' cat.id%}">Delete</a> {% endcomment %}
-    </div>
-    {% comment %} {%load static%}
-    <div class="image">
-      <img src={% static cat.img|cut:'main_app/static/'%} alt="" style="width:
-      200px;">
-    </div></a> {% endcomment %}
-  </div>
-</div>
+<a href="/restaurants/{{restaurant.id}}">
+  <h2>{{restaurant.name}}</h2>
+  <p>Description: {{restaurant.description}}</p>
+  <p>category: {{restaurant.get_category_display}}</p>
+  <p>city: {{restaurant.get_city_display}}</p>
+  {% if not restaurant.is_open%}
+  <p>{{restaurant.name}} is closed now and open at {{restaurant.open_at|time:"h:i A"}}</p>
+  {%else%}
+  <p>{{restaurant.name}} close at {{restaurant.close_at|time:"h:i A"}}</p>
+  {%endif%}
+  {%load static%} <img src={% static restaurant.image|cut:'main_app/static/'%}
+  alt="" style="width: 200px;"></a
+>
+
 {%endfor%} {%endblock%}

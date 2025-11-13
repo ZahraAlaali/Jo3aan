@@ -13,6 +13,7 @@ from .forms import (
     UpdateUserForm,
     CustomProfileCreationForm,
 )
+import datetime
 
 # Create your views here.
 
@@ -52,14 +53,24 @@ def signup(request):
 
 
 def restaurants_index(request):
-    restaurants = Restaurant.objects.all
-    return render(request, "restaurants/index.html", {"restaurants": restaurants})
+    restaurants = Restaurant.objects.filter(user=request.user)
+    now = datetime.datetime.now().time()
+    def checkTime():
+        for restaurant in restaurants:
+            if restaurant.close_at< restaurant.open_at:
+                restaurant.is_open=now>=restaurant.open_at or now<=restaurant.close_at
+            else:
+                restaurant.is_open =restaurant.open_at <= now < restaurant.close_at
+    checkTime()
+    return render(
+        request, "restaurants/index.html", {"restaurants": restaurants, "now": now}
+    )
 
 
 class RestaurantCreate(CreateView):
     model = Restaurant
     fields = "__all__"
-    success_url = "/"
+    success_url = "/restaurants/"
 
 
 @login_required
@@ -130,6 +141,21 @@ def profile_user_update(request, user_id, profile_id):
     )
 
 
+def restaurant_details(request, restaurant_id):
+    restaurant = Restaurant.objects.get(id=restaurant_id)
+    return render(request, "restaurants/details.html", {"restaurant": restaurant})
+
+
+class RestaurantUpdate(UpdateView):
+    model = Restaurant
+    fields = "__all__"
+    success_url = "/restaurants/"
+
+
+class RestaurantDelete(DeleteView):
+    model = Restaurant
+    fields = "__all__"
+    success_url = "/restaurants/"
 # Cart
 
 
