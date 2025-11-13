@@ -6,6 +6,8 @@ from django.contrib.auth.models import User
 
 ROLE = (("customer", "Customer"), ("owner", "Owner"))
 
+STATUS = (("active", "active"), ("ordered", "ordered"))
+
 CATEGORIES = (
     ("bahraini", "Bahraini"),
     ("indian", "Indian"),
@@ -94,10 +96,12 @@ class Restaurant(models.Model):
     close_at = models.TimeField()
     open_at = models.TimeField()
 
+
 class Item(models.Model):
     name = models.CharField(max_length=50)
     description = models.TextField(max_length=500)
-    image = models.ImageField( upload_to="main_app/static/uploads", null=True, blank=True
+    image = models.ImageField(
+        upload_to="main_app/static/uploads", null=True, blank=True
     )
     price = models.FloatField()
     restaurant = models.ForeignKey(Restaurant,on_delete=models.CASCADE)
@@ -107,3 +111,23 @@ class Item(models.Model):
 
     def get_absolute_url(self):
         return reverse('item_detail', kwargs={'pk': self.id})
+
+class Cart(models.Model):
+    customer = models.ForeignKey(User, on_delete=models.CASCADE)
+    total_amount = models.FloatField(default=0.0)
+    cart_status = models.CharField(max_length=50, choices=STATUS, default=STATUS[0][0])
+    items = models.ManyToManyField(Item, through="CartDetails", related_name="carts")
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        total = 0.0
+        for item in self.cartdetails_set.select_related("item").all():
+            total += item.item.price * item.quantity
+        self.total_amount = total
+        Cart.objects.filter(pk=self.pk).update(total_amount=total)
+
+
+class CartDetails(models.Model):
+    cart = models.ForeignKey(Cart, on_delete=models.CASCADE)
+    item = models.ForeignKey(Item, on_delete=models.CASCADE)
+    quantity = models.PositiveIntegerField(default=1)

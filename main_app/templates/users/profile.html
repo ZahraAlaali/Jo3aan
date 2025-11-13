@@ -1,5 +1,8 @@
 {% extends "base.html" %}{% block content %}
 <div class="row my-3 p-3">
+  <div class="col s6">
+    <a href="{% url 'profile_update' user.id profile.id %}">Update Profile</a>
+  </div>
   {% load static %}
   <img src="{% static profile.profileImage|cut:'main_app/static/' %}" alt="" />
   <h1>{{user.username}}</h1>
