@@ -16,6 +16,14 @@ urlpatterns = [
     # profile
     path("profile/", views.profile, name="profile"),
     path("profile/create/", views.ProfileCreate.as_view(), name="craete_profile"),
+
+
+    #item
+    path("item/", views.ItemList.as_view(), name='item_list'),
+    path('item/<int:pk>/',views.ItemDetail.as_view(), name='item_detail'),
+    path('item/create/', views.ItemCreat.as_view(), name='item_create'),
+    path('item/<int:pk>/update/', views.ItemUpdate.as_view(), name='item_update'),
+    path('item/<int:pk>/delete/', views.ItemDelete.as_view(), name='item_delete'),
     path(
         "profile/update/<int:user_id>/<int:profile_id>/",
         views.profile_user_update,

@@ -104,7 +104,13 @@ class Item(models.Model):
         upload_to="main_app/static/uploads", null=True, blank=True
     )
     price = models.FloatField()
+    restaurant = models.ForeignKey(Restaurant,on_delete=models.CASCADE)
 
+    def __str__(self):
+        return self.name
+
+    def get_absolute_url(self):
+        return reverse('item_detail', kwargs={'pk': self.id})
 
 class Cart(models.Model):
     customer = models.ForeignKey(User, on_delete=models.CASCADE)
