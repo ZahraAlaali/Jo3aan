@@ -21,5 +21,6 @@
     {% endif %}
     <a href="{% url 'item_list' %}">Back to List</a>
   </div>
+  <form action="{% url addToCart' user.id %}" method="post"></form>
 </div>
 {% endblock %}

@@ -13,6 +13,7 @@ from .forms import (
     UpdateUserForm,
     CustomProfileCreationForm,
 )
+import datetime
 
 # Create your views here.
 
@@ -52,14 +53,24 @@ def signup(request):
 
 
 def restaurants_index(request):
-    restaurants = Restaurant.objects.all
-    return render(request, "restaurants/index.html", {"restaurants": restaurants})
+    restaurants = Restaurant.objects.filter(user=request.user)
+    now = datetime.datetime.now().time()
+    def checkTime():
+        for restaurant in restaurants:
+            if restaurant.close_at< restaurant.open_at:
+                restaurant.is_open=now>=restaurant.open_at or now<=restaurant.close_at
+            else:
+                restaurant.is_open =restaurant.open_at <= now < restaurant.close_at
+    checkTime()
+    return render(
+        request, "restaurants/index.html", {"restaurants": restaurants, "now": now}
+    )
 
 
 class RestaurantCreate(CreateView):
     model = Restaurant
     fields = "__all__"
-    success_url = "/"
+    success_url = "/restaurants/"
 
 
 @login_required
@@ -130,19 +141,22 @@ def profile_user_update(request, user_id, profile_id):
     )
 
 
+def restaurant_details(request, restaurant_id):
+    restaurant = Restaurant.objects.get(id=restaurant_id)
+    return render(request, "restaurants/details.html", {"restaurant": restaurant})
+
+
+class RestaurantUpdate(UpdateView):
+    model = Restaurant
+    fields = "__all__"
+    success_url = "/restaurants/"
+
+
+class RestaurantDelete(DeleteView):
+    model = Restaurant
+    fields = "__all__"
+    success_url = "/restaurants/"
 # Cart
-def addToCart(request, user_id):
-    pass
-
-
-def changeCartStatus(request, user_id, cart_id):
-    # add the cart to the order before changing the status
-    old_cart = Cart.objects.filter(customer_id=user_id).first()
-    old_cart.cart_status = "ordered"
-    old_cart.save()
-
-    new_cart = Cart.objects.create(customerid=user_id, cart_status="active")
-    return ()
 
 
 def viewCart(request, user_id):
@@ -163,3 +177,33 @@ def deleteItemFromCart(request, user_id, item_id):
     itemDeleted = CartDetails.objects.filter(cart=cart, item_id=item_id)
     itemDeleted.delete()
     return redirect(f"/cart/viewCart/{user_id}/")
+
+
+def increaseQty(request, user_id, item_id):
+    cart = cart = Cart.objects.filter(customer_id=user_id, cart_status="active").first()
+    updateItem = CartDetails.objects.filter(cart=cart, item_id=item_id).first()
+    updateItem.quantity += 1
+    updateItem.save()
+    return redirect(f"/cart/viewCart/{user_id}/")
+
+
+def decreaseQty(request, user_id, item_id):
+    cart = cart = Cart.objects.filter(customer_id=user_id, cart_status="active").first()
+    updateItem = CartDetails.objects.filter(cart=cart, item_id=item_id).first()
+    updateItem.quantity -= 1
+    updateItem.save()
+    return redirect(f"/cart/viewCart/{user_id}/")
+
+
+def addToCart(request, user_id):
+    pass
+
+
+def changeCartStatus(request, user_id, cart_id):
+    # add the cart to the order before changing the status
+    old_cart = Cart.objects.filter(customer_id=user_id).first()
+    old_cart.cart_status = "ordered"
+    old_cart.save()
+
+    new_cart = Cart.objects.create(customerid=user_id, cart_status="active")
+    return ()

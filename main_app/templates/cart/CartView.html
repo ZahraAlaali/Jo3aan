@@ -12,11 +12,11 @@
   <h4>{{total_price}}</h4>
   <div>
     {% if item.quantity == 1 %}
-    <a href="{% url 'deleteItemFromCart' user.id item.id %}">delete</a>
+    <a href="{% url 'deleteItemFromCart' user.id item.item.id %}">delete</a>
     {% else %}
-    <a href="">-</a>
+    <a href="{% url 'decreaseQty' user.id item.item.id %}">-</a>
     {% endif %} {{item.quantity}}
-    <a href="">+</a>
+    <a href="{% url 'increaseQty' user.id item.item.id %}">+</a>
   </div>
 
   {% endfor %}
