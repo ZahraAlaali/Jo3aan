@@ -163,3 +163,15 @@ def deleteItemFromCart(request, user_id, item_id):
     itemDeleted = CartDetails.objects.filter(cart=cart, item_id=item_id)
     itemDeleted.delete()
     return redirect(f"/cart/viewCart/{user_id}/")
+
+
+def increaseQty(request, user_id, item_id):
+    cart = cart = Cart.objects.filter(customer_id=user_id, cart_status="active").first()
+    updateItem = CartDetails.objects.filter(cart=cart, item_id=item_id).first()
+    updateItem.quantity += 1
+    updateItem.save()
+    return redirect(f"/cart/viewCart/{user_id}/")
+
+
+def decreaseQty(request, user_id, item_id):
+    pass

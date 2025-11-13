@@ -16,7 +16,7 @@
     {% else %}
     <a href="">-</a>
     {% endif %} {{item.quantity}}
-    <a href="">+</a>
+    <a href="{% url 'increaseQty' user.id item.item.id %}">+</a>
   </div>
 
   {% endfor %}
