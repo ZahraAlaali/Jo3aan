@@ -1,7 +1,26 @@
-{%extends 'base.html'%} {%block content%}
-{{object.name}}
+{%extends 'base.html'%} {%block content%} {%load static%} {{object.name}}
 <h1>restaurants list</h1>
-{%for restaurant in restaurants%}
+{{user.profile.role}}
+{% if user.profile.role == "customer" %}
+{%for restaurant in customer_restaurants%}
+<a href="/restaurants/{{restaurant.id}}">
+  <h2>{{restaurant.name}}</h2>
+  <p>Description: {{restaurant.description}}</p>
+  <p>category: {{restaurant.get_category_display}}</p>
+  <p>city: {{restaurant.get_city_display}}</p>
+  {{restaurant.is_open}}
+  {% if not restaurant.is_open%}
+  <p>{{restaurant.name}} is closed now and open at {{restaurant.open_at|time:"h:i A"}}</p>
+  {%else%}
+  <p>{{restaurant.name}} close at {{restaurant.close_at|time:"h:i A"}}</p>
+  {%endif%}
+  <img src={% static restaurant.image|cut:'main_app/static/'%} alt="" style="width:200px;">
+</a>
+
+{%endfor%}
+{%else%}
+{%for restaurant in owner_restaurants%}
+{{restaurant.is_open}}
 <a href="/restaurants/{{restaurant.id}}">
   <h2>{{restaurant.name}}</h2>
   <p>Description: {{restaurant.description}}</p>
@@ -12,8 +31,7 @@
   {%else%}
   <p>{{restaurant.name}} close at {{restaurant.close_at|time:"h:i A"}}</p>
   {%endif%}
-  {%load static%} <img src={% static restaurant.image|cut:'main_app/static/'%}
-  alt="" style="width: 200px;"></a
->
+  <img src={% static restaurant.image|cut:'main_app/static/'%} alt="" style="width:200px;">
+</a>
 
-{%endfor%} {%endblock%}
+{%endfor%} {%endif%} {%endblock%}
