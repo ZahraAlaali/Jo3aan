@@ -19,10 +19,14 @@
           </ul>
           <ul class="right">
             {% if user.is_authenticated %}
-
+            {{user.profile.role}}
             <li>
               <a href="{% url 'profile' %}">Profile</a>
             </li>
+
+            <li><a href="{% url 'restaurant_create' %}">Create restaurant</a></li>
+
+            <li><a href="{% url 'restaurants_index' %}">View restaurants</a></li>
             <li>
               <form action="{% url 'logout' %}" method="post">
                 {% csrf_token %}
@@ -30,8 +34,6 @@
               </form>
             </li>
             {% else %}
-            <li><a href="{% url 'restaurant_create' %}">Create restaurant</a></li>
-            <li><a href="{% url 'restaurants_index' %}">View restaurants</a></li>
             <li><a href="{% url 'login' %}">Login</a></li>
             <li><a href="{% url 'signup' %}">Sign Up</a></li>
             {% endif %}

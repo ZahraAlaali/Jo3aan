@@ -95,6 +95,6 @@ class Restaurant(models.Model):
     )
     close_at = models.TimeField()
     open_at = models.TimeField()
-
+    user=models.ForeignKey(User,on_delete=models.CASCADE)
     def __str__(self):
         return self.name
