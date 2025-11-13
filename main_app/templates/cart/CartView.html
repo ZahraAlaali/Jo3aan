@@ -1,0 +1,26 @@
+{% extends 'base.html' %} {% block content %}
+
+<h2>CART</h2>
+<div>
+  {% for item in cart_details %} {% load static %}
+  <img
+    src="{% static item.image|cut:'main_app/static/' %}"
+    alt=""
+    width="300px"
+  />
+  <h4>{{item.name}}</h4>
+  <h4>{{total_price}}</h4>
+  <div>
+    {% if item.quantity == 1 %}
+    <a href="{% url 'deleteItemFromCart' user.id item.id %}">delete</a>
+    {% else %}
+    <a href="">-</a>
+    {% endif %} {{item.quantity}}
+    <a href="">+</a>
+  </div>
+
+  {% endfor %}
+  <div>Subtotal &nbsp; BHD {{cart.total_amount}}</div>
+</div>
+
+{% endblock %}

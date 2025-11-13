@@ -131,3 +131,12 @@ class CartDetails(models.Model):
     cart = models.ForeignKey(Cart, on_delete=models.CASCADE)
     item = models.ForeignKey(Item, on_delete=models.CASCADE)
     quantity = models.PositiveIntegerField(default=1)
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        self.cart.save()
+
+    def delete(self, *args, **kwargs):
+        cart = self.cart
+        super().delete(*args, **kwargs)
+        cart.save()
