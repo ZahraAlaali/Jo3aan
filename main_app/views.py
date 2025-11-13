@@ -91,7 +91,7 @@ class ItemDetail(LoginRequiredMixin, DetailView):
     model = Item
 
 
-class ItemCreat(LoginRequiredMixin, CreateView):
+class ItemCreate(LoginRequiredMixin, CreateView):
     model = Item
     fields = "__all__"
 
@@ -128,47 +128,8 @@ def profile_user_update(request, user_id, profile_id):
         "users/profile_user_update.html",
         {"profile_form": profile_form, "user_form": user_form},
     )
-# @login_required
-# def create_order(request, restaurant_id):
-
-#     profile = get_object_or_404(Profile, user=request.user)
-
-
-#     restaurant = get_object_or_404(Restaurant, id=restaurant_id)
-
-
-#     cart = request.session.get('cart', [])
-
-#     if not cart:
-#         return redirect('cart')
-
-#     total_amount = 0
-#     for c in cart:
-#         item = get_object_or_404(Item, id=c['item_id'])
-#         total_amount += item.price * c['quantity']
-#     order = Order.objects.create(
-#         restaurant=restaurant,
-#         customer=profile,
-#         total_amount=total_amount
-#     )
-
-
-#     request.session['cart'] = []
-
-
-#     return render(request, 'orders/order_success.html', {'order': order})
-
-
-
-
-
-
-
-
 
 # Cart
-
-
 def viewCart(request, user_id):
     cart = Cart.objects.filter(customer_id=user_id, cart_status="active").first()
     cart_details = CartDetails.objects.filter(cart=cart).select_related("item")
@@ -215,5 +176,46 @@ def changeCartStatus(request, user_id, cart_id):
     old_cart.cart_status = "ordered"
     old_cart.save()
 
-    new_cart = Cart.objects.create(customerid=user_id, cart_status="active")
+    new_cart = Cart.objects.create(customer_id=user_id, cart_status="active")
     return ()
+
+# Order
+
+# @login_required
+# def create_order(request, restaurant_id):
+
+#     profile = get_object_or_404(Profile, user=request.user)
+
+
+#     restaurant = get_object_or_404(Restaurant, id=restaurant_id)
+
+
+#     cart = request.session.get('cart', [])
+
+#     if not cart:
+#         return redirect('cart')
+
+#     total_amount = 0
+#     for c in cart:
+#         item = get_object_or_404(Item, id=c['item_id'])
+#         total_amount += item.price * c['quantity']
+#     order = Order.objects.create(
+#         restaurant=restaurant,
+#         customer=profile,
+#         total_amount=total_amount
+#     )
+
+
+#     request.session['cart'] = []
+
+
+#     return render(request, 'orders/order_success.html', {'order': order})
+
+
+
+
+
+
+
+
+
