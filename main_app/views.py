@@ -6,7 +6,8 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
-from .models import Restaurant, User, Profile
+from .models import Restaurant, Item,User, Profile
+from .forms import CustomUserCreationForm
 from .forms import (
     CustomUserCreationForm,
     UpdateProfileForm,
@@ -78,6 +79,28 @@ class ProfileCreate(LoginRequiredMixin, CreateView):
         return super().form_valid(form)
 
 
+class ProfileUpdate(LoginRequiredMixin, UpdateView):
+    model = Profile
+    fields = ["phone", "role", "profileImage"]
+
+
+class ItemList(LoginRequiredMixin, ListView):
+    model = Item
+
+class ItemDetail(LoginRequiredMixin,DetailView):
+    model = Item
+
+class ItemCreat(LoginRequiredMixin,CreateView):
+    model = Item
+    fields = '__all__'
+
+class ItemUpdate(LoginRequiredMixin, UpdateView):
+    model = Item
+    fields = ['name', 'description', 'image', 'price' ]
+
+class ItemDelete(LoginRequiredMixin, DeleteView):
+    model = Item
+    success_url = '/item'
 @login_required
 def profile_user_update(request, user_id, profile_id):
     user = get_object_or_404(User, pk=user_id)
