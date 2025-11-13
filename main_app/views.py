@@ -131,18 +131,6 @@ def profile_user_update(request, user_id, profile_id):
 
 
 # Cart
-def addToCart(request, user_id):
-    pass
-
-
-def changeCartStatus(request, user_id, cart_id):
-    # add the cart to the order before changing the status
-    old_cart = Cart.objects.filter(customer_id=user_id).first()
-    old_cart.cart_status = "ordered"
-    old_cart.save()
-
-    new_cart = Cart.objects.create(customerid=user_id, cart_status="active")
-    return ()
 
 
 def viewCart(request, user_id):
@@ -163,3 +151,33 @@ def deleteItemFromCart(request, user_id, item_id):
     itemDeleted = CartDetails.objects.filter(cart=cart, item_id=item_id)
     itemDeleted.delete()
     return redirect(f"/cart/viewCart/{user_id}/")
+
+
+def increaseQty(request, user_id, item_id):
+    cart = cart = Cart.objects.filter(customer_id=user_id, cart_status="active").first()
+    updateItem = CartDetails.objects.filter(cart=cart, item_id=item_id).first()
+    updateItem.quantity += 1
+    updateItem.save()
+    return redirect(f"/cart/viewCart/{user_id}/")
+
+
+def decreaseQty(request, user_id, item_id):
+    cart = cart = Cart.objects.filter(customer_id=user_id, cart_status="active").first()
+    updateItem = CartDetails.objects.filter(cart=cart, item_id=item_id).first()
+    updateItem.quantity -= 1
+    updateItem.save()
+    return redirect(f"/cart/viewCart/{user_id}/")
+
+
+def addToCart(request, user_id):
+    pass
+
+
+def changeCartStatus(request, user_id, cart_id):
+    # add the cart to the order before changing the status
+    old_cart = Cart.objects.filter(customer_id=user_id).first()
+    old_cart.cart_status = "ordered"
+    old_cart.save()
+
+    new_cart = Cart.objects.create(customerid=user_id, cart_status="active")
+    return ()
