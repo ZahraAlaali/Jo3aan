@@ -7,6 +7,7 @@
     <title>Jo3aan</title>
   </head>
   <body>
+    <p>Logged in as: {{ user }}</p>
     <header class="navbar-fixed">
       <nav>
         <div class="nav-wrapper">
@@ -25,7 +26,6 @@
 
             {% if user.profile.role == "customer" %}
             <li>
-              <a href="{% url 'restaurants_index' %}">View restaurants</a>
             </li>
             <li>
               <a href="{% url 'viewCart' user.id %}">Cart</a>
@@ -33,11 +33,13 @@
 
             {% endif %} {% if user.profile.role == "owner" %}
             <li>
+
               <a href="{% url 'restaurant_create' %}">Create restaurant</a>
             </li>
             <li><a href="{% url 'item_create' %}">Create item</a></li>
 
             {% endif %}
+            <a href="{% url 'restaurants_index' %}">View restaurants</a>
             <li>
               <form action="{% url 'logout' %}" method="post">
                 {% csrf_token %}
