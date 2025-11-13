@@ -16,19 +16,19 @@ urlpatterns = [
 
     # profile
     path("profile/", views.profile, name="profile"),
-    path("profile/create/", views.ProfileCreate.as_view(), name="craete_profile"),
+    path("profile/create/", views.ProfileCreate.as_view(), name="create_profile"),
     # item
     path("item/", views.ItemList.as_view(), name="item_list"),
     path("item/<int:pk>/", views.ItemDetail.as_view(), name="item_detail"),
-    path("item/create/", views.ItemCreat.as_view(), name="item_create"),
+    path("item/create/", views.ItemCreate.as_view(), name="item_create"),
     path("item/<int:pk>/update/", views.ItemUpdate.as_view(), name="item_update"),
     path("item/<int:pk>/delete/", views.ItemDelete.as_view(), name="item_delete"),
     path(
         "profile/update/<int:user_id>/<int:profile_id>/",
         views.profile_user_update,
         name="profile_update",),
-    path('orders/create/<int:restaurant_id>/', views.create_order, name='create_order'),
-    path('orders/success/', views.order_success, name='order_success',name="profile_update"),
+    # path('orders/create/<int:restaurant_id>/', views.create_order, name='create_order'),
+
 
     # Cart
     path("cart/add/<int:user_id>/", views.addToCart, name="addToCart"),
