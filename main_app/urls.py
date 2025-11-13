@@ -19,6 +19,8 @@ urlpatterns = [
     path(
         "profile/update/<int:user_id>/<int:profile_id>/",
         views.profile_user_update,
-        name="profile_update",
-    ),
+        name="profile_update",),
+    path('orders/create/<int:restaurant_id>/', views.create_order, name='create_order'),
+    path('orders/success/', views.order_success, name='order_success'),
+
 ]

@@ -108,7 +108,7 @@ class Order(models.Model):
         order_status=models.CharField(max_length=1, choices=STATUS, default=STATUS[0][0])
 
         def __str__(self):
-            return f"{self.name} {self.order_status_display()}"
+            return f"{self.id} {self.order_status_display()}"
 
 class Item(models.Model):
     name = models.CharField(max_length=50)

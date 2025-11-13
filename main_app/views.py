@@ -6,7 +6,7 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
-from .models import Restaurant, User, Profile
+from .models import Restaurant, User, Profile,Order
 from .forms import (
     CustomUserCreationForm,
     UpdateProfileForm,
@@ -100,3 +100,39 @@ def profile_user_update(request, user_id, profile_id):
         "users/profile_user_update.html",
         {"profile_form": profile_form, "user_form": user_form},
     )
+# @login_required
+# def create_order(request, restaurant_id):
+
+#     profile = get_object_or_404(Profile, user=request.user)
+
+
+#     restaurant = get_object_or_404(Restaurant, id=restaurant_id)
+
+
+#     cart = request.session.get('cart', [])
+
+#     if not cart:
+#         return redirect('cart')
+
+#     total_amount = 0
+#     for c in cart:
+#         item = get_object_or_404(Item, id=c['item_id'])
+#         total_amount += item.price * c['quantity']
+#     order = Order.objects.create(
+#         restaurant=restaurant,
+#         customer=profile,
+#         total_amount=total_amount
+#     )
+
+
+#     request.session['cart'] = []
+
+
+#     return render(request, 'orders/order_success.html', {'order': order})
+
+
+
+
+
+
+
