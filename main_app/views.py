@@ -101,12 +101,16 @@ class RestaurantUpdate(LoginRequiredMixin,UpdateView):
         form.fields['open_at'].widget = forms.TimeInput(attrs={'type': 'time'})
         form.fields['close_at'].widget = forms.TimeInput(attrs={'type': 'time'})
         return form
+    def get_queryset(self):
+        return Restaurant.objects.filter(user=self.request.user)
 
 
 class RestaurantDelete(LoginRequiredMixin,DeleteView):
     model = Restaurant
     fields = "__all__"
     success_url = "/restaurants/"
+    def get_queryset(self):
+        return Restaurant.objects.filter(user=self.request.user)
 
 @login_required
 def restaurant_details(request, restaurant_id):
