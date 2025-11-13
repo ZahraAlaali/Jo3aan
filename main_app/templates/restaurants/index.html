@@ -1,14 +1,16 @@
-{%extends 'base.html'%} {%block content%} {%load static%} {{object.name}}
+{%extends 'base.html'%} {%block content%} {%load static%}
 <h1>restaurants list</h1>
-{{user.profile.role}}
-{% if user.profile.role == "customer" %}
-{%for restaurant in customer_restaurants%}
+{%for restaurant in restaurants%}
 <a href="/restaurants/{{restaurant.id}}">
   <h2>{{restaurant.name}}</h2>
+  {%if user.profile.role == 'customer'%}
   <p>Description: {{restaurant.description}}</p>
-  <p>category: {{restaurant.get_category_display}}</p>
+  <p>categories:  </p>
+  <ul>  {%for category in restaurant.categories.all%}
+    <li>{{category.name}}</li>
+  {%endfor%}</ul>
+
   <p>city: {{restaurant.get_city_display}}</p>
-  {{restaurant.is_open}}
   {% if not restaurant.is_open%}
   <p>{{restaurant.name}} is closed now and open at {{restaurant.open_at|time:"h:i A"}}</p>
   {%else%}
@@ -16,22 +18,6 @@
   {%endif%}
   <img src={% static restaurant.image|cut:'main_app/static/'%} alt="" style="width:200px;">
 </a>
-
+{%endif%}
 {%endfor%}
-{%else%}
-{%for restaurant in owner_restaurants%}
-{{restaurant.is_open}}
-<a href="/restaurants/{{restaurant.id}}">
-  <h2>{{restaurant.name}}</h2>
-  <p>Description: {{restaurant.description}}</p>
-  <p>category: {{restaurant.get_category_display}}</p>
-  <p>city: {{restaurant.get_city_display}}</p>
-  {% if not restaurant.is_open%}
-  <p>{{restaurant.name}} is closed now and open at {{restaurant.open_at|time:"h:i A"}}</p>
-  {%else%}
-  <p>{{restaurant.name}} close at {{restaurant.close_at|time:"h:i A"}}</p>
-  {%endif%}
-  <img src={% static restaurant.image|cut:'main_app/static/'%} alt="" style="width:200px;">
-</a>
-
-{%endfor%} {%endif%} {%endblock%}
+{%endblock%}
