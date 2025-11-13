@@ -1,14 +1,30 @@
 {%extends 'base.html'%}
 {%block content%}
 
-<h1>{{restaurant.name}}</h1>
-<h2>{{restaurant.description}}</h2>
 {%load static%}
-    <div class="image">
-      <img src={% static restaurant.image|cut:'main_app/static/'%} alt="" style="width:
-      200px;">
-      <br>
+<img src={% static restaurant.image|cut:'main_app/static/'%} alt="" style="width:200px;">
+<br>
+<h1>{{restaurant.name}} in {{restaurant.get_city_display}}</h1>
+<h2>{{restaurant.description}}</h2>
+<p>Categories:  </p>
+  <ul>  {%for category in restaurant.categories.all%}
+    <li>{{category.name}}</li>
+  {%endfor%}</ul>
+{%if user.profile.role == 'owner'%}
+{% if not restaurant.is_open%}
+  <p>Open at {{restaurant.open_at|time:"h:i A"}}</p>
+  <p>Close at {{restaurant.close_at|time:"h:i A"}}</p>
+  {%endif%}
 <a href="{%url 'restaurant_update' restaurant.id%}">Update {{restaurant.name}} restaurant</a>
 <br>
 <a href="{%url 'restaurant_delete' restaurant.id%}">Delete {{restaurant.name}} restaurant</a>
+<br>
+{%else%}
+{% if not restaurant.is_open%}
+<p>{{restaurant.name}} is closed now and open at {{restaurant.open_at|time:"h:i A"}}</p>
+{%else%}
+<p>{{restaurant.name}} close at {{restaurant.close_at|time:"h:i A"}}</p>
+{%endif%}
+{%endif%}
+<a href="{%url 'restaurants_index'%}">Back</a>
 {%endblock%}
