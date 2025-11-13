@@ -19,13 +19,19 @@
           </ul>
           <ul class="right">
             {% if user.is_authenticated %}
-            <!-- just for customer -->
-            <a href="{% url 'viewCart' user.id %}">Cart</a>
+
             <li>
               <a href="{% url 'profile' %}">Profile</a>
             </li>
+            <!-- just for customer -->
+            {% if user.profile.role == "customer" %}
+            <li>
+              <a href="{% url 'viewCart' user.id %}">Cart</a>
+            </li>
+            {% endif %} {% if user.profile.role == "owner" %}
             <li><a href="{% url 'item_create' %}">Create item</a></li>
             <li>
+              {% endif %}
               <form action="{% url 'logout' %}" method="post">
                 {% csrf_token %}
                 <button type="submit">Logout</button>
