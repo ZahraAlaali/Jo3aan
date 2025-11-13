@@ -6,7 +6,7 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
-from .models import Restaurant, User, Profile
+from .models import Restaurant, User, Profile, Cart, CartDetails, Item
 from .forms import (
     CustomUserCreationForm,
     UpdateProfileForm,
@@ -89,6 +89,34 @@ class ProfileCreate(LoginRequiredMixin, CreateView):
         return super().form_valid(form)
 
 
+class ProfileUpdate(LoginRequiredMixin, UpdateView):
+    model = Profile
+    fields = ["phone", "role", "profileImage"]
+
+
+class ItemList(LoginRequiredMixin, ListView):
+    model = Item
+
+
+class ItemDetail(LoginRequiredMixin, DetailView):
+    model = Item
+
+
+class ItemCreat(LoginRequiredMixin, CreateView):
+    model = Item
+    fields = "__all__"
+
+
+class ItemUpdate(LoginRequiredMixin, UpdateView):
+    model = Item
+    fields = ["name", "description", "image", "price"]
+
+
+class ItemDelete(LoginRequiredMixin, DeleteView):
+    model = Item
+    success_url = "/item"
+
+
 @login_required
 def profile_user_update(request, user_id, profile_id):
     user = get_object_or_404(User, pk=user_id)
@@ -128,3 +156,54 @@ class RestaurantDelete(DeleteView):
     model = Restaurant
     fields = "__all__"
     success_url = "/restaurants/"
+# Cart
+
+
+def viewCart(request, user_id):
+    cart = Cart.objects.filter(customer_id=user_id, cart_status="active").first()
+    cart_details = CartDetails.objects.filter(cart=cart).select_related("item")
+    for item in cart_details:
+        item.name = item.item.name
+        item.image = item.item.image
+        item.total_price = item.item.price * item.quantity
+
+    return render(
+        request, "cart/CartView.html", {"cart": cart, "cart_details": cart_details}
+    )
+
+
+def deleteItemFromCart(request, user_id, item_id):
+    cart = Cart.objects.filter(customer_id=user_id, cart_status="active").first()
+    itemDeleted = CartDetails.objects.filter(cart=cart, item_id=item_id)
+    itemDeleted.delete()
+    return redirect(f"/cart/viewCart/{user_id}/")
+
+
+def increaseQty(request, user_id, item_id):
+    cart = cart = Cart.objects.filter(customer_id=user_id, cart_status="active").first()
+    updateItem = CartDetails.objects.filter(cart=cart, item_id=item_id).first()
+    updateItem.quantity += 1
+    updateItem.save()
+    return redirect(f"/cart/viewCart/{user_id}/")
+
+
+def decreaseQty(request, user_id, item_id):
+    cart = cart = Cart.objects.filter(customer_id=user_id, cart_status="active").first()
+    updateItem = CartDetails.objects.filter(cart=cart, item_id=item_id).first()
+    updateItem.quantity -= 1
+    updateItem.save()
+    return redirect(f"/cart/viewCart/{user_id}/")
+
+
+def addToCart(request, user_id):
+    pass
+
+
+def changeCartStatus(request, user_id, cart_id):
+    # add the cart to the order before changing the status
+    old_cart = Cart.objects.filter(customer_id=user_id).first()
+    old_cart.cart_status = "ordered"
+    old_cart.save()
+
+    new_cart = Cart.objects.create(customerid=user_id, cart_status="active")
+    return ()

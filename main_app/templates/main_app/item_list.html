@@ -1,0 +1,20 @@
+{% extends 'base.html' %} {% block content %}
+
+<h1>Item List</h1>
+{% for item in item_list %}
+<div>
+  <a href="{% url 'item_detail' item.id %}">
+    <div>
+      <div>
+        <h3>{{ item.name }}</h3>
+        <div>
+          {% load static %}
+          <img width="100px" height="100px"
+          src="{% static item.image|cut:'main_app/static/' %}">
+        </div>
+        <p>{{ item.price }}</p>
+      </div>
+    </div>
+  </a>
+</div>
+{% endfor %} {% endblock %}

@@ -27,6 +27,12 @@
             <li><a href="{% url 'restaurant_create' %}">Create restaurant</a></li>
 
             <li><a href="{% url 'restaurants_index' %}">View restaurants</a></li>
+            <!-- just for customer -->
+            <a href="{% url 'viewCart' user.id %}">Cart</a>
+            <li>
+              <a href="{% url 'profile' %}">Profile</a>
+            </li>
+            <li><a href="{% url 'item_create' %}">Create item</a></li>
             <li>
               <form action="{% url 'logout' %}" method="post">
                 {% csrf_token %}
@@ -34,6 +40,7 @@
               </form>
             </li>
             {% else %}
+         
             <li><a href="{% url 'login' %}">Login</a></li>
             <li><a href="{% url 'signup' %}">Sign Up</a></li>
             {% endif %}
@@ -43,9 +50,7 @@
     </header>
     <main class="container">{% block content %} {% endblock %}</main>
     <footer class="page-footer">
-      <div class="right">
-        All Rights Reserved, &copy, 2025 Jo3aan &nbsp;
-      </div>
+      <div class="right">All Rights Reserved, &copy, 2025 Jo3aan &nbsp;</div>
     </footer>
   </body>
 </html>
