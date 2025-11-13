@@ -53,24 +53,34 @@ def signup(request):
 
 
 def restaurants_index(request):
-    restaurants = Restaurant.objects.filter(user=request.user)
+    owner_restaurants = Restaurant.objects.filter(user=request.user)
+    customer_restaurants = Restaurant.objects.all()
+
     now = datetime.datetime.now().time()
     def checkTime():
-        for restaurant in restaurants:
+        for restaurant in customer_restaurants:
+            if restaurant.close_at< restaurant.open_at:
+                restaurant.is_open=now>=restaurant.open_at or now<=restaurant.close_at
+            else:
+                restaurant.is_open =restaurant.open_at <= now < restaurant.close_at
+        for restaurant in owner_restaurants:
             if restaurant.close_at< restaurant.open_at:
                 restaurant.is_open=now>=restaurant.open_at or now<=restaurant.close_at
             else:
                 restaurant.is_open =restaurant.open_at <= now < restaurant.close_at
     checkTime()
     return render(
-        request, "restaurants/index.html", {"restaurants": restaurants, "now": now}
+        request, "restaurants/index.html", {"customer_restaurants": customer_restaurants, 'owner_restaurants':owner_restaurants, "now": now}
     )
 
 
-class RestaurantCreate(CreateView):
+class RestaurantCreate(LoginRequiredMixin,CreateView):
     model = Restaurant
-    fields = "__all__"
+    fields = ['name','description','image','city','category','close_at','open_at']
     success_url = "/restaurants/"
+    def form_valid(self,form):
+        form.instance.user=self.request.user
+        return super().form_valid(form)
 
 
 @login_required
@@ -148,7 +158,7 @@ def restaurant_details(request, restaurant_id):
 
 class RestaurantUpdate(UpdateView):
     model = Restaurant
-    fields = "__all__"
+    fields = ['name','description','image','city','category','close_at','open_at']
     success_url = "/restaurants/"
 
 
