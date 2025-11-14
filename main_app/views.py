@@ -179,38 +179,6 @@ def changeCartStatus(request, user_id, cart_id):
     new_cart = Cart.objects.create(customer_id=user_id, cart_status="active")
     return ()
 
-# Order
-
-# @login_required
-# def create_order(request, restaurant_id):
-
-#     profile = get_object_or_404(Profile, user=request.user)
-
-
-#     restaurant = get_object_or_404(Restaurant, id=restaurant_id)
-
-
-#     cart = request.session.get('cart', [])
-
-#     if not cart:
-#         return redirect('cart')
-
-#     total_amount = 0
-#     for c in cart:
-#         item = get_object_or_404(Item, id=c['item_id'])
-#         total_amount += item.price * c['quantity']
-#     order = Order.objects.create(
-#         restaurant=restaurant,
-#         customer=profile,
-#         total_amount=total_amount
-#     )
-
-
-#     request.session['cart'] = []
-
-
-#     return render(request, 'orders/order_success.html', {'order': order})
-
 
 
 
