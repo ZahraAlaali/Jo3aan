@@ -109,16 +109,6 @@ class Restaurant(models.Model):
     def __str__(self):
         return self.name
 
-class Order(models.Model):
-        restaurant = models.ForeignKey('Restaurant', on_delete=models.CASCADE)
-        # customer = models.ForeignKey('Customer', on_delete=models.CASCADE)
-        # cart_details = models.ForeignKey('CartDetails', on_delete=models.CASCADE)
-
-        total_amount=models.FloatField()
-        order_status=models.CharField(max_length=1, choices=STATUS, default=STATUS[0][0])
-
-        def __str__(self):
-            return f"{self.id} {self.order_status_display()}"
 
 class Item(models.Model):
     name = models.CharField(max_length=50)
@@ -163,3 +153,14 @@ class CartDetails(models.Model):
         cart = self.cart
         super().delete(*args, **kwargs)
         cart.save()
+
+        class Order(models.Model):
+        restaurant = models.ForeignKey('Restaurant', on_delete=models.CASCADE)
+        # customer = models.ForeignKey('Customer', on_delete=models.CASCADE)
+        # cart_details = models.ForeignKey('CartDetails', on_delete=models.CASCADE)
+
+        total_amount=models.FloatField()
+        order_status=models.CharField(max_length=1, choices=STATUS, default=STATUS[0][0])
+
+        def __str__(self):
+            return f"{self.id} {self.order_status_display()}"
