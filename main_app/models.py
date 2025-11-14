@@ -68,6 +68,7 @@ CITIES = (
     ("karbabad", "Karbabad"),
     ("naim", "Al-Naim"),
     ("gudaibiya", "Gudaibiya"),
+    ("maqabah",'Maqabah')
 )
 STATUS = (
     ("P", "Pending"),
@@ -75,7 +76,11 @@ STATUS = (
 )
 
 # Create your models here.
+class Category(models.Model):
+    name = models.CharField(max_length=50, unique=True)
 
+    def __str__(self):
+        return self.name
 
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
@@ -91,15 +96,18 @@ class Profile(models.Model):
 
 
 class Restaurant(models.Model):
-    restaurant_name = models.CharField(max_length=50)
-    restaurant_description = models.TextField(max_length=250)
-    restaurant_image = models.ImageField(
+    name = models.CharField(max_length=50)
+    description = models.TextField(max_length=250)
+    image = models.ImageField(
         upload_to="main_app/static/uploads", null=True, blank=True
     )
-    city = models.CharField(max_length=20, choices=CITIES, default="")
-    category = models.CharField(max_length=20, choices=CATEGORIES, default="")
-    close_at = models.TimeField()
+    city = models.CharField(max_length=20, choices=CITIES, default=CITIES[0][0])
+    categories = models.ManyToManyField(Category)
     open_at = models.TimeField()
+    close_at = models.TimeField()
+    user=models.ForeignKey(User,on_delete=models.CASCADE)
+    def __str__(self):
+        return self.name
 
 class Order(models.Model):
         restaurant = models.ForeignKey('Restaurant', on_delete=models.CASCADE)

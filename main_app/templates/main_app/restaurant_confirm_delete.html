@@ -1,0 +1,9 @@
+{%extends 'base.html'%}{% block content %}
+<h1>Delete cat</h1>
+<h4>Are you sure you want to delete {{object.name}}?</h4>
+<form action="" method="post">
+  {%csrf_token%}
+  <input type="submit" value="Yes-delete" class="btn">
+  <a href="{%url 'restaurants_index'%}" class="btn red">Cancel</a>
+</form>
+{% endblock %}
