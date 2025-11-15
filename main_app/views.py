@@ -12,6 +12,7 @@ from .forms import (
     UpdateProfileForm,
     UpdateUserForm,
     CustomProfileCreationForm,
+    ItemForm
 )
 import datetime
 from django import forms
@@ -139,29 +140,6 @@ class ProfileUpdate(LoginRequiredMixin, UpdateView):
 
 
 
-class ItemList(LoginRequiredMixin, ListView):
-    model = Item
-
-
-class ItemDetail(LoginRequiredMixin, DetailView):
-    model = Item
-
-
-class ItemCreat(LoginRequiredMixin, CreateView):
-    model = Item
-    fields = "__all__"
-
-
-class ItemUpdate(LoginRequiredMixin, UpdateView):
-    model = Item
-    fields = ["name", "description", "image", "price"]
-
-
-class ItemDelete(LoginRequiredMixin, DeleteView):
-    model = Item
-    success_url = "/item"
-
-
 @login_required
 def profile_user_update(request, user_id, profile_id):
     user = get_object_or_404(User, pk=user_id)
@@ -189,8 +167,6 @@ def profile_user_update(request, user_id, profile_id):
 
 
 # Cart
-
-
 def viewCart(request, user_id):
     cart = Cart.objects.filter(customer_id=user_id, cart_status="active").first()
     cart_details = CartDetails.objects.filter(cart=cart).select_related("item")
@@ -239,3 +215,36 @@ def changeCartStatus(request, user_id, cart_id):
 
     new_cart = Cart.objects.create(customerid=user_id, cart_status="active")
     return ()
+
+#Items
+class ItemList(LoginRequiredMixin, ListView):
+    model = Item
+
+
+class ItemDetail(LoginRequiredMixin, DetailView):
+    model = Item
+
+
+class ItemCreat(LoginRequiredMixin, CreateView):
+    model = Item
+    fields = "__all__"
+
+
+class ItemUpdate(LoginRequiredMixin, UpdateView):
+    model = Item
+    fields = ["name", "description", "image", "price"]
+
+
+class ItemDelete(LoginRequiredMixin, DeleteView):
+    model = Item
+    success_url = "/item"
+
+
+def add_item(request, restaurant_id):
+    form = ItemForm(request.POST)
+    if form.is_valid():
+        print("here")
+        new_Item = form.save(commit=False)
+        new_Item.restaurant_id = restaurant_id
+        new_Item.save()
+    return redirect('detail', restaurant_id)

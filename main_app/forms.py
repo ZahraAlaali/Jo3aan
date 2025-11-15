@@ -1,6 +1,7 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
-from .models import User, Profile
+from django.forms import ModelForm
+from .models import User, Profile, Item
 
 
 class CustomUserCreationForm(UserCreationForm):
@@ -25,3 +26,8 @@ class UpdateUserForm(forms.ModelForm):
     class Meta:
         model = User
         fields = ["username"]
+
+class ItemForm(ModelForm):
+    class Meta:
+        model = Item
+        fields = '__all__'

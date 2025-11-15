@@ -13,9 +13,11 @@ urlpatterns = [
         name="restaurant_create",
     ),
     path("restaurants/", views.restaurants_index, name="restaurants_index"),
+    
     # profile
     path("profile/", views.profile, name="profile"),
     path("profile/create/", views.ProfileCreate.as_view(), name="craete_profile"),
+
     # item
     path("item/", views.ItemList.as_view(), name="item_list"),
     path("item/<int:pk>/", views.ItemDetail.as_view(), name="item_detail"),
