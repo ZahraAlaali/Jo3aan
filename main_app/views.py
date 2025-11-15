@@ -247,29 +247,25 @@ def profile_user_update(request, user_id, profile_id):
     )
 
 
-class RestaurantUpdate(UpdateView):
-    model = Restaurant
-    fields = "__all__"
-    success_url = "/restaurants/"
-
-
-class RestaurantDelete(DeleteView):
-    model = Restaurant
-    fields = "__all__"
-    success_url = "/restaurants/"
-
-
 # Cart
 def viewCart(request, user_id):
     cart = Cart.objects.filter(customer_id=user_id, cart_status="active").first()
     cart_details = CartDetails.objects.filter(cart=cart).select_related("item")
-    for item in cart_details:
-        item.name = item.item.name
-        item.image = item.item.image
-        item.total_price = item.item.price * item.quantity
+    restaurants = []
+    for row in cart_details:
+        itemInItem = Item.objects.filter(id=row.item_id).first()
+        restaurant = Restaurant.objects.filter(id=itemInItem.restaurant_id).first()
+        if restaurant.name not in restaurants:
+            restaurants.append(restaurant.name)
+        row.name = row.item.name
+        row.image = row.item.image
+        row.total_price = row.item.price * row.quantity
+        row.restaurant = restaurant.name
 
     return render(
-        request, "cart/CartView.html", {"cart": cart, "cart_details": cart_details}
+        request,
+        "cart/CartView.html",
+        {"cart": cart, "cart_details": cart_details, "restaurants": restaurants},
     )
 
 
