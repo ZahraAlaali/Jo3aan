@@ -12,9 +12,11 @@ from .forms import (
     UpdateProfileForm,
     UpdateUserForm,
     CustomProfileCreationForm,
+    AddToCartForm,
 )
 import datetime
 from django import forms
+
 # Create your views here.
 
 
@@ -51,6 +53,7 @@ def signup(request):
         },
     )
 
+
 # restaurant part
 @login_required
 def restaurants_index(request):
@@ -58,64 +61,94 @@ def restaurants_index(request):
     customer_restaurants = Restaurant.objects.all()
     now = datetime.datetime.now().time()
     print(request.user.profile.role)
-    if request.user.profile.role=='owner':
-        restaurants=owner_restaurants
+    if request.user.profile.role == "owner":
+        restaurants = owner_restaurants
     else:
-        restaurants=customer_restaurants
+        restaurants = customer_restaurants
+
     def checkTime():
         for restaurant in customer_restaurants:
-            if restaurant.close_at< restaurant.open_at:
-                restaurant.is_open=now>=restaurant.open_at or now<=restaurant.close_at
+            if restaurant.close_at < restaurant.open_at:
+                restaurant.is_open = (
+                    now >= restaurant.open_at or now <= restaurant.close_at
+                )
             else:
-                restaurant.is_open =restaurant.open_at <= now < restaurant.close_at
+                restaurant.is_open = restaurant.open_at <= now < restaurant.close_at
         for restaurant in owner_restaurants:
-            if restaurant.close_at< restaurant.open_at:
-                restaurant.is_open=now>=restaurant.open_at or now<=restaurant.close_at
+            if restaurant.close_at < restaurant.open_at:
+                restaurant.is_open = (
+                    now >= restaurant.open_at or now <= restaurant.close_at
+                )
             else:
-                restaurant.is_open =restaurant.open_at <= now < restaurant.close_at
+                restaurant.is_open = restaurant.open_at <= now < restaurant.close_at
+
     checkTime()
     return render(
-        request, "restaurants/index.html", {'restaurants':restaurants, "now": now}
+        request, "restaurants/index.html", {"restaurants": restaurants, "now": now}
     )
 
 
-class RestaurantCreate(LoginRequiredMixin,CreateView):
+class RestaurantCreate(LoginRequiredMixin, CreateView):
     model = Restaurant
-    fields = ['name','description','image','city','categories','close_at','open_at']
+    fields = [
+        "name",
+        "description",
+        "image",
+        "city",
+        "categories",
+        "close_at",
+        "open_at",
+    ]
     success_url = "/restaurants/"
+
     def get_form(self):
         form = super().get_form()
-        form.fields['open_at'].widget = forms.TimeInput(attrs={'type': 'time'})
-        form.fields['close_at'].widget = forms.TimeInput(attrs={'type': 'time'})
+        form.fields["open_at"].widget = forms.TimeInput(attrs={"type": "time"})
+        form.fields["close_at"].widget = forms.TimeInput(attrs={"type": "time"})
         return form
-    def form_valid(self,form):
-        form.instance.user=self.request.user
+
+    def form_valid(self, form):
+        form.instance.user = self.request.user
         return super().form_valid(form)
 
-class RestaurantUpdate(LoginRequiredMixin,UpdateView):
+
+class RestaurantUpdate(LoginRequiredMixin, UpdateView):
     model = Restaurant
-    fields = ['name','description','image','city','categories','open_at','close_at']
+    fields = [
+        "name",
+        "description",
+        "image",
+        "city",
+        "categories",
+        "open_at",
+        "close_at",
+    ]
     success_url = "/restaurants/"
+
     def get_form(self):
         form = super().get_form()
-        form.fields['open_at'].widget = forms.TimeInput(attrs={'type': 'time'})
-        form.fields['close_at'].widget = forms.TimeInput(attrs={'type': 'time'})
+        form.fields["open_at"].widget = forms.TimeInput(attrs={"type": "time"})
+        form.fields["close_at"].widget = forms.TimeInput(attrs={"type": "time"})
         return form
+
     def get_queryset(self):
         return Restaurant.objects.filter(user=self.request.user)
 
 
-class RestaurantDelete(LoginRequiredMixin,DeleteView):
+class RestaurantDelete(LoginRequiredMixin, DeleteView):
     model = Restaurant
     fields = "__all__"
     success_url = "/restaurants/"
+
     def get_queryset(self):
         return Restaurant.objects.filter(user=self.request.user)
+
 
 @login_required
 def restaurant_details(request, restaurant_id):
     restaurant = Restaurant.objects.get(id=restaurant_id)
     return render(request, "restaurants/details.html", {"restaurant": restaurant})
+
 
 @login_required
 def profile(request):
@@ -138,13 +171,41 @@ class ProfileUpdate(LoginRequiredMixin, UpdateView):
     fields = ["phone", "role", "profileImage"]
 
 
-
 class ItemList(LoginRequiredMixin, ListView):
     model = Item
 
 
+def addToCart(request, user_id, item_id):
+    if request.method == "POST":
+        form = AddToCartForm(request.POST)
+        if form.is_valid():
+            cart = Cart.objects.filter(
+                customer_id=user_id, cart_status="active"
+            ).first()
+            itemInCart = CartDetails.objects.filter(cart=cart, item_id=item_id).first()
+            if (
+                itemInCart
+                and itemInCart.comment == (form.cleaned_data.get("comment")).strip()
+            ):
+                itemInCart.quantity += form.cleaned_data.get("quantity")
+                itemInCart.save()
+            else:
+                newRecord = form.save(commit=False)
+                newRecord.cart = cart
+                newRecord.item_id = item_id
+                newRecord.save()
+            return redirect("viewCart", user_id=user_id)
+        return redirect("item_detail", pk=item_id)
+    return redirect("item_detail", pk=item_id)
+
+
 class ItemDetail(LoginRequiredMixin, DetailView):
     model = Item
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["add_to_cart_form"] = AddToCartForm()
+        return context
 
 
 class ItemCreat(LoginRequiredMixin, CreateView):
@@ -186,11 +247,19 @@ def profile_user_update(request, user_id, profile_id):
     )
 
 
+class RestaurantUpdate(UpdateView):
+    model = Restaurant
+    fields = "__all__"
+    success_url = "/restaurants/"
+
+
+class RestaurantDelete(DeleteView):
+    model = Restaurant
+    fields = "__all__"
+    success_url = "/restaurants/"
 
 
 # Cart
-
-
 def viewCart(request, user_id):
     cart = Cart.objects.filter(customer_id=user_id, cart_status="active").first()
     cart_details = CartDetails.objects.filter(cart=cart).select_related("item")
@@ -204,31 +273,29 @@ def viewCart(request, user_id):
     )
 
 
-def deleteItemFromCart(request, user_id, item_id):
+def deleteItemFromCart(request, user_id, cartDetail_id):
     cart = Cart.objects.filter(customer_id=user_id, cart_status="active").first()
-    itemDeleted = CartDetails.objects.filter(cart=cart, item_id=item_id)
+    itemDeleted = get_object_or_404(
+        CartDetails.objects.filter(cart=cart, id=cartDetail_id)
+    )
     itemDeleted.delete()
     return redirect(f"/cart/viewCart/{user_id}/")
 
 
-def increaseQty(request, user_id, item_id):
+def increaseQty(request, user_id, cartDetail_id):
     cart = cart = Cart.objects.filter(customer_id=user_id, cart_status="active").first()
-    updateItem = CartDetails.objects.filter(cart=cart, item_id=item_id).first()
+    updateItem = CartDetails.objects.filter(cart=cart, id=cartDetail_id).first()
     updateItem.quantity += 1
     updateItem.save()
     return redirect(f"/cart/viewCart/{user_id}/")
 
 
-def decreaseQty(request, user_id, item_id):
+def decreaseQty(request, user_id, cartDetail_id):
     cart = cart = Cart.objects.filter(customer_id=user_id, cart_status="active").first()
-    updateItem = CartDetails.objects.filter(cart=cart, item_id=item_id).first()
+    updateItem = CartDetails.objects.filter(cart=cart, id=cartDetail_id).first()
     updateItem.quantity -= 1
     updateItem.save()
     return redirect(f"/cart/viewCart/{user_id}/")
-
-
-def addToCart(request, user_id):
-    pass
 
 
 def changeCartStatus(request, user_id, cart_id):
