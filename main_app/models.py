@@ -147,4 +147,5 @@ class CartDetails(models.Model):
     def delete(self, *args, **kwargs):
         cart = self.cart
         super().delete(*args, **kwargs)
+        cart.total_amount = 0.0
         cart.save()

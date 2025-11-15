@@ -12,16 +12,16 @@
   <h4>{{total_price}}</h4>
   <div>
     {% if item.quantity == 1 %}
-    <a href="{% url 'deleteItemFromCart' user.id item.item.id %}">delete</a>
+    <a href="{% url 'deleteItemFromCart' user.id item.id %}">delete</a>
     {% else %}
-    <a href="{% url 'decreaseQty' user.id item.item.id %}">-</a>
+    <a href="{% url 'decreaseQty' user.id item.id %}">-</a>
     {% endif %} {{item.quantity}}
-    <a href="{% url 'increaseQty' user.id item.item.id %}">+</a>
+    <a href="{% url 'increaseQty' user.id item.id %}">+</a>
   </div>
   {% if item.comment %}
   <h4>Comment: {{item.comment}}</h4>
   {% endif %}
-  <a href="{% url 'deleteItemFromCart' user.id item.item.id %}">Delete</a>
+  <a href="{% url 'deleteItemFromCart' user.id item.id %}">Delete</a>
   <br />
   {% endfor %}
   <div>Subtotal &nbsp; BHD {{cart.total_amount}}</div>
