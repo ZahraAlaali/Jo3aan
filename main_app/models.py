@@ -68,8 +68,16 @@ CITIES = (
     ("karbabad", "Karbabad"),
     ("naim", "Al-Naim"),
     ("gudaibiya", "Gudaibiya"),
+    ("maqabah", "Maqabah"),
 )
+
+
 # Create your models here.
+class Category(models.Model):
+    name = models.CharField(max_length=50, unique=True)
+
+    def __str__(self):
+        return self.name
 
 
 class Profile(models.Model):
@@ -92,11 +100,9 @@ class Restaurant(models.Model):
         upload_to="main_app/static/uploads", null=True, blank=True
     )
     city = models.CharField(max_length=20, choices=CITIES, default=CITIES[0][0])
-    category = models.CharField(
-        max_length=20, choices=CATEGORIES, default=CATEGORIES[0][0]
-    )
-    close_at = models.TimeField()
+    categories = models.ManyToManyField(Category)
     open_at = models.TimeField()
+    close_at = models.TimeField()
     user = models.ForeignKey(User, on_delete=models.CASCADE)
 
     def __str__(self):
