@@ -7,7 +7,6 @@
     <title>Jo3aan</title>
   </head>
   <body>
-    <p>Logged in as: {{ user }}</p>
     <header class="navbar-fixed">
       <nav>
         <div class="nav-wrapper">
@@ -25,8 +24,6 @@
             </li>
 
             {% if user.profile.role == "customer" %}
-            <li>
-            </li>
             <li>
               <a href="{% url 'viewCart' user.id %}">Cart</a>
             </li>
