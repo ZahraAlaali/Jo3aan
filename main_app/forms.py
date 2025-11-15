@@ -30,4 +30,4 @@ class UpdateUserForm(forms.ModelForm):
 class AddToCartForm(forms.ModelForm):
     class Meta:
         model = CartDetails
-        fields = ["quantity"]
+        fields = ["quantity", "comment"]
