@@ -12,6 +12,7 @@ from .forms import (
     UpdateProfileForm,
     UpdateUserForm,
     CustomProfileCreationForm,
+    AddToCartForm,
 )
 import datetime
 
@@ -55,12 +56,16 @@ def signup(request):
 def restaurants_index(request):
     restaurants = Restaurant.objects.filter(user=request.user)
     now = datetime.datetime.now().time()
+
     def checkTime():
         for restaurant in restaurants:
-            if restaurant.close_at< restaurant.open_at:
-                restaurant.is_open=now>=restaurant.open_at or now<=restaurant.close_at
+            if restaurant.close_at < restaurant.open_at:
+                restaurant.is_open = (
+                    now >= restaurant.open_at or now <= restaurant.close_at
+                )
             else:
-                restaurant.is_open =restaurant.open_at <= now < restaurant.close_at
+                restaurant.is_open = restaurant.open_at <= now < restaurant.close_at
+
     checkTime()
     return render(
         request, "restaurants/index.html", {"restaurants": restaurants, "now": now}
@@ -98,8 +103,29 @@ class ItemList(LoginRequiredMixin, ListView):
     model = Item
 
 
+def addToCart(request, user_id, item_id):
+    if request.method == "POST":
+        form = AddToCartForm(request.POST)
+        if form.is_valid():
+            cart = Cart.objects.filter(
+                customer_id=user_id, cart_status="active"
+            ).first()
+            newRecord = form.save(commit=False)
+            newRecord.cart = cart
+            newRecord.item_id = item_id
+            newRecord.save()
+            return redirect("viewCart", user_id=user_id)
+        return redirect("item_detail", pk=item_id)
+    return redirect("item_detail", pk=item_id)
+
+
 class ItemDetail(LoginRequiredMixin, DetailView):
     model = Item
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["add_to_cart_form"] = AddToCartForm()
+        return context
 
 
 class ItemCreat(LoginRequiredMixin, CreateView):
@@ -156,9 +182,9 @@ class RestaurantDelete(DeleteView):
     model = Restaurant
     fields = "__all__"
     success_url = "/restaurants/"
+
+
 # Cart
-
-
 def viewCart(request, user_id):
     cart = Cart.objects.filter(customer_id=user_id, cart_status="active").first()
     cart_details = CartDetails.objects.filter(cart=cart).select_related("item")
@@ -193,10 +219,6 @@ def decreaseQty(request, user_id, item_id):
     updateItem.quantity -= 1
     updateItem.save()
     return redirect(f"/cart/viewCart/{user_id}/")
-
-
-def addToCart(request, user_id):
-    pass
 
 
 def changeCartStatus(request, user_id, cart_id):

@@ -27,11 +27,23 @@ urlpatterns = [
         views.profile_user_update,
         name="profile_update",
     ),
-    path('restaurants/<int:restaurant_id>/', views.restaurant_details, name='restaurant_details'),
-    path('restaurants/<int:pk>/update/', views.RestaurantUpdate.as_view(),name='restaurant_update'),
-    path('restaurants/<int:pk>/delete/', views.RestaurantDelete.as_view(),name='restaurant_delete'),
+    path(
+        "restaurants/<int:restaurant_id>/",
+        views.restaurant_details,
+        name="restaurant_details",
+    ),
+    path(
+        "restaurants/<int:pk>/update/",
+        views.RestaurantUpdate.as_view(),
+        name="restaurant_update",
+    ),
+    path(
+        "restaurants/<int:pk>/delete/",
+        views.RestaurantDelete.as_view(),
+        name="restaurant_delete",
+    ),
     # Cart
-    path("cart/add/<int:user_id>/", views.addToCart, name="addToCart"),
+    path("cart/add/<int:user_id>/<int:item_id>/", views.addToCart, name="addToCart"),
     path(
         "cart/changeStatus/<int:user_id>/<int:cart_id>/",
         views.changeCartStatus,
