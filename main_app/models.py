@@ -138,6 +138,7 @@ class CartDetails(models.Model):
     cart = models.ForeignKey(Cart, on_delete=models.CASCADE)
     item = models.ForeignKey(Item, on_delete=models.CASCADE)
     quantity = models.PositiveIntegerField(default=1)
+    comment = models.TextField(max_length=100, default="")
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
