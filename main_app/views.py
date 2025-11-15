@@ -110,10 +110,18 @@ def addToCart(request, user_id, item_id):
             cart = Cart.objects.filter(
                 customer_id=user_id, cart_status="active"
             ).first()
-            newRecord = form.save(commit=False)
-            newRecord.cart = cart
-            newRecord.item_id = item_id
-            newRecord.save()
+            itemInCart = CartDetails.objects.filter(cart=cart, item_id=item_id).first()
+            if (
+                itemInCart
+                and itemInCart.comment == (form.cleaned_data.get("comment")).strip()
+            ):
+                itemInCart.quantity += form.cleaned_data.get("quantity")
+                itemInCart.save()
+            else:
+                newRecord = form.save(commit=False)
+                newRecord.cart = cart
+                newRecord.item_id = item_id
+                newRecord.save()
             return redirect("viewCart", user_id=user_id)
         return redirect("item_detail", pk=item_id)
     return redirect("item_detail", pk=item_id)
