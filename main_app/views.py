@@ -177,7 +177,6 @@ def addToCart(request, user_id, item_id, restaurant_id):
                 newRecord = form.save(commit=False)
                 newRecord.cart = cart
                 newRecord.item_id = item_id
-                newRecord.restaurant_id = restaurant_id
                 newRecord.save()
             return redirect("viewCart", user_id=user_id)
         return redirect("item_detail", pk=item_id)
@@ -289,18 +288,24 @@ def changeCartStatus(request, user_id, cart_id):
     return ()
 
 def createOrder(request,user_id):
-    cart = Cart.objects.get(customer_id=user_id, cart_status="active")
+
+    cart= Cart.objects.get(
+        customer_id=user_id,
+        cart_status="active")
+
     order = Order.objects.create(
         restaurant=cart.restaurant,
         customer_id=user_id,
         total_amount=cart.total_amount,
         order_status='P',
+
     )
 
     cart.cart_status = "ordered"
     cart.save()
 
     return redirect(f"/cart/viewCart/{user_id}/")
+
 
 
 
