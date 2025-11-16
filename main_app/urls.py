@@ -54,4 +54,9 @@ urlpatterns = [
         views.decreaseQty,
         name="decreaseQty",
     ),
+    path(
+        "orders/create/<int:user_id>/",
+        views.createOrder,
+        name="create_order"
+    ),
 ]
