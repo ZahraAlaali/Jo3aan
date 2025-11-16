@@ -71,4 +71,7 @@ urlpatterns = [
         views.createOrder,
         name="create_order"
     ),
+    path(
+        "orders/customer/<int:user_id>/",views.customerOrders, name="customer_orders"
+    ),
 ]
