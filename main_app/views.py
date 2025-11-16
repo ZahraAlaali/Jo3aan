@@ -309,6 +309,12 @@ def customerOrders(request, user_id):
     orders = Order.objects.filter(customer_id=user_id).order_by("-id")
     return render(request, "orders/customer_orders.html", {"orders" : orders })
 
+def restaurantOrders(request):
+    restaurants = Restaurant.objects.filter(user=request.user)
+    orders = Order.objects.filter(restaurant__in=restaurants).order_by("-id")
+    return render(request, "orders/customer_orders.html", {"orders" : orders } )
+
+
 
 
 
