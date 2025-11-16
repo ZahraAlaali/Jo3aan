@@ -74,4 +74,7 @@ urlpatterns = [
     path(
         "orders/customer/<int:user_id>/",views.customerOrders, name="customer_orders"
     ),
+    path(
+        "orders/restaurant/<int:user_id>/",views.restaurant.Orders, name="restaurant_orders"
+    ),
 ]
