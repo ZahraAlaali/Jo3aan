@@ -1,7 +1,6 @@
 {%extends 'base.html'%} {%block content%}
 <div>
   <div>
-
     {%load static%} <img src={% static restaurant.image|cut:'main_app/static/'%}
     alt="" style="width:200px;">
     <br />
@@ -18,28 +17,27 @@
     <p>Close at {{restaurant.close_at|time:"h:i A"}}</p>
     {%endif%}
     <a href="{%url 'restaurant_update' restaurant.id%}"
-    >Update {{restaurant.name}} restaurant</a
+      >Update {{restaurant.name}} restaurant</a
     >
     <br />
     <a href="{%url 'restaurant_delete' restaurant.id%}"
-    >Delete {{restaurant.name}} restaurant</a
+      >Delete {{restaurant.name}} restaurant</a
     >
+    <div>
+      <form action="{% url 'add_item' restaurant.id %}" method="post">
+        {% csrf_token %} {{ item_form.as_p }}
+      </form>
+    </div>
     <br />
     {%else%} {% if not restaurant.is_open%}
     <p>
-      {{restaurant.name}} is closed now and open at {{restaurant.open_at|time:"h:i
-      A"}}
+      {{restaurant.name}} is closed now and open at
+      {{restaurant.open_at|time:"h:i A"}}
     </p>
     {%else%}
     <p>{{restaurant.name}} close at {{restaurant.close_at|time:"h:i A"}}</p>
-    {%endif%} {%endif%}
+    '' {%endif%} {%endif%}
     <a href="{%url 'restaurants_index'%}">Back</a>
-  </div>
-  <div>
-    <form action="{% url 'add_item' restaurant.id %}" method="post">
-      {% csrf_token %}
-      {{ item_form.as_p }}
-    </form>
   </div>
 </div>
 {%endblock%}

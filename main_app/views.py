@@ -116,7 +116,8 @@ class RestaurantDelete(LoginRequiredMixin,DeleteView):
 @login_required
 def restaurant_details(request, restaurant_id):
     restaurant = Restaurant.objects.get(id=restaurant_id)
-    return render(request, "restaurants/details.html", {"restaurant": restaurant})
+    item_form = ItemForm()
+    return render(request, "restaurants/details.html", {"restaurant": restaurant,"item_form":item_form})
 
 @login_required
 def profile(request):
@@ -216,7 +217,7 @@ def changeCartStatus(request, user_id, cart_id):
     new_cart = Cart.objects.create(customerid=user_id, cart_status="active")
     return ()
 
-#Items
+# Items
 class ItemList(LoginRequiredMixin, ListView):
     model = Item
 
