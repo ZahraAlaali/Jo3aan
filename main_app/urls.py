@@ -75,6 +75,6 @@ urlpatterns = [
         "orders/customer/<int:user_id>/",views.customerOrders, name="customer_orders"
     ),
     path(
-        "orders/restaurant/<int:user_id>/",views.restaurant.Orders, name="restaurant_orders"
+        "orders/restaurant/<int:user_id>/",views.restaurantOrders, name="restaurant_orders"
     ),
 ]
