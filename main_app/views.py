@@ -306,6 +306,9 @@ def createOrder(request,user_id):
 
     return redirect(f"/cart/viewCart/{user_id}/")
 
+def customerOrders(request, user_id):
+    orders = Order.objects.filter(customer_id=user_id).order_by("-id")
+    return render(request, "orders/customer_orders.html", {"orders" : orders })
 
 
 
