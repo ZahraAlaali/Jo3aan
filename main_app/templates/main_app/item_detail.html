@@ -19,6 +19,15 @@
     <a href="{% url 'item_delete' item.id%}">Delete</a>
     <a href="{% url 'item_list' %}">Back to List</a>
   </div>
+<<<<<<< HEAD
   <form action="{% url addToCart' user.id item.id item.restaurant_id%}" method="post"></form>
+=======
+  {% if user.profile.role == "customer" %}
+  <form action="{% url 'addToCart' user.id item.id %}" method="post">
+    {% csrf_token %} {{ add_to_cart_form.as_p }}
+    <input type="submit" value="Add To Cart" />
+  </form>
+  {% endif %}
+>>>>>>> 346e0732385ff98c0585e1e568fea061169ecc51
 </div>
 {% endblock %}
