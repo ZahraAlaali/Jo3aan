@@ -32,7 +32,7 @@ urlpatterns = [
     path('restaurants/<int:pk>/update/', views.RestaurantUpdate.as_view(),name='restaurant_update'),
     path('restaurants/<int:pk>/delete/', views.RestaurantDelete.as_view(),name='restaurant_delete'),
     # Cart
-    path("cart/add/<int:user_id>/", views.addToCart, name="addToCart"),
+    path("cart/add/<int:user_id>/<int:item_id>/<int:restaurant_id>/", views.addToCart, name="addToCart"),
     path(
         "cart/changeStatus/<int:user_id>/<int:cart_id>/",
         views.changeCartStatus,

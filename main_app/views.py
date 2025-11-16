@@ -237,7 +237,7 @@ def changeCartStatus(request, user_id, cart_id):
     return ()
 
 def createOrder(request,user_id):
-    cart = Cart.object.get(customer_id=user_id, cart_status="active")
+    cart = Cart.objects.get(customer_id=user_id, cart_status="active")
     order = Order.objects.create(
         restaurant=cart.restaurant,
         customer_id=user_id,
@@ -248,9 +248,12 @@ def createOrder(request,user_id):
     cart.cart_status = "ordered"
     cart.save()
 
-    return redirect(f"/orders/customer/{user_id}/")
+    return redirect(f"/cart/viewCart/{user_id}/")
 
-    
+
+
+
+
 
 
 
