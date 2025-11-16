@@ -58,23 +58,15 @@ def signup(request):
 @login_required
 def restaurants_index(request):
     now = datetime.datetime.now().time()
-    print(request.user.profile.role)
-    if request.user.profile.role=='owner':
-        restaurants=owner_restaurants
+    if request.user.profile.role == "owner":
+        restaurants = Restaurant.objects.filter(user=request.user)
     else:
-        restaurants=customer_restaurants
-    def checkTime():
-        for restaurant in customer_restaurants:
-            if restaurant.close_at< restaurant.open_at:
-                restaurant.is_open=now>=restaurant.open_at or now<=restaurant.close_at
-            else:
-                restaurant.is_open =restaurant.open_at <= now < restaurant.close_at
-        for restaurant in owner_restaurants:
-            if restaurant.close_at< restaurant.open_at:
-                restaurant.is_open=now>=restaurant.open_at or now<=restaurant.close_at
-            else:
-                restaurant.is_open =restaurant.open_at <= now < restaurant.close_at
-    checkTime()
+        restaurants = Restaurant.objects.all()
+    for restaurant in restaurants:
+        if restaurant.close_at < restaurant.open_at:
+            restaurant.is_open = now >= restaurant.open_at or now <= restaurant.close_at
+        else:
+            restaurant.is_open = restaurant.open_at <= now < restaurant.close_at
     return render(
         request, "restaurants/index.html", {"restaurants": restaurants, "now": now}
     )
