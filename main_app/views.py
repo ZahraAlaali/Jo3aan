@@ -303,7 +303,6 @@ def createOrder(request,user_id):
 
     cart.cart_status = "ordered"
     cart.save()
-
     return redirect(f"/cart/viewCart/{user_id}/")
 
 def customerOrders(request, user_id):

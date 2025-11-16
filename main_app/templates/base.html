@@ -28,12 +28,16 @@
               <a href="{% url 'viewCart' user.id %}">Cart</a>
             </li>
 
+            <li><a href="{% url 'customer_orders' user.id %}">Orders</a></li>
+
             {% endif %} {% if user.profile.role == "owner" %}
             <li>
 
               <a href="{% url 'restaurant_create' %}">Create restaurant</a>
             </li>
             <li><a href="{% url 'item_create' %}">Create item</a></li>
+
+
 
             {% endif %}
             <a href="{% url 'restaurants_index' %}">View restaurants</a>

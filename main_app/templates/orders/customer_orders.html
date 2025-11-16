@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h2> My Orders </h2>
+{% if orders.count %}
+{% for order in orders %}
+<div>
+  <p>Restaurant: {{ order.restaurant.name }}</p>
+  <p>status: {{ order.get_order_status_display}}</p>
+</div>
+<hr>
+{% endfor %}
+
+{% else %}
+
+<p> You have no orders yet </p>
+{% endif %}
+{% endblock %}
