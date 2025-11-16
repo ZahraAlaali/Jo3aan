@@ -308,11 +308,10 @@ def add_item(request, restaurant_id):
         new_Item.save()
     return redirect('restaurant_details', restaurant_id)
 
-class ItemUpdate(LoginRequiredMixin, UpdateView):
+class ItemUpdate(LoginRequiredMixin, UpdateView ):
     model = Item
     fields = ["name", "description", "image", "price"]
-    
-
+    success_url = "/restaurants/{restaurant_id}/"
 
 class ItemDelete(LoginRequiredMixin, DeleteView):
     model = Item
