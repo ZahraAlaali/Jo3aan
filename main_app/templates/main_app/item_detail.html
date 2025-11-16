@@ -22,5 +22,11 @@
     <a href="{% url 'item_list' %}">Back to List</a>
   </div>
 
+  {% if user.profile.role == "customer" %}
+  <form action="{% url 'addToCart' user.id item.id %}" method="post">
+    {% csrf_token %} {{ add_to_cart_form.as_p }}
+    <input type="submit" value="Add To Cart" />
+  </form>
+  {% endif %}
 </div>
 {% endblock %}

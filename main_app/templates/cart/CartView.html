@@ -2,23 +2,33 @@
 
 <h2>CART</h2>
 <div>
-  {% for item in cart_details %} {% load static %}
-  <img
-    src="{% static item.image|cut:'main_app/static/' %}"
-    alt=""
-    width="300px"
-  />
-  <h4>{{item.name}}</h4>
-  <h4>{{total_price}}</h4>
-  <div>
-    {% if item.quantity == 1 %}
-    <a href="{% url 'deleteItemFromCart' user.id item.item.id %}">delete</a>
-    {% else %}
-    <a href="{% url 'decreaseQty' user.id item.item.id %}">-</a>
-    {% endif %} {{item.quantity}}
-    <a href="{% url 'increaseQty' user.id item.item.id %}">+</a>
-  </div>
-
+  {% for restaurant in restaurants %}
+  <h3>{{restaurant}}</h3>
+    {% for item in cart_details %}
+      {% if item.restaurant == restaurant %}
+        {% load static %}
+        <img
+          src="{% static item.image|cut:'main_app/static/' %}"
+          alt=""
+          width="300px"
+        />
+        <h4>{{item.name}}</h4>
+        <h4>{{total_price}}</h4>
+        <div>
+          {% if item.quantity == 1 %}
+          <a href="{% url 'deleteItemFromCart' user.id item.id %}">delete</a>
+          {% else %}
+          <a href="{% url 'decreaseQty' user.id item.id %}">-</a>
+          {% endif %} {{item.quantity}}
+          <a href="{% url 'increaseQty' user.id item.id %}">+</a>
+        </div>
+        {% if item.comment %}
+        <h4>Comment: {{item.comment}}</h4>
+        {% endif %}
+        <a href="{% url 'deleteItemFromCart' user.id item.id %}">Delete</a>
+        <br />
+      {% endif %}
+    {% endfor %}
   {% endfor %}
   <div>Subtotal &nbsp; BHD {{cart.total_amount}}</div>
 </div>

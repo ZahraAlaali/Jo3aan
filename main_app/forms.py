@@ -1,7 +1,7 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.forms import ModelForm
-from .models import User, Profile, Item
+from .models import User, Profile, CartDetails,Item
 
 
 class CustomUserCreationForm(UserCreationForm):
@@ -31,3 +31,8 @@ class ItemForm(ModelForm):
     class Meta:
         model = Item
         fields = '__all__'
+
+class AddToCartForm(forms.ModelForm):
+    class Meta:
+        model = CartDetails
+        fields = ["quantity", "comment"]
