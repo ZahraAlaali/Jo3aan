@@ -15,6 +15,7 @@ from .forms import (
 )
 import datetime
 from django import forms
+
 # Create your views here.
 
 
@@ -51,71 +52,86 @@ def signup(request):
         },
     )
 
+
 # restaurant part
 @login_required
 def restaurants_index(request):
-    owner_restaurants = Restaurant.objects.filter(user=request.user)
-    customer_restaurants = Restaurant.objects.all()
     now = datetime.datetime.now().time()
-    print(request.user.profile.role)
-    if request.user.profile.role=='owner':
-        restaurants=owner_restaurants
+    if request.user.profile.role == "owner":
+        restaurants = Restaurant.objects.filter(user=request.user)
     else:
-        restaurants=customer_restaurants
-    def checkTime():
-        for restaurant in customer_restaurants:
-            if restaurant.close_at< restaurant.open_at:
-                restaurant.is_open=now>=restaurant.open_at or now<=restaurant.close_at
-            else:
-                restaurant.is_open =restaurant.open_at <= now < restaurant.close_at
-        for restaurant in owner_restaurants:
-            if restaurant.close_at< restaurant.open_at:
-                restaurant.is_open=now>=restaurant.open_at or now<=restaurant.close_at
-            else:
-                restaurant.is_open =restaurant.open_at <= now < restaurant.close_at
-    checkTime()
+        restaurants = Restaurant.objects.all()
+    for restaurant in restaurants:
+        if restaurant.close_at < restaurant.open_at:
+            restaurant.is_open = now >= restaurant.open_at or now <= restaurant.close_at
+        else:
+            restaurant.is_open = restaurant.open_at <= now < restaurant.close_at
     return render(
-        request, "restaurants/index.html", {'restaurants':restaurants, "now": now}
+        request, "restaurants/index.html", {"restaurants": restaurants, "now": now}
     )
 
 
-class RestaurantCreate(LoginRequiredMixin,CreateView):
+class RestaurantCreate(LoginRequiredMixin, CreateView):
     model = Restaurant
-    fields = ['name','description','image','city','categories','close_at','open_at']
+    fields = [
+        "name",
+        "description",
+        "image",
+        "city",
+        "categories",
+        "close_at",
+        "open_at",
+    ]
     success_url = "/restaurants/"
+
     def get_form(self):
         form = super().get_form()
-        form.fields['open_at'].widget = forms.TimeInput(attrs={'type': 'time'})
-        form.fields['close_at'].widget = forms.TimeInput(attrs={'type': 'time'})
+        form.fields["open_at"].widget = forms.TimeInput(attrs={"type": "time"})
+        form.fields["close_at"].widget = forms.TimeInput(attrs={"type": "time"})
         return form
-    def form_valid(self,form):
-        form.instance.user=self.request.user
+
+    def form_valid(self, form):
+        form.instance.user = self.request.user
         return super().form_valid(form)
 
-class RestaurantUpdate(LoginRequiredMixin,UpdateView):
+
+class RestaurantUpdate(LoginRequiredMixin, UpdateView):
     model = Restaurant
-    fields = ['name','description','image','city','categories','open_at','close_at']
+    fields = [
+        "name",
+        "description",
+        "image",
+        "city",
+        "categories",
+        "open_at",
+        "close_at",
+    ]
     success_url = "/restaurants/"
+
     def get_form(self):
         form = super().get_form()
-        form.fields['open_at'].widget = forms.TimeInput(attrs={'type': 'time'})
-        form.fields['close_at'].widget = forms.TimeInput(attrs={'type': 'time'})
+        form.fields["open_at"].widget = forms.TimeInput(attrs={"type": "time"})
+        form.fields["close_at"].widget = forms.TimeInput(attrs={"type": "time"})
         return form
+
     def get_queryset(self):
         return Restaurant.objects.filter(user=self.request.user)
 
 
-class RestaurantDelete(LoginRequiredMixin,DeleteView):
+class RestaurantDelete(LoginRequiredMixin, DeleteView):
     model = Restaurant
     fields = "__all__"
     success_url = "/restaurants/"
+
     def get_queryset(self):
         return Restaurant.objects.filter(user=self.request.user)
+
 
 @login_required
 def restaurant_details(request, restaurant_id):
     restaurant = Restaurant.objects.get(id=restaurant_id)
     return render(request, "restaurants/details.html", {"restaurant": restaurant})
+
 
 @login_required
 def profile(request):
@@ -136,7 +152,6 @@ class ProfileCreate(LoginRequiredMixin, CreateView):
 class ProfileUpdate(LoginRequiredMixin, UpdateView):
     model = Profile
     fields = ["phone", "role", "profileImage"]
-
 
 
 class ItemList(LoginRequiredMixin, ListView):
@@ -184,8 +199,6 @@ def profile_user_update(request, user_id, profile_id):
         "users/profile_user_update.html",
         {"profile_form": profile_form, "user_form": user_form},
     )
-
-
 
 
 # Cart
