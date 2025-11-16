@@ -6,7 +6,7 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
-from .models import Restaurant, User, Profile, Cart, CartDetails, Item
+from .models import Restaurant, User, Profile, Cart, CartDetails, Item,Order
 from .forms import (
     CustomUserCreationForm,
     UpdateProfileForm,
@@ -235,6 +235,22 @@ def changeCartStatus(request, user_id, cart_id):
 
     new_cart = Cart.objects.create(customer_id=user_id, cart_status="active")
     return ()
+
+def createOrder(request,user_id):
+    cart = Cart.object.get(customer_id=user_id, cart_status="active")
+    order = Order.objects.create(
+        restaurant=cart.restaurant,
+        customer_id=user_id,
+        total_amount=cart.total_amount,
+        order_status='P',
+    )
+
+    cart.cart_status = "ordered"
+    cart.save()
+
+    return redirect(f"/orders/customer/{user_id}/")
+
+    
 
 
 
