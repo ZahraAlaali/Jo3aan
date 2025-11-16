@@ -23,11 +23,7 @@
     <a href="{%url 'restaurant_delete' restaurant.id%}"
       >Delete {{restaurant.name}} restaurant</a
     >
-    <div>
-      <form action="{% url 'add_item' restaurant.id %}" method="post">
-        {% csrf_token %} {{ item_form.as_p }}
-      </form>
-    </div>
+
     <br />
     {%else%} {% if not restaurant.is_open%}
     <p>
@@ -38,6 +34,24 @@
     <p>{{restaurant.name}} close at {{restaurant.close_at|time:"h:i A"}}</p>
     '' {%endif%} {%endif%}
     <a href="{%url 'restaurants_index'%}">Back</a>
+  </div>
+  <hr />
+  <div>
+    <h1>Add A New Item</h1>
+    <form action="{% url 'add_item' restaurant.id %}" method="post">
+      {% csrf_token %} {{ item_form.as_p }}
+      <input type="submit" value="Add Item" class="btn" />
+    </form>
+  </div>
+  <div>
+    {% for item in restaurant.item_set.all %}
+    <h3> {{ item.name }} </h3>
+    <p>Description: {{item.description }}</p>
+    <p>price: {{ item.price }}BD </p>
+    {% load static %}
+      <img width="100px" height="100px"
+        src="{% static item.image|cut:'main_app/static/' %}">
+    {% endfor%}
   </div>
 </div>
 {%endblock%}
