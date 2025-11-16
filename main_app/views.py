@@ -175,26 +175,69 @@ class ItemList(LoginRequiredMixin, ListView):
     model = Item
 
 
-def addToCart(request, user_id, item_id):
+def createNewCart(request, user_id, item_id, restaurant_id):
+    pass
+
+
+def addToCart(request, user_id, item_id, restaurant_id):
     if request.method == "POST":
         form = AddToCartForm(request.POST)
         if form.is_valid():
             cart = Cart.objects.filter(
                 customer_id=user_id, cart_status="active"
             ).first()
-            itemInCart = CartDetails.objects.filter(cart=cart, item_id=item_id).first()
-            if (
-                itemInCart
-                and itemInCart.comment == (form.cleaned_data.get("comment")).strip()
-            ):
-                itemInCart.quantity += form.cleaned_data.get("quantity")
-                itemInCart.save()
+            if cart and cart.restaurant_id == restaurant_id:
+                itemInCart = CartDetails.objects.filter(cart=cart, item_id=item_id)
+                sameComment = False
+                for item in itemInCart:
+                    if item.comment == (form.cleaned_data.get("comment")).strip():
+                        sameComment = True
+                if itemInCart and sameComment:
+                    itemInCart.quantity += form.cleaned_data.get("quantity")
+                    itemInCart.save()
+                else:
+                    newRecord = form.save(commit=False)
+                    newRecord.cart = cart
+                    newRecord.item_id = item_id
+                    newRecord.save()
+                return redirect("viewCart", user_id=user_id)
+            elif cart and cart.restaurant_id != restaurant_id:
+                cart = cart = Cart.objects.get(
+                    customer_id=user_id, cart_status="active"
+                )
+                restaurantInCart = Restaurant.objects.get(id=cart.restaurant_id)
+                restaurantRequested = Restaurant.objects.get(id=restaurant_id)
+                quantity = form.cleaned_data.get("quantity")
+                comment = form.cleaned_data.get("comment")
+                return render(
+                    request,
+                    "cart/confirm_new_cart.html",
+                    {
+                        "user_id": user_id,
+                        "item_id": item_id,
+                        "restaurantInCart": restaurantInCart,
+                        "restaurantRequested": restaurantRequested,
+                        "quantity": quantity,
+                        "comment": comment,
+                    },
+                )
+
             else:
-                newRecord = form.save(commit=False)
-                newRecord.cart = cart
-                newRecord.item_id = item_id
+                cart = Cart(
+                    customer_id=user_id,
+                    cart_status="active",
+                    restaurant_id=restaurant_id,
+                )
+                cart.save()
+
+                newRecord = CartDetails(
+                    cart=cart,
+                    item_id=item_id,
+                    quantity=form.cleaned_data.get("quantity"),
+                    comment=form.cleaned_data.get("comment"),
+                )
                 newRecord.save()
-            return redirect("viewCart", user_id=user_id)
+                return redirect("viewCart", user_id=user_id)
         return redirect("item_detail", pk=item_id)
     return redirect("item_detail", pk=item_id)
 
@@ -292,13 +335,3 @@ def decreaseQty(request, user_id, cartDetail_id):
     updateItem.quantity -= 1
     updateItem.save()
     return redirect(f"/cart/viewCart/{user_id}/")
-
-
-def changeCartStatus(request, user_id, cart_id):
-    # add the cart to the order before changing the status
-    old_cart = Cart.objects.filter(customer_id=user_id).first()
-    old_cart.cart_status = "ordered"
-    old_cart.save()
-
-    new_cart = Cart.objects.create(customerid=user_id, cart_status="active")
-    return ()

@@ -43,12 +43,11 @@ urlpatterns = [
         name="restaurant_delete",
     ),
     # Cart
-    path("cart/add/<int:user_id>/<int:item_id>/", views.addToCart, name="addToCart"),
     path(
-        "cart/changeStatus/<int:user_id>/<int:cart_id>/",
-        views.changeCartStatus,
-        name="changeCartStatus",
-    ),  # change the status->place order
+        "cart/add/<int:user_id>/<int:item_id>/<int:restaurant_id>/",
+        views.addToCart,
+        name="addToCart",
+    ),
     path("cart/viewCart/<int:user_id>/", views.viewCart, name="viewCart"),
     path(
         "cartDetails/delete/<int:user_id>/<int:cartDetail_id>/",
@@ -64,5 +63,10 @@ urlpatterns = [
         "cartDetails/update/<int:user_id>/<int:cartDetail_id>/dec/",
         views.decreaseQty,
         name="decreaseQty",
+    ),
+    path(
+        "cart/createNewCart/<int:user_id>/<int:item_id>/<int:restaurant_id>/",
+        views.createNewCart,
+        name="createNewCart",
     ),
 ]

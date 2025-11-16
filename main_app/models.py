@@ -130,6 +130,7 @@ class Cart(models.Model):
     total_amount = models.FloatField(default=0.0)
     cart_status = models.CharField(max_length=50, choices=STATUS, default=STATUS[0][0])
     items = models.ManyToManyField(Item, through="CartDetails", related_name="carts")
+    restaurant = models.ForeignKey(Restaurant, on_delete=models.CASCADE)
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
