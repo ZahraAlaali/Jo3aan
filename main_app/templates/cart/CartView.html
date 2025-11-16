@@ -21,6 +21,8 @@
 
   {% endfor %}
   <div>Subtotal &nbsp; BHD {{cart.total_amount}}</div>
+  <a href="{% url 'create_order' user.id %}" class="btn btn-primary">Place Order</a>
+
 </div>
 
 {% endblock %}
