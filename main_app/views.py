@@ -175,10 +175,6 @@ class ItemList(LoginRequiredMixin, ListView):
     model = Item
 
 
-def createNewCart(request, user_id, item_id, restaurant_id):
-    pass
-
-
 def addToCart(request, user_id, item_id, restaurant_id):
     if request.method == "POST":
         form = AddToCartForm(request.POST)
@@ -187,12 +183,12 @@ def addToCart(request, user_id, item_id, restaurant_id):
                 customer_id=user_id, cart_status="active"
             ).first()
             if cart and cart.restaurant_id == restaurant_id:
-                itemInCart = CartDetails.objects.filter(cart=cart, item_id=item_id)
-                sameComment = False
-                for item in itemInCart:
-                    if item.comment == (form.cleaned_data.get("comment")).strip():
-                        sameComment = True
-                if itemInCart and sameComment:
+                itemInCart = CartDetails.objects.filter(
+                    cart=cart,
+                    item_id=item_id,
+                    comment=(form.cleaned_data.get("comment")).strip(),
+                ).first()
+                if itemInCart:
                     itemInCart.quantity += form.cleaned_data.get("quantity")
                     itemInCart.save()
                 else:
@@ -240,6 +236,31 @@ def addToCart(request, user_id, item_id, restaurant_id):
                 return redirect("viewCart", user_id=user_id)
         return redirect("item_detail", pk=item_id)
     return redirect("item_detail", pk=item_id)
+
+
+def createNewCart(request, user_id, item_id, restaurant_id):
+    if request.method == "POST":
+        buttonValue = request.POST.get("decision")
+        if buttonValue == "new":
+            cart = Cart.objects.get(customer_id=user_id, cart_status="active")
+            cart.delete()
+            cart = Cart(
+                customer_id=user_id,
+                cart_status="active",
+                restaurant_id=restaurant_id,
+            )
+            cart.save()
+
+            newRecord = CartDetails(
+                cart=cart,
+                item_id=item_id,
+                quantity=request.POST.get("quantity"),
+                comment=request.POST.get("comment"),
+            )
+            newRecord.save()
+            return redirect("viewCart", user_id=user_id)
+        else:
+            return redirect(f"/restaurants/{restaurant_id}/")
 
 
 class ItemDetail(LoginRequiredMixin, DetailView):
