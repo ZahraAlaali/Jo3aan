@@ -193,22 +193,17 @@ class ItemDetail(LoginRequiredMixin, DetailView):
         context["add_to_cart_form"] = AddToCartForm()
         return context
 
-
 class ItemCreat(LoginRequiredMixin, CreateView):
     model = Item
     fields = "__all__"
-
 
 class ItemUpdate(LoginRequiredMixin, UpdateView):
     model = Item
     fields = ["name", "description", "image", "price"]
 
-
 class ItemDelete(LoginRequiredMixin, DeleteView):
     model = Item
     success_url = "/item"
-
-
 
 @login_required
 def profile_user_update(request, user_id, profile_id):
@@ -299,19 +294,9 @@ class ItemDetail(LoginRequiredMixin, DetailView):
     model = Item
 
 
-class ItemCreat(LoginRequiredMixin, CreateView):
-    model = Item
-    fields = "__all__"
-
-
-class ItemUpdate(LoginRequiredMixin, UpdateView):
-    model = Item
-    fields = ["name", "description", "image", "price"]
-
-
-class ItemDelete(LoginRequiredMixin, DeleteView):
-    model = Item
-    success_url = "/item"
+# class ItemCreat(LoginRequiredMixin, CreateView):
+#     model = Item
+#     fields = "__all__"
 
 
 def add_item(request, restaurant_id):
@@ -322,3 +307,13 @@ def add_item(request, restaurant_id):
         new_Item.restaurant_id = restaurant_id
         new_Item.save()
     return redirect('restaurant_details', restaurant_id)
+
+class ItemUpdate(LoginRequiredMixin, UpdateView):
+    model = Item
+    fields = ["name", "description", "image", "price"]
+    
+
+
+class ItemDelete(LoginRequiredMixin, DeleteView):
+    model = Item
+    success_url = "/restaurants/{restaurant_id}/"

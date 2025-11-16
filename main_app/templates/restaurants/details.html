@@ -38,7 +38,11 @@
   <hr />
   <div>
     <h1>Add A New Item</h1>
-    <form action="{% url 'add_item' restaurant.id %}" method="post" enctype="multipart/form-data" >
+    <form
+      action="{% url 'add_item' restaurant.id %}"
+      method="post"
+      enctype="multipart/form-data"
+    >
       {% csrf_token %} {{ item_form.as_p }}
       <input type="submit" value="Add Item" class="btn" />
     </form>
@@ -48,9 +52,25 @@
     <h3>{{ item.name }}</h3>
     <p>Description: {{item.description }}</p>
     <p>price: {{ item.price }}BD</p>
-    {% load static %}
-    <img width="100px" height="100px" src={% static item.image|cut:'main_app/static/' %}/>
-    {% endfor%}
+    <div>
+      {% load static %}
+      <img
+        src="{%static item.image|cut:'main_app/static/' %}"
+        alt="Item image"
+      />
+    </div>
+    <div>
+      {% if user.profile.role  == "owner" %}
+      <a href="{% url 'item_update' item.id %}">Edit</a>
+      <a href="{% url 'item_delete' item.id%}">Delete</a>
+      {% endif %}
+    </div>
+    {% if user.profile.role == "customer" %}
+    <form action="{% url 'addToCart' user.id item.id %}" method="post">
+      {% csrf_token %} {{ add_to_cart_form.as_p }}
+      <input type="submit" value="Add To Cart" />
+    </form>
+    {% endif %} {% endfor%}
   </div>
 </div>
 {%endblock%}

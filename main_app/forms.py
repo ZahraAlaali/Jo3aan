@@ -30,7 +30,7 @@ class UpdateUserForm(forms.ModelForm):
 class ItemForm(ModelForm):
     class Meta:
         model = Item
-        fields = '__all__'
+        fields = ["name", "description","image", "price"]
 
 class AddToCartForm(forms.ModelForm):
     class Meta:
