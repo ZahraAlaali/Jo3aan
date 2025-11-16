@@ -68,14 +68,17 @@ CITIES = (
     ("karbabad", "Karbabad"),
     ("naim", "Al-Naim"),
     ("gudaibiya", "Gudaibiya"),
-    ("maqabah",'Maqabah')
+    ("maqabah", "Maqabah"),
 )
+
+
 # Create your models here.
 class Category(models.Model):
     name = models.CharField(max_length=50, unique=True)
 
     def __str__(self):
         return self.name
+
 
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
@@ -100,7 +103,8 @@ class Restaurant(models.Model):
     categories = models.ManyToManyField(Category)
     open_at = models.TimeField()
     close_at = models.TimeField()
-    user=models.ForeignKey(User,on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+
     def __str__(self):
         return self.name
 
@@ -112,13 +116,14 @@ class Item(models.Model):
         upload_to="main_app/static/uploads", null=True, blank=True
     )
     price = models.FloatField()
-    restaurant = models.ForeignKey(Restaurant,on_delete=models.CASCADE)
+    restaurant = models.ForeignKey(Restaurant, on_delete=models.CASCADE)
 
     def __str__(self):
         return self.name
 
     def get_absolute_url(self):
-        return reverse('item_detail', kwargs={'pk': self.id})
+        return reverse("item_detail", kwargs={"pk": self.id})
+
 
 class Cart(models.Model):
     customer = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -139,6 +144,7 @@ class CartDetails(models.Model):
     cart = models.ForeignKey(Cart, on_delete=models.CASCADE)
     item = models.ForeignKey(Item, on_delete=models.CASCADE)
     quantity = models.PositiveIntegerField(default=1)
+    comment = models.TextField(max_length=100, default="", blank=True, null=True)
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
@@ -147,4 +153,5 @@ class CartDetails(models.Model):
     def delete(self, *args, **kwargs):
         cart = self.cart
         super().delete(*args, **kwargs)
+        cart.total_amount = 0.0
         cart.save()

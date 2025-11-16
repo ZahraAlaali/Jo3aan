@@ -12,6 +12,7 @@ from .forms import (
     UpdateProfileForm,
     UpdateUserForm,
     CustomProfileCreationForm,
+    AddToCartForm,
 )
 import datetime
 from django import forms
@@ -57,15 +58,23 @@ def signup(request):
 @login_required
 def restaurants_index(request):
     now = datetime.datetime.now().time()
-    if request.user.profile.role == "owner":
-        restaurants = Restaurant.objects.filter(user=request.user)
+    print(request.user.profile.role)
+    if request.user.profile.role=='owner':
+        restaurants=owner_restaurants
     else:
-        restaurants = Restaurant.objects.all()
-    for restaurant in restaurants:
-        if restaurant.close_at < restaurant.open_at:
-            restaurant.is_open = now >= restaurant.open_at or now <= restaurant.close_at
-        else:
-            restaurant.is_open = restaurant.open_at <= now < restaurant.close_at
+        restaurants=customer_restaurants
+    def checkTime():
+        for restaurant in customer_restaurants:
+            if restaurant.close_at< restaurant.open_at:
+                restaurant.is_open=now>=restaurant.open_at or now<=restaurant.close_at
+            else:
+                restaurant.is_open =restaurant.open_at <= now < restaurant.close_at
+        for restaurant in owner_restaurants:
+            if restaurant.close_at< restaurant.open_at:
+                restaurant.is_open=now>=restaurant.open_at or now<=restaurant.close_at
+            else:
+                restaurant.is_open =restaurant.open_at <= now < restaurant.close_at
+    checkTime()
     return render(
         request, "restaurants/index.html", {"restaurants": restaurants, "now": now}
     )
@@ -158,8 +167,37 @@ class ItemList(LoginRequiredMixin, ListView):
     model = Item
 
 
+def addToCart(request, user_id, item_id):
+    if request.method == "POST":
+        form = AddToCartForm(request.POST)
+        if form.is_valid():
+            cart = Cart.objects.filter(
+                customer_id=user_id, cart_status="active"
+            ).first()
+            itemInCart = CartDetails.objects.filter(cart=cart, item_id=item_id).first()
+            if (
+                itemInCart
+                and itemInCart.comment == (form.cleaned_data.get("comment")).strip()
+            ):
+                itemInCart.quantity += form.cleaned_data.get("quantity")
+                itemInCart.save()
+            else:
+                newRecord = form.save(commit=False)
+                newRecord.cart = cart
+                newRecord.item_id = item_id
+                newRecord.save()
+            return redirect("viewCart", user_id=user_id)
+        return redirect("item_detail", pk=item_id)
+    return redirect("item_detail", pk=item_id)
+
+
 class ItemDetail(LoginRequiredMixin, DetailView):
     model = Item
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["add_to_cart_form"] = AddToCartForm()
+        return context
 
 
 class ItemCreat(LoginRequiredMixin, CreateView):
@@ -202,46 +240,50 @@ def profile_user_update(request, user_id, profile_id):
 
 
 # Cart
-
-
 def viewCart(request, user_id):
     cart = Cart.objects.filter(customer_id=user_id, cart_status="active").first()
     cart_details = CartDetails.objects.filter(cart=cart).select_related("item")
-    for item in cart_details:
-        item.name = item.item.name
-        item.image = item.item.image
-        item.total_price = item.item.price * item.quantity
+    restaurants = []
+    for row in cart_details:
+        itemInItem = Item.objects.filter(id=row.item_id).first()
+        restaurant = Restaurant.objects.filter(id=itemInItem.restaurant_id).first()
+        if restaurant.name not in restaurants:
+            restaurants.append(restaurant.name)
+        row.name = row.item.name
+        row.image = row.item.image
+        row.total_price = row.item.price * row.quantity
+        row.restaurant = restaurant.name
 
     return render(
-        request, "cart/CartView.html", {"cart": cart, "cart_details": cart_details}
+        request,
+        "cart/CartView.html",
+        {"cart": cart, "cart_details": cart_details, "restaurants": restaurants},
     )
 
 
-def deleteItemFromCart(request, user_id, item_id):
+def deleteItemFromCart(request, user_id, cartDetail_id):
     cart = Cart.objects.filter(customer_id=user_id, cart_status="active").first()
-    itemDeleted = CartDetails.objects.filter(cart=cart, item_id=item_id)
+    itemDeleted = get_object_or_404(
+        CartDetails.objects.filter(cart=cart, id=cartDetail_id)
+    )
     itemDeleted.delete()
     return redirect(f"/cart/viewCart/{user_id}/")
 
 
-def increaseQty(request, user_id, item_id):
+def increaseQty(request, user_id, cartDetail_id):
     cart = cart = Cart.objects.filter(customer_id=user_id, cart_status="active").first()
-    updateItem = CartDetails.objects.filter(cart=cart, item_id=item_id).first()
+    updateItem = CartDetails.objects.filter(cart=cart, id=cartDetail_id).first()
     updateItem.quantity += 1
     updateItem.save()
     return redirect(f"/cart/viewCart/{user_id}/")
 
 
-def decreaseQty(request, user_id, item_id):
+def decreaseQty(request, user_id, cartDetail_id):
     cart = cart = Cart.objects.filter(customer_id=user_id, cart_status="active").first()
-    updateItem = CartDetails.objects.filter(cart=cart, item_id=item_id).first()
+    updateItem = CartDetails.objects.filter(cart=cart, id=cartDetail_id).first()
     updateItem.quantity -= 1
     updateItem.save()
     return redirect(f"/cart/viewCart/{user_id}/")
-
-
-def addToCart(request, user_id):
-    pass
 
 
 def changeCartStatus(request, user_id, cart_id):
