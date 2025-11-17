@@ -1,6 +1,7 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
-from .models import User, Profile, CartDetails
+from django.forms import ModelForm
+from .models import User, Profile, CartDetails,Item
 
 
 class CustomUserCreationForm(UserCreationForm):
@@ -26,6 +27,10 @@ class UpdateUserForm(forms.ModelForm):
         model = User
         fields = ["username"]
 
+class ItemForm(ModelForm):
+    class Meta:
+        model = Item
+        fields = ["name", "description","itemImage", "price"]
 
 class AddToCartForm(forms.ModelForm):
     class Meta:

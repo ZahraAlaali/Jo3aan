@@ -14,42 +14,50 @@ urlpatterns = [
     ),
     path("restaurants/", views.restaurants_index, name="restaurants_index"),
 
-    # profile
-    path("profile/", views.profile, name="profile"),
-    path("profile/create/", views.ProfileCreate.as_view(), name="create_profile"),
     # item
     path("item/", views.ItemList.as_view(), name="item_list"),
     path("item/<int:pk>/", views.ItemDetail.as_view(), name="item_detail"),
     path("item/create/", views.ItemCreate.as_view(), name="item_create"),
     path("item/<int:pk>/update/", views.ItemUpdate.as_view(), name="item_update"),
     path("item/<int:pk>/delete/", views.ItemDelete.as_view(), name="item_delete"),
+
+    # profile
+    path("profile/", views.profile, name="profile"),
+    path("profile/create/", views.ProfileCreate.as_view(), name="craete_profile"),
     path(
         "profile/update/<int:user_id>/<int:profile_id>/",
         views.profile_user_update,
         name="profile_update",
     ),
     path(
-        "restaurants/<int:restaurant_id>/",
-        views.restaurant_details,
-        name="restaurant_details",
+        "profile/update/<int:user_id>/<int:profile_id>/",
+        views.profile_user_update,
+        name="profile_update",
     ),
-    path(
-        "restaurants/<int:pk>/update/",
-        views.RestaurantUpdate.as_view(),
-        name="restaurant_update",
-    ),
-    path(
-        "restaurants/<int:pk>/delete/",
-        views.RestaurantDelete.as_view(),
-        name="restaurant_delete",
-    ),
+
+    #Restaurant
+    path("restaurants/", views.restaurants_index, name="restaurants_index"),
+    path('restaurants/<int:restaurant_id>/', views.restaurant_details, name='restaurant_details'),
+    path("restaurants/create/",views.RestaurantCreate.as_view(),
+    name="restaurant_create"),
+    path('restaurants/<int:pk>/update/', views.RestaurantUpdate.as_view(),name='restaurant_update'),
+    path('restaurants/<int:pk>/delete/', views.RestaurantDelete.as_view(),name='restaurant_delete'),
+
+    # item
+    path("item/", views.ItemList.as_view(), name="item_list"),
+    path("item/<int:pk>/", views.ItemDetail.as_view(), name="item_detail"),
+    path("item/create/", views.ItemCreat.as_view(), name="item_create"),
+    path("item/<int:pk>/update/", views.ItemUpdate.as_view(), name="item_update"),
+    path("item/<int:pk>/delete/", views.ItemDelete.as_view(), name="item_delete"),
+    path('restaurants/<int:restaurant_id>/add_item', views.add_item, name='add_item'),
+
     # Cart
-    path("cart/add/<int:user_id>/<int:item_id>/<int:restaurant_id>/", views.addToCart, name="addToCart"),
+  
     path(
-        "cart/changeStatus/<int:user_id>/<int:cart_id>/",
-        views.changeCartStatus,
-        name="changeCartStatus",
-    ),  # change the status->place order
+        "cart/add/<int:user_id>/<int:item_id>/<int:restaurant_id>/",
+        views.addToCart,
+        name="addToCart",
+    ),
     path("cart/viewCart/<int:user_id>/", views.viewCart, name="viewCart"),
     path(
         "cartDetails/delete/<int:user_id>/<int:cartDetail_id>/",
@@ -79,4 +87,8 @@ urlpatterns = [
     ),
     path("orders/ready/<int:order_id>/", views.mark_order_ready, name="mark_ready"),
 
+        "cart/createNewCart/<int:user_id>/<int:item_id>/<int:restaurant_id>/",
+        views.createNewCart,
+        name="createNewCart",
+    ),
 ]
