@@ -10,7 +10,7 @@
         <div>
           {% load static %}
           <img width="100px" height="100px"
-          src="{% static item.image|cut:'main_app/static/' %}">
+          src="{% static item.itemImage|cut:'main_app/static/' %}">
         </div>
         <p>{{ item.price }}</p>
       </div>

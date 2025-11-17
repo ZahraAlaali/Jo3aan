@@ -1,5 +1,6 @@
 {%extends 'base.html'%} {%block content%}
 <div>
+  <!-- for Restaurant -->
   <div>
     {%load static%} <img src={% static restaurant.image|cut:'main_app/static/'%}
     alt="" style="width:200px;">
@@ -33,22 +34,26 @@
     </p>
     {%else%}
     <p>{{restaurant.name}} close at {{restaurant.close_at|time:"h:i A"}}</p>
-     {%endif%} {%endif%}
+    {%endif%} {%endif%}
     <a href="{%url 'restaurants_index'%}">Back</a>
   </div>
   <hr />
-
+  <!-- for Items -->
   <div>
     {%if user.profile.role == 'owner'%}
     <h1>Add A New Item</h1>
-    <form
-      action="{% url 'add_item' restaurant.id %}"
-      method="post"
-      enctype="multipart/form-data"
-    >
-      {% csrf_token %} {{ item_form.as_p }}
-      <input type="submit" value="Add Item" class="btn" />
-    </form>
+     {% if object %}
+  <h1>Edit {{object.name}}</h1>
+  {% else %}
+  <h1>Add item </h1>
+  {% endif %}
+  <form action="{% url 'add_item' restaurant.id %}" method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    <table>
+      {{ item_form.as_table }}
+    </table>
+    <input type="submit" name="submit" class="btn">
+  </form>
     {% endif %}
   </div>
   <div>
@@ -58,23 +63,23 @@
     <p>price: {{ item.price }}BD</p>
     <div>
       {% load static %}
-      <img
-        src="{%static item.image|cut:'main_app/static/' %}"
-        alt="Item image"
-      />
+      <img src="{%static item.itemImage|cut:'main_app/static/' %}"alt="Item image"/>
     </div>
     <div>
-      {% if user.profile.role  == "owner" %}
+      {% if user.profile.role == "owner" %}
       <a href="{% url 'item_update' item.id %}">Edit</a>
       <a href="{% url 'item_delete' item.id%}">Delete</a>
       {% endif %}
     </div>
-    {% if user.profile.role == "customer" %}
-    <form action="{% url 'addToCart' user.id item.id %}" method="post">
-      {% csrf_token %} {{ add_to_cart_form.as_p }}
-      <input type="submit" value="Add To Cart" />
-    </form>
-    {% endif %} {% endfor%}
+    <!-- for customer Cart -->
+    <div>
+      {% if user.profile.role == "customer" %}
+      <form action="{% url 'addToCart' user.id item.id %}" method="post">
+        {% csrf_token %} {{ add_to_cart_form.as_p }}
+        <input type="submit" value="Add To Cart" />
+      </form>
+      {% endif %} {% endfor%}
+    </div>
   </div>
 </div>
 {%endblock%}
