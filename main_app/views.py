@@ -184,10 +184,6 @@ class ProfileUpdate(LoginRequiredMixin, UpdateView):
     fields = ["phone", "role", "profileImage"]
 
 
-class ItemList(LoginRequiredMixin, ListView):
-    model = Item
-
-
 def addToCart(request, user_id, item_id, restaurant_id):
     if request.method == "POST":
         form = AddToCartForm(request.POST)
