@@ -6,7 +6,7 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
-from .models import Restaurant, User, Profile, Cart, CartDetails, Item
+from .models import Restaurant, User, Profile, Cart, CartDetails, Item, Order
 from .forms import (
     CustomUserCreationForm,
     UpdateProfileForm,
@@ -247,6 +247,30 @@ def addToCart(request, user_id, item_id, restaurant_id):
     return redirect("item_detail", pk=item_id)
 
 
+class ItemDetail(LoginRequiredMixin, DetailView):
+    model = Item
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["add_to_cart_form"] = AddToCartForm()
+        return context
+
+
+class ItemCreate(LoginRequiredMixin, CreateView):
+    model = Item
+    fields = "__all__"
+
+
+class ItemUpdate(LoginRequiredMixin, UpdateView):
+    model = Item
+    fields = ["name", "description", "image", "price"]
+
+
+class ItemDelete(LoginRequiredMixin, DeleteView):
+    model = Item
+    success_url = "/item"
+
+
 def createNewCart(request, user_id, item_id, restaurant_id):
     if request.method == "POST":
         buttonValue = request.POST.get("decision")
@@ -343,11 +367,43 @@ def decreaseQty(request, user_id, cartDetail_id):
     return redirect(f"/cart/viewCart/{user_id}/")
 
 
+def createOrder(request, user_id):
+
+    cart = Cart.objects.get(customer_id=user_id, cart_status="active")
+
+    order = Order.objects.create(
+        restaurant=cart.restaurant,
+        customer_id=user_id,
+        total_amount=cart.total_amount,
+        order_status="P",
+    )
+
+    cart.cart_status = "ordered"
+    cart.save()
+    return redirect(f"/cart/viewCart/{user_id}/")
+
+
+def customerOrders(request, user_id):
+    orders = Order.objects.filter(customer_id=user_id).order_by("-id")
+    return render(request, "orders/customer_orders.html", {"orders": orders})
+
+
+def restaurantOrders(request):
+    restaurants = Restaurant.objects.filter(user=request.user)
+    orders = Order.objects.filter(restaurant__in=restaurants).order_by("-id")
+    return render(request, "orders/restaurant_orders.html", {"orders": orders})
+
+
+def mark_order_ready(request, order_id):
+    order = Order.objects.get(id=order_id)
+    if request.user != order.restaurant.user:
+        return redirect("home")
+    order.order_status = "R"
+    order.save()
+    return redirect("restaurant_orders")
+
+
 # Items
-class ItemList(LoginRequiredMixin, ListView):
-    model = Item
-
-
 class ItemDetail(LoginRequiredMixin, DetailView):
     model = Item
 

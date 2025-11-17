@@ -17,11 +17,6 @@ urlpatterns = [
         views.profile_user_update,
         name="profile_update",
     ),
-    path(
-        "profile/update/<int:user_id>/<int:profile_id>/",
-        views.profile_user_update,
-        name="profile_update",
-    ),
     # path("password-reset/", ResetPasswordView.as_view(), name="password_reset"),
     # path(
     #     "password-reset-confirm/<uidb64>/<token>/",
@@ -60,7 +55,6 @@ urlpatterns = [
         name="restaurant_delete",
     ),
     # item
-    path("item/", views.ItemList.as_view(), name="item_list"),
     path("item/<int:pk>/", views.ItemDetail.as_view(), name="item_detail"),
     path("item/create/", views.ItemCreat.as_view(), name="item_create"),
     path("item/<int:pk>/update/", views.ItemUpdate.as_view(), name="item_update"),
@@ -93,4 +87,10 @@ urlpatterns = [
         views.createNewCart,
         name="createNewCart",
     ),
+    path("orders/create/<int:user_id>/", views.createOrder, name="create_order"),
+    path(
+        "orders/customer/<int:user_id>/", views.customerOrders, name="customer_orders"
+    ),
+    path("orders/restaurant/", views.restaurantOrders, name="restaurant_orders"),
+    path("orders/ready/<int:order_id>/", views.mark_order_ready, name="mark_ready"),
 ]
