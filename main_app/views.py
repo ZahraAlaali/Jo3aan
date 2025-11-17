@@ -435,3 +435,4 @@ class ItemUpdate(LoginRequiredMixin, UpdateView):
 class ItemDelete(LoginRequiredMixin, DeleteView):
     model = Item
     success_url = "/restaurants/{restaurant_id}/"
+
