@@ -1,8 +1,8 @@
 from django.urls import path, include
 from . import views
 
-# from views import ResetPasswordView
-# from django.contrib.auth import views as auth_views
+from .views import ResetPasswordView
+from django.contrib.auth import views as auth_views
 
 urlpatterns = [
     # Sign Up
@@ -17,21 +17,21 @@ urlpatterns = [
         views.profile_user_update,
         name="profile_update",
     ),
-    # path("password-reset/", ResetPasswordView.as_view(), name="password_reset"),
-    # path(
-    #     "password-reset-confirm/<uidb64>/<token>/",
-    #     auth_views.PasswordResetConfirmView.as_view(
-    #         template_name="users/password_reset_confirm.html"
-    #     ),
-    #     name="password_reset_confirm",
-    # ),
-    # path(
-    #     "password-reset-complete/",
-    #     auth_views.PasswordResetCompleteView.as_view(
-    #         template_name="users/password_reset_complete.html"
-    #     ),
-    #     name="password_reset_complete",
-    # ),
+    path("password-reset/", ResetPasswordView.as_view(), name="password_reset"),
+    path(
+        "password-reset-confirm/<uidb64>/<token>/",
+        auth_views.PasswordResetConfirmView.as_view(
+            template_name="main_app/password_reset_confirm.html"
+        ),
+        name="password_reset_confirm",
+    ),
+    path(
+        "password-reset-complete/",
+        auth_views.PasswordResetCompleteView.as_view(
+            template_name="main_app/password_reset_complete.html"
+        ),
+        name="password_reset_complete",
+    ),
     # Restaurant
     path("restaurants/", views.restaurants_index, name="restaurants_index"),
     path(
