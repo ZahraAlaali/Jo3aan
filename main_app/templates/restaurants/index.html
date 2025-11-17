@@ -1,0 +1,22 @@
+{%extends 'base.html'%} {%block content%} {%load static%}
+<h1>restaurants list</h1>
+{%for restaurant in restaurants%}
+<a href="/restaurants/{{restaurant.id}}">
+  <img src={% static restaurant.image|cut:'main_app/static/'%} alt="" style="width:200px;">
+  <h2>{{restaurant.name}} in {{restaurant.get_city_display}}</h2>
+  {%if user.profile.role == 'customer'%}
+  <p>Description: {{restaurant.description}}</p>
+  <p>categories:  </p>
+  <ul>  {%for category in restaurant.categories.all%}
+    <li>{{category.name}}</li>
+  {%endfor%}</ul>
+  {% if not restaurant.is_open%}
+  <p>{{restaurant.name}} is closed now and open at {{restaurant.open_at|time:"h:i A"}}</p>
+  {%else%}
+  <p>{{restaurant.name}} close at {{restaurant.close_at|time:"h:i A"}}</p>
+  {%endif%}
+</a>
+{%endif%}
+<hr>
+{%endfor%}
+{%endblock%}
