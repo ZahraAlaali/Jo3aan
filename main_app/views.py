@@ -19,11 +19,8 @@ import datetime
 from django import forms
 
 # Create your views here.
-
-
 def home(request):
     return render(request, "home.html")
-
 
 def signup(request):
     error_message = ""
@@ -140,6 +137,7 @@ def restaurant_details(request, restaurant_id):
     )
 
 
+#Profile Part
 @login_required
 def profile(request):
     profile = Profile.objects.get(user_id=request.user.id)
@@ -160,11 +158,32 @@ class ProfileUpdate(LoginRequiredMixin, UpdateView):
     model = Profile
     fields = ["phone", "role", "profileImage"]
 
+@login_required
+def profile_user_update(request, user_id, profile_id):
+    user = get_object_or_404(User, pk=user_id)
+    profile = get_object_or_404(Profile, pk=profile_id)
 
-class ItemList(LoginRequiredMixin, ListView):
-    model = Item
+    if request.method == "POST":
+        profile_form = UpdateProfileForm(request.POST, request.FILES, instance=profile)
+        user_form = UpdateUserForm(request.POST, instance=user)
+
+        if profile_form.is_valid() and user_form.is_valid():
+            profile_data = profile_form.save()
+            user_data = user_form.save()
+            return redirect("/profile")
+    else:
+        profile_form = UpdateProfileForm(instance=profile)
+        user_form = UpdateUserForm(instance=user)
+
+    return render(
+        request,
+        "users/profile_user_update.html",
+        {"profile_form": profile_form, "user_form": user_form},
+    )
 
 
+
+# Cart part
 def addToCart(request, user_id, item_id, restaurant_id):
     if request.method == "POST":
         form = AddToCartForm(request.POST)
@@ -253,31 +272,6 @@ def createNewCart(request, user_id, item_id, restaurant_id):
             return redirect(f"/restaurants/{restaurant_id}/")
 
 
-@login_required
-def profile_user_update(request, user_id, profile_id):
-    user = get_object_or_404(User, pk=user_id)
-    profile = get_object_or_404(Profile, pk=profile_id)
-
-    if request.method == "POST":
-        profile_form = UpdateProfileForm(request.POST, request.FILES, instance=profile)
-        user_form = UpdateUserForm(request.POST, instance=user)
-
-        if profile_form.is_valid() and user_form.is_valid():
-            profile_data = profile_form.save()
-            user_data = user_form.save()
-            return redirect("/profile")
-    else:
-        profile_form = UpdateProfileForm(instance=profile)
-        user_form = UpdateUserForm(instance=user)
-
-    return render(
-        request,
-        "users/profile_user_update.html",
-        {"profile_form": profile_form, "user_form": user_form},
-    )
-
-
-# Cart
 def viewCart(request, user_id):
     cart = Cart.objects.filter(customer_id=user_id, cart_status="active").first()
     cart_details = CartDetails.objects.filter(cart=cart).select_related("item")
@@ -325,19 +319,6 @@ def decreaseQty(request, user_id, cartDetail_id):
 
 
 # Items
-class ItemList(LoginRequiredMixin, ListView):
-    model = Item
-
-
-class ItemDetail(LoginRequiredMixin, DetailView):
-    model = Item
-
-
-class ItemCreat(LoginRequiredMixin, CreateView):
-    model = Item
-    fields = ["name", "description", "itemImage", "price"]
-
-
 def add_item(request, restaurant_id):
     form = ItemForm(
         request.POST, request.FILES

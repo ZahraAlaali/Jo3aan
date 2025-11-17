@@ -31,9 +31,6 @@ urlpatterns = [
     path('restaurants/<int:pk>/delete/', views.RestaurantDelete.as_view(),name='restaurant_delete'),
 
     # item
-    path("item/", views.ItemList.as_view(), name="item_list"),
-    path("item/<int:pk>/", views.ItemDetail.as_view(), name="item_detail"),
-    path("item/create/", views.ItemCreat.as_view(), name="item_create"),
     path("item/<int:pk>/update/", views.ItemUpdate.as_view(), name="item_update"),
     path("item/<int:pk>/delete/", views.ItemDelete.as_view(), name="item_delete"),
     path('restaurants/<int:restaurant_id>/add_item', views.add_item, name='add_item'),
