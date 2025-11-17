@@ -13,6 +13,7 @@ from .forms import (
     UpdateUserForm,
     CustomProfileCreationForm,
     AddToCartForm,
+    ItemForm,
 )
 import datetime
 from django import forms
@@ -131,7 +132,12 @@ class RestaurantDelete(LoginRequiredMixin, DeleteView):
 @login_required
 def restaurant_details(request, restaurant_id):
     restaurant = Restaurant.objects.get(id=restaurant_id)
-    return render(request, "restaurants/details.html", {"restaurant": restaurant})
+    item_form = ItemForm()
+    return render(
+        request,
+        "restaurants/details.html",
+        {"restaurant": restaurant, "item_form": item_form},
+    )
 
 
 @login_required
@@ -247,30 +253,6 @@ def createNewCart(request, user_id, item_id, restaurant_id):
             return redirect(f"/restaurants/{restaurant_id}/")
 
 
-class ItemDetail(LoginRequiredMixin, DetailView):
-    model = Item
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["add_to_cart_form"] = AddToCartForm()
-        return context
-
-
-class ItemCreat(LoginRequiredMixin, CreateView):
-    model = Item
-    fields = "__all__"
-
-
-class ItemUpdate(LoginRequiredMixin, UpdateView):
-    model = Item
-    fields = ["name", "description", "image", "price"]
-
-
-class ItemDelete(LoginRequiredMixin, DeleteView):
-    model = Item
-    success_url = "/item"
-
-
 @login_required
 def profile_user_update(request, user_id, profile_id):
     user = get_object_or_404(User, pk=user_id)
@@ -340,3 +322,41 @@ def decreaseQty(request, user_id, cartDetail_id):
     updateItem.quantity -= 1
     updateItem.save()
     return redirect(f"/cart/viewCart/{user_id}/")
+
+
+# Items
+class ItemList(LoginRequiredMixin, ListView):
+    model = Item
+
+
+class ItemDetail(LoginRequiredMixin, DetailView):
+    model = Item
+
+
+class ItemCreat(LoginRequiredMixin, CreateView):
+    model = Item
+    fields = ["name", "description", "itemImage", "price"]
+
+
+def add_item(request, restaurant_id):
+    form = ItemForm(
+        request.POST, request.FILES
+    )  # nextttt time do not forgotttttt to adddddddddddddd request.FILE so it worksssss okay??????
+    if form.is_valid():
+        print("here")
+        new_Item = form.save(commit=False)
+        new_Item.restaurant_id = restaurant_id
+        new_Item.save()
+    return redirect("restaurant_details", restaurant_id)
+
+
+class ItemUpdate(LoginRequiredMixin, UpdateView):
+    model = Item
+    item_form = ItemForm()
+    fields = ["name", "description", "itemImage", "price"]
+    success_url = "/restaurants/{restaurant_id}/"
+
+
+class ItemDelete(LoginRequiredMixin, DeleteView):
+    model = Item
+    success_url = "/restaurants/{restaurant_id}/"
