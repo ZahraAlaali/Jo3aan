@@ -13,6 +13,7 @@ from .forms import (
     UpdateUserForm,
     CustomProfileCreationForm,
     AddToCartForm,
+    ItemForm
 )
 import datetime
 from django import forms
@@ -131,7 +132,8 @@ class RestaurantDelete(LoginRequiredMixin, DeleteView):
 @login_required
 def restaurant_details(request, restaurant_id):
     restaurant = Restaurant.objects.get(id=restaurant_id)
-    return render(request, "restaurants/details.html", {"restaurant": restaurant})
+    item_form = ItemForm()
+    return render(request, "restaurants/details.html", {"restaurant": restaurant,"item_form":item_form})
 
 
 @login_required
@@ -153,10 +155,6 @@ class ProfileCreate(LoginRequiredMixin, CreateView):
 class ProfileUpdate(LoginRequiredMixin, UpdateView):
     model = Profile
     fields = ["phone", "role", "profileImage"]
-
-
-class ItemList(LoginRequiredMixin, ListView):
-    model = Item
 
 
 def addToCart(request, user_id, item_id):
@@ -183,29 +181,25 @@ def addToCart(request, user_id, item_id):
     return redirect("item_detail", pk=item_id)
 
 
-class ItemDetail(LoginRequiredMixin, DetailView):
-    model = Item
+# class ItemDetail(LoginRequiredMixin, DetailView):
+#     model = Item
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["add_to_cart_form"] = AddToCartForm()
-        return context
+#     def get_context_data(self, **kwargs):
+#         context = super().get_context_data(**kwargs)
+#         context["add_to_cart_form"] = AddToCartForm()
+#         return context
 
+# class ItemCreat(LoginRequiredMixin, CreateView):
+#     model = Item
+#     fields = "__all__"
 
-class ItemCreat(LoginRequiredMixin, CreateView):
-    model = Item
-    fields = "__all__"
+# class ItemUpdate(LoginRequiredMixin, UpdateView):
+#     model = Item
+#     fields = ["name", "description", "itemImage", "price"]
 
-
-class ItemUpdate(LoginRequiredMixin, UpdateView):
-    model = Item
-    fields = ["name", "description", "image", "price"]
-
-
-class ItemDelete(LoginRequiredMixin, DeleteView):
-    model = Item
-    success_url = "/item"
-
+# class ItemDelete(LoginRequiredMixin, DeleteView):
+#     model = Item
+#     success_url = "/item"
 
 @login_required
 def profile_user_update(request, user_id, profile_id):
@@ -286,3 +280,35 @@ def changeCartStatus(request, user_id, cart_id):
 
     new_cart = Cart.objects.create(customerid=user_id, cart_status="active")
     return ()
+
+# Items
+class ItemList(LoginRequiredMixin, ListView):
+    model = Item
+
+
+class ItemDetail(LoginRequiredMixin, DetailView):
+    model = Item
+
+
+class ItemCreat(LoginRequiredMixin, CreateView):
+    model = Item
+    fields = ["name", "description", "itemImage", "price"]
+
+def add_item(request, restaurant_id):
+    form = ItemForm(request.POST, request.FILES) #nextttt time do not forgotttttt to adddddddddddddd request.FILE so it worksssss okay??????
+    if form.is_valid():
+        print("here")
+        new_Item = form.save(commit=False)
+        new_Item.restaurant_id = restaurant_id
+        new_Item.save()
+    return redirect('restaurant_details', restaurant_id)
+
+class ItemUpdate(LoginRequiredMixin, UpdateView ):
+    model = Item
+    item_form = ItemForm()
+    fields = ["name", "description", "itemImage", "price"]
+    success_url = "/restaurants/{restaurant_id}/"
+
+class ItemDelete(LoginRequiredMixin, DeleteView):
+    model = Item
+    success_url = "/restaurants/{restaurant_id}/"

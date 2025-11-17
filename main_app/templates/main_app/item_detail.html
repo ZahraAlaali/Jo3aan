@@ -7,18 +7,16 @@
   </div>
   <div>
     {% load static %}
-    <img
-      width="100px"
-      height="100px"
-      src="{% static item.image|cut:'main_app/static/' %}"
-      alt="{{ item.name }}"
-    />
+    <img width="100px" height="100px" src="{%static item.itemImage|cut:'main_app/static/'%}" alt="{{ item.name }}" />
   </div>
   <div>
+    {% if item.restaurant.owner == user %}
     <a href="{% url 'item_update' item.id %}">Edit</a>
     <a href="{% url 'item_delete' item.id%}">Delete</a>
+    {% endif %}
     <a href="{% url 'item_list' %}">Back to List</a>
   </div>
+
   {% if user.profile.role == "customer" %}
   <form action="{% url 'addToCart' user.id item.id %}" method="post">
     {% csrf_token %} {{ add_to_cart_form.as_p }}
