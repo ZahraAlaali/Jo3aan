@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 
 from pathlib import Path
 import os
+import stripe
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -25,7 +26,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = "django-insecure-2+q&ff*(gb+smbcphf*+8e+a8cf0$0+=vdu0n7ni4jw((@#7@-"
-
+stripe.api_key = os.environ.get('STRIPE_API_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
