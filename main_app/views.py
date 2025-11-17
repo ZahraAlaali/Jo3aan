@@ -294,7 +294,7 @@ def createOrder(request,user_id):
         cart_status="active")
 
     order = Order.objects.create(
-        restaurant=cart.restaurant,
+        restaurant= cart.restaurant,
         customer_id=user_id,
         total_amount=cart.total_amount,
         order_status='P',
@@ -320,7 +320,7 @@ def mark_order_ready(request, order_id):
         return redirect("home")
     order.order_status = "R"
     order.save()
-    return redirect("restaurant_orders", user_id=request.user.id)
+    return redirect("restaurant_orders")
 
 
 

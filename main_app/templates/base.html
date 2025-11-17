@@ -32,6 +32,7 @@
 
             {% endif %} {% if user.profile.role == "owner" %}
             <li>
+              <li><a href="{% url 'restaurant_orders' %}">Orders</a></li>
 
               <a href="{% url 'restaurant_create' %}">Create restaurant</a>
             </li>
