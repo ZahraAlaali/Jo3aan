@@ -61,9 +61,9 @@ def signup(request):
 
 
 class ResetPasswordView(SuccessMessageMixin, PasswordResetView):
-    template_name = "users/password_reset.html"
-    email_template_name = "users/password_reset_email.html"
-    subject_template_name = "users/password_reset_subject"
+    template_name = "main_app/password_reset.html"
+    email_template_name = "main_app/password_reset_email.html"
+    subject_template_name = "main_app/password_reset_subject.txt"
     success_message = (
         "We've emailed you instructions for setting your password, "
         "if an account exists with the email you entered. You should receive them shortly."
