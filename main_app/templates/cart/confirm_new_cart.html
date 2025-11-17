@@ -1,0 +1,20 @@
+<h2>Start new Cart?</h2>
+<p>
+  You already have Items from {{restaurantInCart.name}} <br />Would You like to
+  empty the Cart for new Items from {{restaurantRequested.name}}
+</p>
+<form
+  action="{% url 'createNewCart' user_id item_id restaurantRequested.id %}"
+  method="post"
+>
+  {% csrf_token %}
+  <input type="hidden" name="quantity" value="{{quantity}}" />
+  <input type="hidden" name="comment" value="{{comment}}" />
+  <button type="submit" name="decision" value="new">
+    Create new cart and add this item
+  </button>
+
+  <button type="submit" name="decision" value="keep">
+    Keep current cart (don't change anything)
+  </button>
+</form>
