@@ -7,6 +7,19 @@ urlpatterns = [
     path("accounts/signup/", views.signup, name="signup"),
     #
     path("", views.home, name="home"),
+    path(
+        "restaurants/create/",
+        views.RestaurantCreate.as_view(),
+        name="restaurant_create",
+    ),
+    path("restaurants/", views.restaurants_index, name="restaurants_index"),
+
+    # item
+    path("item/", views.ItemList.as_view(), name="item_list"),
+    path("item/<int:pk>/", views.ItemDetail.as_view(), name="item_detail"),
+    path("item/create/", views.ItemCreate.as_view(), name="item_create"),
+    path("item/<int:pk>/update/", views.ItemUpdate.as_view(), name="item_update"),
+    path("item/<int:pk>/delete/", views.ItemDelete.as_view(), name="item_delete"),
 
     # profile
     path("profile/", views.profile, name="profile"),
@@ -39,6 +52,7 @@ urlpatterns = [
     path('restaurants/<int:restaurant_id>/add_item', views.add_item, name='add_item'),
 
     # Cart
+  
     path(
         "cart/add/<int:user_id>/<int:item_id>/<int:restaurant_id>/",
         views.addToCart,
@@ -61,6 +75,18 @@ urlpatterns = [
         name="decreaseQty",
     ),
     path(
+        "orders/create/<int:user_id>/",
+        views.createOrder,
+        name="create_order"
+    ),
+    path(
+        "orders/customer/<int:user_id>/",views.customerOrders, name="customer_orders"
+    ),
+    path(
+        "orders/restaurant/",views.restaurantOrders, name="restaurant_orders"
+    ),
+    path("orders/ready/<int:order_id>/", views.mark_order_ready, name="mark_ready"),
+
         "cart/createNewCart/<int:user_id>/<int:item_id>/<int:restaurant_id>/",
         views.createNewCart,
         name="createNewCart",
