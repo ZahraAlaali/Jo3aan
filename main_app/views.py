@@ -312,7 +312,15 @@ def customerOrders(request, user_id):
 def restaurantOrders(request):
     restaurants = Restaurant.objects.filter(user=request.user)
     orders = Order.objects.filter(restaurant__in=restaurants).order_by("-id")
-    return render(request, "orders/customer_orders.html", {"orders" : orders } )
+    return render(request, "orders/restaurant_orders.html", {"orders" : orders } )
+
+def updateOrderStatus(request, order_id):
+    order = Order.objects.get(id=order_id)
+    if request.user != order.restaurant.user:
+        return redirect("home")
+    order.order_status = "R"
+    order.save()
+    return redirect("restaurant_orders", user_id=request.user.id)
 
 
 

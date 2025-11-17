@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Restaurant Orders</h2>
+
+{% if orders %}
+    {% for order in orders %}
+        <div>
+            <p><strong>Order #{{ order.id }}</strong></p>
+            <p>Customer: {{ order.customer.username }}</p>
+            <p>
+                Status:
+                {{ order.get_order_status_display }}
+            </p>
+
+
+            {% if order.order_status == "P" %}
+                <a href="{% url 'update_order_status' order.id 'R' %}">
+                    Mark as Ready
+                </a>
+            {% endif %}
+        </div>
+
+        <hr>
+    {% endfor %}
+{% else %}
+    <p>No orders for your restaurant yet.</p>
+{% endif %}
+
+{% endblock %}
