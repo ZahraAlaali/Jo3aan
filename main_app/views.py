@@ -6,7 +6,7 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
-from .models import Restaurant, User, Profile, Cart, CartDetails, Item,Order
+from .models import Restaurant, User, Profile, Cart, CartDetails, Item, Order
 from .forms import (
     CustomUserCreationForm,
     UpdateProfileForm,
@@ -17,6 +17,11 @@ from .forms import (
 )
 import datetime
 from django import forms
+
+# reset password
+from django.urls import reverse_lazy
+from django.contrib.auth.views import PasswordResetView
+from django.contrib.messages.views import SuccessMessageMixin
 
 # Create your views here.
 
@@ -53,6 +58,19 @@ def signup(request):
             "error_message": error_message,
         },
     )
+
+
+# class ResetPasswordView(SuccessMessageMixin, PasswordResetView):
+#     template_name = "users/password_reset.html"
+#     email_template_name = "users/password_reset_email.html"
+#     subject_template_name = "users/password_reset_subject"
+#     success_message = (
+#         "We've emailed you instructions for setting your password, "
+#         "if an account exists with the email you entered. You should receive them shortly."
+#         " If you don't receive an email, "
+#         "please make sure you've entered the address you registered with, and check your spam folder."
+#     )
+#     success_url = reverse_lazy("home")
 
 
 # restaurant part
@@ -133,10 +151,15 @@ class RestaurantDelete(LoginRequiredMixin, DeleteView):
 def restaurant_details(request, restaurant_id):
     restaurant = Restaurant.objects.get(id=restaurant_id)
     item_form = ItemForm()
+    add_to_cart_form = AddToCartForm()
     return render(
         request,
         "restaurants/details.html",
-        {"restaurant": restaurant, "item_form": item_form},
+        {
+            "restaurant": restaurant,
+            "item_form": item_form,
+            "add_to_cart_form": add_to_cart_form,
+        },
     )
 
 
@@ -159,10 +182,6 @@ class ProfileCreate(LoginRequiredMixin, CreateView):
 class ProfileUpdate(LoginRequiredMixin, UpdateView):
     model = Profile
     fields = ["phone", "role", "profileImage"]
-
-
-class ItemList(LoginRequiredMixin, ListView):
-    model = Item
 
 
 def addToCart(request, user_id, item_id, restaurant_id):
@@ -250,6 +269,8 @@ class ItemUpdate(LoginRequiredMixin, UpdateView):
 class ItemDelete(LoginRequiredMixin, DeleteView):
     model = Item
     success_url = "/item"
+
+
 def createNewCart(request, user_id, item_id, restaurant_id):
     if request.method == "POST":
         buttonValue = request.POST.get("decision")
@@ -310,7 +331,7 @@ def viewCart(request, user_id):
         if restaurant.name not in restaurants:
             restaurants.append(restaurant.name)
         row.name = row.item.name
-        row.image = row.item.image
+        row.itemImage = row.item.itemImage
         row.total_price = row.item.price * row.quantity
         row.restaurant = restaurant.name
 
@@ -346,40 +367,32 @@ def decreaseQty(request, user_id, cartDetail_id):
     return redirect(f"/cart/viewCart/{user_id}/")
 
 
-# Items
-class ItemList(LoginRequiredMixin, ListView):
-    model = Item
+def createOrder(request, user_id):
 
-
-    new_cart = Cart.objects.create(customer_id=user_id, cart_status="active")
-    return ()
-
-def createOrder(request,user_id):
-
-    cart= Cart.objects.get(
-        customer_id=user_id,
-        cart_status="active")
+    cart = Cart.objects.get(customer_id=user_id, cart_status="active")
 
     order = Order.objects.create(
-        restaurant= cart.restaurant,
+        restaurant=cart.restaurant,
         customer_id=user_id,
         total_amount=cart.total_amount,
-        order_status='P',
-
+        order_status="P",
     )
 
     cart.cart_status = "ordered"
     cart.save()
     return redirect(f"/cart/viewCart/{user_id}/")
 
+
 def customerOrders(request, user_id):
     orders = Order.objects.filter(customer_id=user_id).order_by("-id")
-    return render(request, "orders/customer_orders.html", {"orders" : orders })
+    return render(request, "orders/customer_orders.html", {"orders": orders})
+
 
 def restaurantOrders(request):
     restaurants = Restaurant.objects.filter(user=request.user)
     orders = Order.objects.filter(restaurant__in=restaurants).order_by("-id")
-    return render(request, "orders/restaurant_orders.html", {"orders" : orders } )
+    return render(request, "orders/restaurant_orders.html", {"orders": orders})
+
 
 def mark_order_ready(request, order_id):
     order = Order.objects.get(id=order_id)
@@ -390,19 +403,7 @@ def mark_order_ready(request, order_id):
     return redirect("restaurant_orders")
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
+# Items
 class ItemDetail(LoginRequiredMixin, DetailView):
     model = Item
 
