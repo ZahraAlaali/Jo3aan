@@ -6,16 +6,22 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
-from .models import Restaurant, User, Profile, Cart, CartDetails, Item,Order
+from .models import Restaurant, User, Profile, Cart, CartDetails, Item, Order
 from .forms import (
     CustomUserCreationForm,
     UpdateProfileForm,
     UpdateUserForm,
     CustomProfileCreationForm,
     AddToCartForm,
+    ItemForm,
 )
 import datetime
 from django import forms
+
+# reset password
+from django.urls import reverse_lazy
+from django.contrib.auth.views import PasswordResetView
+from django.contrib.messages.views import SuccessMessageMixin
 
 # Create your views here.
 
@@ -52,6 +58,19 @@ def signup(request):
             "error_message": error_message,
         },
     )
+
+
+# class ResetPasswordView(SuccessMessageMixin, PasswordResetView):
+#     template_name = "users/password_reset.html"
+#     email_template_name = "users/password_reset_email.html"
+#     subject_template_name = "users/password_reset_subject"
+#     success_message = (
+#         "We've emailed you instructions for setting your password, "
+#         "if an account exists with the email you entered. You should receive them shortly."
+#         " If you don't receive an email, "
+#         "please make sure you've entered the address you registered with, and check your spam folder."
+#     )
+#     success_url = reverse_lazy("home")
 
 
 # restaurant part
@@ -131,7 +150,17 @@ class RestaurantDelete(LoginRequiredMixin, DeleteView):
 @login_required
 def restaurant_details(request, restaurant_id):
     restaurant = Restaurant.objects.get(id=restaurant_id)
-    return render(request, "restaurants/details.html", {"restaurant": restaurant})
+    item_form = ItemForm()
+    add_to_cart_form = AddToCartForm()
+    return render(
+        request,
+        "restaurants/details.html",
+        {
+            "restaurant": restaurant,
+            "item_form": item_form,
+            "add_to_cart_form": add_to_cart_form,
+        },
+    )
 
 
 @login_required
@@ -155,10 +184,6 @@ class ProfileUpdate(LoginRequiredMixin, UpdateView):
     fields = ["phone", "role", "profileImage"]
 
 
-class ItemList(LoginRequiredMixin, ListView):
-    model = Item
-
-
 def addToCart(request, user_id, item_id, restaurant_id):
     if request.method == "POST":
         form = AddToCartForm(request.POST)
@@ -166,19 +191,58 @@ def addToCart(request, user_id, item_id, restaurant_id):
             cart = Cart.objects.filter(
                 customer_id=user_id, cart_status="active"
             ).first()
-            itemInCart = CartDetails.objects.filter(cart=cart, item_id=item_id).first()
-            if (
-                itemInCart
-                and itemInCart.comment == (form.cleaned_data.get("comment")).strip()
-            ):
-                itemInCart.quantity += form.cleaned_data.get("quantity")
-                itemInCart.save()
+            if cart and cart.restaurant_id == restaurant_id:
+                itemInCart = CartDetails.objects.filter(
+                    cart=cart,
+                    item_id=item_id,
+                    comment=(form.cleaned_data.get("comment")).strip(),
+                ).first()
+                if itemInCart:
+                    itemInCart.quantity += form.cleaned_data.get("quantity")
+                    itemInCart.save()
+                else:
+                    newRecord = form.save(commit=False)
+                    newRecord.cart = cart
+                    newRecord.item_id = item_id
+                    newRecord.save()
+                return redirect("viewCart", user_id=user_id)
+            elif cart and cart.restaurant_id != restaurant_id:
+                cart = cart = Cart.objects.get(
+                    customer_id=user_id, cart_status="active"
+                )
+                restaurantInCart = Restaurant.objects.get(id=cart.restaurant_id)
+                restaurantRequested = Restaurant.objects.get(id=restaurant_id)
+                quantity = form.cleaned_data.get("quantity")
+                comment = form.cleaned_data.get("comment")
+                return render(
+                    request,
+                    "cart/confirm_new_cart.html",
+                    {
+                        "user_id": user_id,
+                        "item_id": item_id,
+                        "restaurantInCart": restaurantInCart,
+                        "restaurantRequested": restaurantRequested,
+                        "quantity": quantity,
+                        "comment": comment,
+                    },
+                )
+
             else:
-                newRecord = form.save(commit=False)
-                newRecord.cart = cart
-                newRecord.item_id = item_id
+                cart = Cart(
+                    customer_id=user_id,
+                    cart_status="active",
+                    restaurant_id=restaurant_id,
+                )
+                cart.save()
+
+                newRecord = CartDetails(
+                    cart=cart,
+                    item_id=item_id,
+                    quantity=form.cleaned_data.get("quantity"),
+                    comment=form.cleaned_data.get("comment"),
+                )
                 newRecord.save()
-            return redirect("viewCart", user_id=user_id)
+                return redirect("viewCart", user_id=user_id)
         return redirect("item_detail", pk=item_id)
     return redirect("item_detail", pk=item_id)
 
@@ -205,6 +269,31 @@ class ItemUpdate(LoginRequiredMixin, UpdateView):
 class ItemDelete(LoginRequiredMixin, DeleteView):
     model = Item
     success_url = "/item"
+
+
+def createNewCart(request, user_id, item_id, restaurant_id):
+    if request.method == "POST":
+        buttonValue = request.POST.get("decision")
+        if buttonValue == "new":
+            cart = Cart.objects.get(customer_id=user_id, cart_status="active")
+            cart.delete()
+            cart = Cart(
+                customer_id=user_id,
+                cart_status="active",
+                restaurant_id=restaurant_id,
+            )
+            cart.save()
+
+            newRecord = CartDetails(
+                cart=cart,
+                item_id=item_id,
+                quantity=request.POST.get("quantity"),
+                comment=request.POST.get("comment"),
+            )
+            newRecord.save()
+            return redirect("viewCart", user_id=user_id)
+        else:
+            return redirect(f"/restaurants/{restaurant_id}/")
 
 
 @login_required
@@ -242,7 +331,7 @@ def viewCart(request, user_id):
         if restaurant.name not in restaurants:
             restaurants.append(restaurant.name)
         row.name = row.item.name
-        row.image = row.item.image
+        row.itemImage = row.item.itemImage
         row.total_price = row.item.price * row.quantity
         row.restaurant = restaurant.name
 
@@ -278,41 +367,32 @@ def decreaseQty(request, user_id, cartDetail_id):
     return redirect(f"/cart/viewCart/{user_id}/")
 
 
-def changeCartStatus(request, user_id, cart_id):
-    # add the cart to the order before changing the status
-    old_cart = Cart.objects.filter(customer_id=user_id).first()
-    old_cart.cart_status = "ordered"
-    old_cart.save()
+def createOrder(request, user_id):
 
-    new_cart = Cart.objects.create(customer_id=user_id, cart_status="active")
-    return ()
-
-def createOrder(request,user_id):
-
-    cart= Cart.objects.get(
-        customer_id=user_id,
-        cart_status="active")
+    cart = Cart.objects.get(customer_id=user_id, cart_status="active")
 
     order = Order.objects.create(
-        restaurant= cart.restaurant,
+        restaurant=cart.restaurant,
         customer_id=user_id,
         total_amount=cart.total_amount,
-        order_status='P',
-
+        order_status="P",
     )
 
     cart.cart_status = "ordered"
     cart.save()
     return redirect(f"/cart/viewCart/{user_id}/")
 
+
 def customerOrders(request, user_id):
     orders = Order.objects.filter(customer_id=user_id).order_by("-id")
-    return render(request, "orders/customer_orders.html", {"orders" : orders })
+    return render(request, "orders/customer_orders.html", {"orders": orders})
+
 
 def restaurantOrders(request):
     restaurants = Restaurant.objects.filter(user=request.user)
     orders = Order.objects.filter(restaurant__in=restaurants).order_by("-id")
-    return render(request, "orders/restaurant_orders.html", {"orders" : orders } )
+    return render(request, "orders/restaurant_orders.html", {"orders": orders})
+
 
 def mark_order_ready(request, order_id):
     order = Order.objects.get(id=order_id)
@@ -323,16 +403,35 @@ def mark_order_ready(request, order_id):
     return redirect("restaurant_orders")
 
 
+# Items
+class ItemDetail(LoginRequiredMixin, DetailView):
+    model = Item
 
 
+class ItemCreat(LoginRequiredMixin, CreateView):
+    model = Item
+    fields = ["name", "description", "itemImage", "price"]
 
 
+def add_item(request, restaurant_id):
+    form = ItemForm(
+        request.POST, request.FILES
+    )  # nextttt time do not forgotttttt to adddddddddddddd request.FILE so it worksssss okay??????
+    if form.is_valid():
+        print("here")
+        new_Item = form.save(commit=False)
+        new_Item.restaurant_id = restaurant_id
+        new_Item.save()
+    return redirect("restaurant_details", restaurant_id)
 
 
+class ItemUpdate(LoginRequiredMixin, UpdateView):
+    model = Item
+    item_form = ItemForm()
+    fields = ["name", "description", "itemImage", "price"]
+    success_url = "/restaurants/{restaurant_id}/"
 
 
-
-
-
-
-
+class ItemDelete(LoginRequiredMixin, DeleteView):
+    model = Item
+    success_url = "/restaurants/{restaurant_id}/"

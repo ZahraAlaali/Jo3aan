@@ -8,7 +8,7 @@
       {% if item.restaurant == restaurant %}
         {% load static %}
         <img
-          src="{% static item.image|cut:'main_app/static/' %}"
+          src="{% static item.itemImage|cut:'main_app/static/' %}"
           alt=""
           width="300px"
         />
