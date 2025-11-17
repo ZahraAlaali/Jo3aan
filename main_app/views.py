@@ -314,7 +314,7 @@ def restaurantOrders(request):
     orders = Order.objects.filter(restaurant__in=restaurants).order_by("-id")
     return render(request, "orders/restaurant_orders.html", {"orders" : orders } )
 
-def updateOrderStatus(request, order_id):
+def mark_order_ready(request, order_id):
     order = Order.objects.get(id=order_id)
     if request.user != order.restaurant.user:
         return redirect("home")
