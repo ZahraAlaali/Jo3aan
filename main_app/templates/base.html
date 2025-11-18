@@ -32,7 +32,7 @@
 
             {% endif %} {% if user.profile.role == "owner" %}
             <li>
-              <li><a href="{% url 'restaurant_orders' %}">Orders</a></li>
+              <li><a href="{% url 'orders_list' %}">Orders</a></li>
 
               <a href="{% url 'restaurant_create' %}">Create restaurant</a>
             </li>
@@ -40,7 +40,7 @@
             {% endif %}
             <a href="{% url 'restaurants_index' %}">View restaurants</a>
             {%else%}
-              <li><a href="{% url 'driver_orders' %}">Orders</a></li>
+              <li><a href="{% url 'orders_list' %}">Orders</a></li>
             {%endif%}
             <li>
               <form action="{% url 'logout' %}" method="post">

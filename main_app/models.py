@@ -113,15 +113,6 @@ class Restaurant(models.Model):
     def __str__(self):
         return self.name
 
-class Order(models.Model):
-        restaurant = models.ForeignKey(Restaurant, on_delete=models.CASCADE)
-        customer = models.ForeignKey(User, on_delete=models.CASCADE)
-        # driver=models.ForeignKey(User, on_delete=models.CASCADE)
-        total_amount=models.FloatField(default=0.0)
-        order_status=models.CharField(max_length=2, choices=ORDER_STATUS, default=ORDER_STATUS[0][0])
-
-        def __str__(self):
-            return f"{self.id} {self.get_order_status_display()}"
 
 class Item(models.Model):
     name = models.CharField(max_length=50)
@@ -156,6 +147,16 @@ class Cart(models.Model):
     def get_display_total_amount(self):
         return "{0:.2f}".format(self.total_amount / 100)
 
+
+class Order(models.Model):
+        restaurant = models.ForeignKey(Restaurant, on_delete=models.CASCADE)
+        customer = models.ForeignKey(User, on_delete=models.CASCADE)
+        cart=models.ForeignKey(Cart, on_delete=models.CASCADE)
+        # driver=models.ForeignKey(User, on_delete=models.CASCADE)
+        total_amount=models.FloatField(default=0.0)
+        order_status=models.CharField(max_length=2, choices=ORDER_STATUS, default=ORDER_STATUS[0][0])
+        def __str__(self):
+            return f"{self.id} {self.get_order_status_display()}"
 
 class CartDetails(models.Model):
     cart = models.ForeignKey(Cart, on_delete=models.CASCADE)
