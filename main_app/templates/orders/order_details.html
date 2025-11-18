@@ -13,8 +13,6 @@
 <button><a href="{% url 'orders_list' %}">back</a></button>
 {%if user.profile.role == 'owner' and order.order_status == 'P'%}
 <button><a href="{% url 'change_order_status' order.id %}">Ready</a></button>
-{% endif %}
-
 {%elif user.profile.role == 'driver' and order.order_status == 'R'%}
 <button><a href="{% url 'change_order_status' order.id %}">Picked up</a></button>
 {%elif user.profile.role == 'driver' and order.order_status == 'PU'%}
