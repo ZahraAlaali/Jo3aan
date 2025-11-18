@@ -22,7 +22,7 @@
             <li>
               <a href="{% url 'profile' %}">Profile</a>
             </li>
-
+            {% if user.profile.role != 'driver' %}
             {% if user.profile.role == "customer" %}
             <li>
               <a href="{% url 'viewCart' user.id %}">Cart</a>
@@ -36,12 +36,14 @@
               <li>
               <a href="{% url 'restaurant_create' %}">Create restaurant</a>
             </li>
-
-
-
             {% endif %}
             <li><a href="{% url 'restaurants_index' %}">View restaurants</a>
             </li>
+            {% endif %}
+            <a href="{% url 'restaurants_index' %}">View restaurants</a>
+            {%else%}
+              <li><a href="{% url 'driver_orders' %}">Orders</a></li>
+            {%endif%}
             <li>
               <form action="{% url 'logout' %}" method="post">
                 {% csrf_token %}
