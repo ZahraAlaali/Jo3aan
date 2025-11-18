@@ -17,6 +17,15 @@ Including another URLconf
 
 from django.contrib import admin
 from django.urls import path, include
+from main_app.views import (
+    CreateCheckoutSessionView,
+    cartLandingPageView,
+    SuccessView,
+    CancelView,
+    stripe_webhook,
+    StripeIntentView
+)
+
 
 urlpatterns = [
     path("admin/", admin.site.urls),
