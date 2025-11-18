@@ -1,7 +1,7 @@
 {% extends 'base.html' %} {% block content %}
 <h1>Orders List</h1>
 {% for order in order_list %} {%if order.order_status != 'P'%}
-<a href="{% url 'viewCart' user.id %}">
+<a href="{% url 'order_details' order.id %}">
   <h1>{{order.id}}</h1>
   <h3>{{order.get_order_status_display}}</h3>
 </a>
