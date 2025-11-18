@@ -427,7 +427,7 @@ def change_order_status(request, order_id):
         order.order_status = "R"
     elif order.order_status == "R":
         order.order_status = "PU"
-        order.driver=request.user
+        order.driver = request.user
     else:
         order.order_status = "D"
     order.save()
@@ -561,3 +561,23 @@ def get_driver_location(request, driver_id):
         return JsonResponse({"lat": obj.lat, "lng": obj.lng})
     except DriverLocation.DoesNotExist:
         return JsonResponse({"lat": None, "lng": None})
+
+
+def choose_location(request, order_id):
+    order = Order.objects.get(id=order_id)
+    return render(request, "orders/choose_location.html", {"order": order})
+
+
+@csrf_exempt
+def save_location(request, order_id):
+    if request.method == "POST":
+        data = json.loads(request.body)
+        lat = data.get("lat")
+        lng = data.get("lng")
+
+        order = Order.objects.get(id=order_id)
+        order.customer_lat = lat
+        order.customer_lng = lng
+        order.save()
+
+        return JsonResponse({"status": "saved"})

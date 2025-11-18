@@ -101,4 +101,14 @@ urlpatterns = [
     path("orders/driver/<int:order_id>", views.order_details, name="order_details"),
     path("api/driver/<int:driver_id>/update-location/", views.update_driver_location),
     path("api/driver/<int:driver_id>/location/", views.get_driver_location),
+    path(
+        "orders/<int:order_id>/choose-location/",
+        views.choose_location,
+        name="choose_location",
+    ),
+    path(
+        "api/order/<int:order_id>/save-location/",
+        views.save_location,
+        name="save_location",
+    ),
 ]
