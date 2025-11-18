@@ -1,0 +1,7 @@
+{% extends 'base.html' %}
+{% block content %}
+<h1>Orders List</h1>
+{% for order in orders_list %}
+<h1>{{order.id}}</h1>
+{% endfor %}
+{% endblock %}
