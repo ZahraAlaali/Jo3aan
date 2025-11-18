@@ -424,6 +424,7 @@ def change_order_status(request, order_id):
         order.order_status = "R"
     elif order.order_status == "R":
         order.order_status = "PU"
+        order.driver=request.user
     else:
         order.order_status = "D"
     order.save()

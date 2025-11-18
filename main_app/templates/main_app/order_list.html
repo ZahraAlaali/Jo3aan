@@ -1,7 +1,12 @@
 {% extends 'base.html' %} {% block content %}
 <h1>Orders List</h1>
 {% for order in order_list %}
-{%if user.profile.role == 'owner' or user.profile.role == 'driver' and order.order_status != 'P' %}
+{%if user.profile.role == 'owner' or user.profile.role == 'driver' and order.order_status == 'R' %}
+<a href="{% url 'order_details' order.id %}">
+  <h1>{{order.id}}</h1>
+  <h3>{{order.get_order_status_display}}</h3>
+</a>
+{% elif user.profile.role == 'driver' and order.driver == user.id and order.order_status == 'PU' or order.order_status == 'D'%}
 <a href="{% url 'order_details' order.id %}">
   <h1>{{order.id}}</h1>
   <h3>{{order.get_order_status_display}}</h3>
