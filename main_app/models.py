@@ -196,6 +196,9 @@ class Order(models.Model):
         max_length=2, choices=ORDER_STATUS, default=ORDER_STATUS[0][0]
     )
     cart = models.ForeignKey(Cart, on_delete=models.CASCADE)
+    # customer location
+    customer_lat = models.FloatField(null=True, blank=True)
+    customer_lng = models.FloatField(null=True, blank=True)
 
     def __str__(self):
         return f"{self.id} {self.get_order_status_display()}"

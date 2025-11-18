@@ -390,7 +390,8 @@ def createOrder(request, user_id):
 
     cart.cart_status = "ordered"
     cart.save()
-    return redirect(f"/orders/customer/{user_id}/")
+    return redirect("choose_location", order.id)
+    # return redirect(f"/orders/customer/{user_id}/")
 
 
 def customerOrders(request, user_id):
