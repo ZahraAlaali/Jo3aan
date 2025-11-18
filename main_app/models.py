@@ -86,6 +86,16 @@ class Category(models.Model):
         return self.name
 
 
+class DriverLocation(models.Model):
+    driver = models.OneToOneField(User, on_delete=models.CASCADE)
+    lat = models.FloatField(null=True, blank=True)
+    lng = models.FloatField(null=True, blank=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"{self.driver.username} Location"
+
+
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     phone = models.CharField(max_length=8)

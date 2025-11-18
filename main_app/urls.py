@@ -90,7 +90,29 @@ urlpatterns = [
         "orders/customer/<int:user_id>/", views.customerOrders, name="customer_orders"
     ),
     path("orders/restaurant/", views.restaurantOrders, name="restaurant_orders"),
+<<<<<<< HEAD
     path("orders/ready/<int:order_id>/", views.change_order_status, name="change_order_status"),
     path('orders/driver/',views.orders_list.as_view(), name='orders_list'),
     path('orders/driver/<int:order_id>', views.order_details,name='order_details')
+=======
+    path(
+        "orders/ready/<int:order_id>/",
+        views.change_order_status,
+        name="change_order_status",
+    ),
+    path("orders/driver/", views.orders_list.as_view(), name="orders_list"),
+    path("orders/driver/<int:order_id>", views.order_details, name="order_details"),
+    path("api/driver/<int:driver_id>/update-location/", views.update_driver_location),
+    path("api/driver/<int:driver_id>/location/", views.get_driver_location),
+    path(
+        "orders/<int:order_id>/choose-location/",
+        views.choose_location,
+        name="choose_location",
+    ),
+    path(
+        "api/order/<int:order_id>/save-location/",
+        views.save_location,
+        name="save_location",
+    ),
+>>>>>>> 4a272f31fc2307f32a70df7198fab47b2e79a4dc
 ]
