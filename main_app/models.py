@@ -116,7 +116,7 @@ class Restaurant(models.Model):
 class Order(models.Model):
         restaurant = models.ForeignKey(Restaurant, on_delete=models.CASCADE)
         customer = models.ForeignKey(User, on_delete=models.CASCADE)
-
+        driver=models.ForeignKey(User, on_delete=models.CASCADE)
         total_amount=models.FloatField(default=0.0)
         order_status=models.CharField(max_length=1, choices=ORDER_STATUS, default=ORDER_STATUS[0][0])
 
