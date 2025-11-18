@@ -34,7 +34,6 @@ urlpatterns = [
         StripeIntentView.as_view(),
         name="create-payment-intent",
     ),
-    # path('webhooks/stripe/', stripe_webhook, name='stripe-webhook'),
     path("cancel/", CancelView.as_view(), name="cancel"),
     path("landing/", cartLandingPageView.as_view(), name="landing-page"),
     path(
