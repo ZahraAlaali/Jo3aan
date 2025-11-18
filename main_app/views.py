@@ -405,7 +405,7 @@ class driver_orders(ListView):
     # orders=Order.objects.filter(order_status='R')
     # return render(request, 'orders/driver_orders.html',{"orders":orders})
     model=Order
-class order_details(DeleteView):
+class order_details(DetailView):
     model=Order
 def mark_order_ready(request, order_id):
     order = Order.objects.get(id=order_id)
