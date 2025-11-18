@@ -2,15 +2,12 @@ from django.shortcuts import render, redirect, get_object_or_404
 from .models import Profile
 import json
 import stripe
-from django.core.mail import send_mail
 from django.conf import settings
 from django.views.generic import TemplateView
-from django.views.decorators.csrf import csrf_exempt
-from django.http import JsonResponse, HttpResponse
+from django.http import JsonResponse
 from django.views import View
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.views.generic import ListView, DetailView
-from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -78,7 +75,7 @@ class ResetPasswordView(SuccessMessageMixin, PasswordResetView):
         " If you don't receive an email, "
         "please make sure you've entered the address you registered with, and check your spam folder."
     )
-    success_url = reverse_lazy("home")
+    success_url = reverse_lazy("password_reset")
 
 
 # restaurant part
@@ -213,7 +210,7 @@ def addToCart(request, user_id, item_id, restaurant_id):
                     newRecord.cart = cart
                     newRecord.item_id = item_id
                     newRecord.save()
-                return redirect("viewCart", user_id=user_id)
+                return redirect(f"/restaurants/{restaurant_id}")
             elif cart and cart.restaurant_id != restaurant_id:
                 cart = cart = Cart.objects.get(
                     customer_id=user_id, cart_status="active"
@@ -250,9 +247,9 @@ def addToCart(request, user_id, item_id, restaurant_id):
                     comment=form.cleaned_data.get("comment"),
                 )
                 newRecord.save()
-                return redirect("viewCart", user_id=user_id)
-        return redirect("item_detail", pk=item_id)
-    return redirect("item_detail", pk=item_id)
+                return redirect(f"/restaurants/{restaurant_id}/")
+        return redirect(f"/restaurants/{restaurant_id}/")
+    return redirect(f"/restaurants/{restaurant_id}/")
 
 
 class ItemDetail(LoginRequiredMixin, DetailView):
@@ -299,7 +296,7 @@ def createNewCart(request, user_id, item_id, restaurant_id):
                 comment=request.POST.get("comment"),
             )
             newRecord.save()
-            return redirect("viewCart", user_id=user_id)
+            return redirect(f"/restaurants/{restaurant_id}/")
         else:
             return redirect(f"/restaurants/{restaurant_id}/")
 
@@ -332,22 +329,24 @@ def profile_user_update(request, user_id, profile_id):
 def viewCart(request, user_id):
     cart = Cart.objects.filter(customer_id=user_id, cart_status="active").first()
     cart_details = CartDetails.objects.filter(cart=cart).select_related("item")
-    restaurants = []
     for row in cart_details:
-        itemInItem = Item.objects.filter(id=row.item_id).first()
-        restaurant = Restaurant.objects.filter(id=itemInItem.restaurant_id).first()
-        if restaurant.name not in restaurants:
-            restaurants.append(restaurant.name)
+
+        restaurantInData = Restaurant.objects.get(id=cart.restaurant_id)
+        restaurant = restaurantInData.name
         row.name = row.item.name
         row.itemImage = row.item.itemImage
         row.total_price = row.item.price * row.quantity
-        row.restaurant = restaurant.name
-
-    return render(
-        request,
-        "cart/CartView.html",
-        {"cart": cart, "cart_details": cart_details, "restaurants": restaurants},
-    )
+    if cart_details:
+        return render(
+            request,
+            "cart/CartView.html",
+            {"cart": cart, "cart_details": cart_details, "restaurant": restaurant},
+        )
+    else:
+        return render(
+            request,
+            "cart/CartView.html",
+        )
 
 
 def deleteItemFromCart(request, user_id, cartDetail_id):
@@ -410,7 +409,7 @@ class orders_list(ListView):
 
 def order_details(request, order_id):
     order = Order.objects.get(id=order_id)
-    cart=Cart.objects.get(order=order_id)
+    cart = Cart.objects.get(order=order_id)
     items = CartDetails.objects.filter(cart_id=cart.id)
     return render(
         request, "orders/order_details.html", {"order": order, "items": items}
@@ -431,7 +430,8 @@ def change_order_status(request, order_id):
     if request.user.profile.role == "owner":
         return redirect("restaurant_orders")
     else:
-        return redirect("order_details",order_id)
+        return redirect("order_details", order_id)
+
 
 # Items
 class ItemDetail(LoginRequiredMixin, DetailView):
@@ -498,8 +498,8 @@ class CreateCheckoutSessionView(View):
                     "price_data": {
                         "currency": "usd",
                         "unit_amount": cart.total_amount,
-                        "cart_data": {
-                            "name": cart.name,
+                        "product_data": {
+                            "name": f"Cart #{cart.id}",
                             # 'images': ['https://i.imgur.com/EHyR2nP.png'],
                         },
                     },
@@ -508,64 +508,10 @@ class CreateCheckoutSessionView(View):
             ],
             metadata={"cart_id": cart.id},
             mode="payment",
-            success_url=YOUR_DOMAIN + "/success/",
-            cancel_url=YOUR_DOMAIN + "/cancel/",
+            success_url=YOUR_DOMAIN + f"/orders/create/{self.request.user.id}/",
+            cancel_url="/cancel/",
         )
         return JsonResponse({"id": checkout_session.id})
-
-
-@csrf_exempt
-def stripe_webhook(request):
-    payload = request.body
-    sig_header = request.META["HTTP_STRIPE_SIGNATURE"]
-    event = None
-
-    try:
-        event = stripe.Webhook.construct_event(
-            payload, sig_header, settings.STRIPE_WEBHOOK_SECRET
-        )
-    except ValueError as e:
-        # Invalid payload
-        return HttpResponse(status=400)
-    except stripe.error.SignatureVerificationError as e:
-        # Invalid signature
-        return HttpResponse(status=400)
-
-    # Handle the checkout.session.completed event
-    if event["type"] == "checkout.session.completed":
-        session = event["data"]["object"]
-
-        customer_email = session["customer_details"]["email"]
-        cart_id = session["metadata"]["cart_id"]
-
-        cart = Cart.objects.get(id=cart_id)
-
-        send_mail(
-            subject="Here is your cart",
-            message=f"Thanks for your purchase. Here is the cart you ordered. The URL is {cart.url}",
-            recipient_list=[customer_email],
-            from_email="matt@test.com",
-        )
-
-    elif event["type"] == "payment_intent.succeeded":
-        intent = event["data"]["object"]
-
-        stripe_customer_id = intent["customer"]
-        stripe_customer = stripe.Customer.retrieve(stripe_customer_id)
-
-        customer_email = stripe_customer["email"]
-        cart_id = intent["metadata"]["cart_id"]
-
-        cart = Cart.objects.get(id=cart_id)
-
-        send_mail(
-            subject="Here is your cart",
-            message=f"Thanks for your purchase. Here is the cart you ordered. The URL is {cart.url}",
-            recipient_list=[customer_email],
-            from_email="matt@test.com",
-        )
-
-    return HttpResponse(status=200)
 
 
 class StripeIntentView(View):
@@ -576,7 +522,7 @@ class StripeIntentView(View):
             cart_id = self.kwargs["pk"]
             cart = Cart.objects.get(id=cart_id)
             intent = stripe.PaymentIntent.create(
-                amount=cart.total_amount,
+                amount=int(cart.total_amount * 100),
                 currency="usd",
                 customer=customer["id"],
                 metadata={"cart_id": cart.id},

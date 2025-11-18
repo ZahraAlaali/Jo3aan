@@ -5,58 +5,77 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Jo3aan</title>
+    <link rel="stylesheet" href="{% static 'css/base.css' %}">
   </head>
   <body>
-    <header class="navbar-fixed">
-      <nav>
-        <div class="nav-wrapper">
-          <ul>
-            <li>
-              <a href="{% url 'home' %}" class="left brand-logo"
-                >&nbsp;&nbsp;Jo3aan</a
-              >
-            </li>
-          </ul>
-          <ul class="right">
-            {% if user.is_authenticated %}
-            <li>
-              <a href="{% url 'profile' %}">Profile</a>
-            </li>
-            {% if user.profile.role != 'driver' %}
-            {% if user.profile.role == "customer" %}
-            <li>
-              <a href="{% url 'viewCart' user.id %}">Cart</a>
-            </li>
+  <header class="navbar-fixed">
+  <nav>
+    <div class="nav-wrapper">
+      <ul>
+        <li>
+          <a href="{% url 'home' %}" class="left brand-logo"
+            >&nbsp;&nbsp;Jo3aan</a
+          >
+        </li>
+      </ul>
+      <ul class="right">
+        {% if user.is_authenticated %}
+        <li>
+          <a href="{% url 'profile' %}">Profile</a>
+        </li>
 
-            <li><a href="{% url 'customer_orders' user.id %}">Orders</a></li>
+        {% if user.profile.role == 'customer' %}
+        <li>
+          <a href="{% url 'viewCart' user.id %}">Cart</a>
+        </li>
+        <li>
+          <a href="{% url 'customer_orders' user.id %}">Orders</a>
+        </li>
+        <li>
+          <a href="{% url 'restaurants_index' %}">Restaurants</a>
+        </li>
 
-            {% endif %} {% if user.profile.role == "owner" %}
-            <li>
-              <li><a href="{% url 'orders_list' %}">Orders</a></li>
+        {% elif user.profile.role == 'owner' %}
+        <li>
+          <a href="{% url 'restaurant_orders' %}">Orders</a>
+        </li>
+        <li>
+          <a href="{% url 'restaurant_create' %}">Create restaurant</a>
+        </li>
+        <li>
+          <a href="{% url 'restaurants_index' %}">Restaurants</a>
+        </li>
 
-              <a href="{% url 'restaurant_create' %}">Create restaurant</a>
-            </li>
-            <li><a href="{% url 'item_create' %}">Create item</a></li>
-            {% endif %}
-            <a href="{% url 'restaurants_index' %}">View restaurants</a>
-            {%else%}
-              <li><a href="{% url 'orders_list' %}">Orders</a></li>
-            {%endif%}
-            <li>
-              <form action="{% url 'logout' %}" method="post">
-                {% csrf_token %}
-                <button type="submit">Logout</button>
-              </form>
-            </li>
-            {% else %}
+        {% elif user.profile.role == 'driver' %}
+        <li>
+          <a href="{% url 'driver_orders' %}">Orders</a>
+        </li>
+        {% endif %}
 
-            <li><a href="{% url 'login' %}">Login</a></li>
-            <li><a href="{% url 'signup' %}">Sign Up</a></li>
-            {% endif %}
-          </ul>
-        </div>
-      </nav>
-    </header>
+        <li>
+          <form action="{% url 'logout' %}" method="post">
+            {% csrf_token %}
+            <button type="submit">Logout</button>
+          </form>
+        </li>
+        {% else %}
+        <li><a href="{% url 'login' %}">Login</a></li>
+        <li><a href="{% url 'signup' %}">Sign Up</a></li>
+        {% endif %}
+      </ul>
+    </div>
+  </nav>
+</header>
+
+    {% if messages %}
+  <div class="container mt-3">
+    {% for message in messages %}
+      <div class="alert alert-{{ message.tags }}">
+        {{ message }}
+      </div>
+    {% endfor %}
+  </div>
+{% endif %}
     <main class="container">{% block content %} {% endblock %}</main>
     <footer class="page-footer">
       <div class="right">All Rights Reserved, &copy, 2025 Jo3aan &nbsp;</div>
