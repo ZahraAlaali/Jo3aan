@@ -1,7 +1,10 @@
 {% extends 'base.html' %}
 {% block content %}
 <h1>Orders List</h1>
-{% for order in orders_list %}
+{% for order in order_list %}
+{%if order.order_status != 'P'%}
 <h1>{{order.id}}</h1>
+<h2>{{order.get_order_status_display}}</h2>
+{%endif%}
 {% endfor %}
 {% endblock %}
