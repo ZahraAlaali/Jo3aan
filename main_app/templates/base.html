@@ -57,6 +57,15 @@
         </div>
       </nav>
     </header>
+    {% if messages %}
+  <div class="container mt-3">
+    {% for message in messages %}
+      <div class="alert alert-{{ message.tags }}">
+        {{ message }}
+      </div>
+    {% endfor %}
+  </div>
+{% endif %}
     <main class="container">{% block content %} {% endblock %}</main>
     <footer class="page-footer">
       <div class="right">All Rights Reserved, &copy, 2025 Jo3aan &nbsp;</div>
