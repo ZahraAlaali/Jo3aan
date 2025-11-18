@@ -93,5 +93,6 @@ urlpatterns = [
     ),
     path("orders/restaurant/", views.restaurantOrders, name="restaurant_orders"),
     path("orders/ready/<int:order_id>/", views.mark_order_ready, name="mark_ready"),
-    
+    path('orders/driver/',views.driver_orders.as_view(), name='driver_orders')
+
 ]
