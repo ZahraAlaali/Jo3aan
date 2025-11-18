@@ -329,22 +329,24 @@ def profile_user_update(request, user_id, profile_id):
 def viewCart(request, user_id):
     cart = Cart.objects.filter(customer_id=user_id, cart_status="active").first()
     cart_details = CartDetails.objects.filter(cart=cart).select_related("item")
-    restaurants = []
     for row in cart_details:
-        itemInItem = Item.objects.filter(id=row.item_id).first()
-        restaurant = Restaurant.objects.filter(id=itemInItem.restaurant_id).first()
-        if restaurant.name not in restaurants:
-            restaurants.append(restaurant.name)
+
+        restaurantInData = Restaurant.objects.get(id=cart.restaurant_id)
+        restaurant = restaurantInData.name
         row.name = row.item.name
         row.itemImage = row.item.itemImage
         row.total_price = row.item.price * row.quantity
-        row.restaurant = restaurant.name
-
-    return render(
-        request,
-        "cart/CartView.html",
-        {"cart": cart, "cart_details": cart_details, "restaurants": restaurants},
-    )
+    if cart_details:
+        return render(
+            request,
+            "cart/CartView.html",
+            {"cart": cart, "cart_details": cart_details, "restaurant": restaurant},
+        )
+    else:
+        return render(
+            request,
+            "cart/CartView.html",
+        )
 
 
 def deleteItemFromCart(request, user_id, cartDetail_id):
