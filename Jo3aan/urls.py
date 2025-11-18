@@ -29,12 +29,12 @@ from main_app.views import (
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path("", include("main_app.urls")),
     path("accounts/", include("django.contrib.auth.urls")),
     path('create-payment-intent/<pk>/', StripeIntentView.as_view(), name='create-payment-intent'),
     path('webhooks/stripe/', stripe_webhook, name='stripe-webhook'),
     path('cancel/', CancelView.as_view(), name='cancel'),
     path('success/', SuccessView.as_view(), name='success'),
-    path('', cartLandingPageView.as_view(), name='landing-page'),
-    path('create-checkout-session/<pk>/', CreateCheckoutSessionView.as_view(), name='create-checkout-session')
+    path('landing/', cartLandingPageView.as_view(), name='landing-page'),
+    path('create-checkout-session/<pk>/', CreateCheckoutSessionView.as_view(), name='create-checkout-session'),
+    path("", include("main_app.urls")),
 ]

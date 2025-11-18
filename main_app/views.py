@@ -459,7 +459,7 @@ class cartLandingPageView(TemplateView):
     template_name = "landing.html"
 
     def get_context_data(self, **kwargs):
-        cart = cart.objects.get(name="Test cart")
+        cart = Cart.objects.get(customer_id=self.request.user.id, cart_status='active')
         context = super(cartLandingPageView, self).get_context_data(**kwargs)
         context.update({
             "cart": cart,
@@ -471,7 +471,7 @@ class cartLandingPageView(TemplateView):
 class CreateCheckoutSessionView(View):
     def post(self, request, *args, **kwargs):
         cart_id = self.kwargs["pk"]
-        cart = cart.objects.get(id=cart_id)
+        cart = Cart.objects.get(id=cart_id)
         YOUR_DOMAIN = "http://127.0.0.1:8000"
         checkout_session = stripe.checkout.Session.create(
             payment_method_types=['card'],
@@ -479,7 +479,7 @@ class CreateCheckoutSessionView(View):
                 {
                     'price_data': {
                         'currency': 'usd',
-                        'unit_amount': cart.price,
+                        'unit_amount': cart.total_amount,
                         'cart_data': {
                             'name': cart.name,
                             # 'images': ['https://i.imgur.com/EHyR2nP.png'],
@@ -524,7 +524,7 @@ def stripe_webhook(request):
         customer_email = session["customer_details"]["email"]
         cart_id = session["metadata"]["cart_id"]
 
-        cart = cart.objects.get(id=cart_id)
+        cart = Cart.objects.get(id=cart_id)
 
         send_mail(
             subject="Here is your cart",
@@ -533,7 +533,7 @@ def stripe_webhook(request):
             from_email="matt@test.com"
         )
 
-        
+
 
     elif event["type"] == "payment_intent.succeeded":
         intent = event['data']['object']
@@ -562,9 +562,9 @@ class StripeIntentView(View):
             req_json = json.loads(request.body)
             customer = stripe.Customer.create(email=req_json['email'])
             cart_id = self.kwargs["pk"]
-            cart = cart.objects.get(id=cart_id)
+            cart = Cart.objects.get(id=cart_id)
             intent = stripe.PaymentIntent.create(
-                amount=cart.price,
+                amount=cart.total_amount,
                 currency='usd',
                 customer=customer['id'],
                 metadata={
