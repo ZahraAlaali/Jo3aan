@@ -90,11 +90,6 @@ urlpatterns = [
         "orders/customer/<int:user_id>/", views.customerOrders, name="customer_orders"
     ),
     path("orders/restaurant/", views.restaurantOrders, name="restaurant_orders"),
-<<<<<<< HEAD
-    path("orders/ready/<int:order_id>/", views.change_order_status, name="change_order_status"),
-    path('orders/driver/',views.orders_list.as_view(), name='orders_list'),
-    path('orders/driver/<int:order_id>', views.order_details,name='order_details')
-=======
     path(
         "orders/ready/<int:order_id>/",
         views.change_order_status,
@@ -114,5 +109,4 @@ urlpatterns = [
         views.save_location,
         name="save_location",
     ),
->>>>>>> 4a272f31fc2307f32a70df7198fab47b2e79a4dc
 ]
