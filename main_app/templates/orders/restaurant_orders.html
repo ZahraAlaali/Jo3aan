@@ -11,7 +11,7 @@
       <p>Status: {{ order.get_order_status_display }}</p>
 
       {% if order.order_status == "P" %}
-        <form action="{% url 'mark_ready' order.id %}" method="POST">
+        <form action="{% url 'change_order_status' order.id %}" method="POST">
           {% csrf_token %}
           <button type="submit">Mark as Ready</button>
         </form>

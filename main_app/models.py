@@ -4,7 +4,7 @@ from django.contrib.auth.models import User
 
 # from phonenumber_field.modelfields import PhoneNumberField
 
-ROLE = (("customer", "Customer"), ("owner", "Owner"), ('driver','Driver'))
+ROLE = (("customer", "Customer"), ("owner", "Owner"), ("driver", "Driver"))
 
 STATUS = (("active", "active"), ("ordered", "ordered"))
 
@@ -72,10 +72,11 @@ CITIES = (
 )
 ORDER_STATUS = (
     ("P", "Pending"),
-    ("R","Ready"),
-    ('PU','Picked up'),
-    ('D','Delivered')
+    ("R", "Ready"),
+    ("PU", "Picked up"),
+    ("D", "Delivered"),
 )
+
 
 # Create your models here.
 class Category(models.Model):
@@ -113,15 +114,6 @@ class Restaurant(models.Model):
     def __str__(self):
         return self.name
 
-class Order(models.Model):
-        restaurant = models.ForeignKey(Restaurant, on_delete=models.CASCADE)
-        customer = models.ForeignKey(User, on_delete=models.CASCADE)
-        # driver=models.ForeignKey(User, on_delete=models.CASCADE)
-        total_amount=models.FloatField(default=0.0)
-        order_status=models.CharField(max_length=2, choices=ORDER_STATUS, default=ORDER_STATUS[0][0])
-
-        def __str__(self):
-            return f"{self.id} {self.get_order_status_display()}"
 
 class Item(models.Model):
     name = models.CharField(max_length=50)
@@ -153,8 +145,9 @@ class Cart(models.Model):
             total += item.item.price * item.quantity
         self.total_amount = total
         Cart.objects.filter(pk=self.pk).update(total_amount=total)
+
     def get_display_total_amount(self):
-        return "{0:.2f}".format(self.total_amount / 100)
+        return f"{self.total_amount:.2f}"
 
 
 class CartDetails(models.Model):
@@ -174,3 +167,25 @@ class CartDetails(models.Model):
         cart.save()
 
 
+class Order(models.Model):
+    restaurant = models.ForeignKey(Restaurant, on_delete=models.CASCADE)
+    customer = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name="customer_orders",
+    )
+    driver = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="driver_orders",
+    )
+    total_amount = models.FloatField(default=0.0)
+    order_status = models.CharField(
+        max_length=2, choices=ORDER_STATUS, default=ORDER_STATUS[0][0]
+    )
+    cart = models.ForeignKey(Cart, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f"{self.id} {self.get_order_status_display()}"
