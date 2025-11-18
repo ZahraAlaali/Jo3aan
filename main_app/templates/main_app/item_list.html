@@ -3,7 +3,7 @@
 <h1>Item List</h1>
 {% for item in item_list %}
 <div>
-  <a href="{% url 'item_detail' item.id %}">
+  <a href="{% url 'restaurant_details' item.id %}">
     <div>
       <div>
         <h3>{{ item.name }}</h3>

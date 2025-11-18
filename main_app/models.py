@@ -138,7 +138,7 @@ class Item(models.Model):
         return self.name
 
     def get_absolute_url(self):
-        return reverse("item_detail", kwargs={"pk": self.id})
+        return reverse("/restaurants/{restaurant_id}/", kwargs={"pk": self.id})
 
 
 class Cart(models.Model):
