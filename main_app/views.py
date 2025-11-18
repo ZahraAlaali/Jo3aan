@@ -35,7 +35,7 @@ from django.contrib.messages.views import SuccessMessageMixin
 
 
 def home(request):
-    return render(request, "home.html")
+    return redirect("restaurants_index")
 
 
 def signup(request):
@@ -213,7 +213,7 @@ def addToCart(request, user_id, item_id, restaurant_id):
                     newRecord.cart = cart
                     newRecord.item_id = item_id
                     newRecord.save()
-                return redirect(f"/restaurants/{restaurant_id}")
+                return redirect(f"/restaurants/{restaurant_id}/")
             elif cart and cart.restaurant_id != restaurant_id:
                 cart = cart = Cart.objects.get(
                     customer_id=user_id, cart_status="active"
@@ -455,7 +455,7 @@ def add_item(request, restaurant_id):
         new_Item = form.save(commit=False)
         new_Item.restaurant_id = restaurant_id
         new_Item.save()
-    return redirect("restaurant_details", restaurant_id)
+    return redirect(f"/restaurants/{restaurant_id}/", restaurant_id)
 
 
 class ItemUpdate(LoginRequiredMixin, UpdateView):
@@ -470,6 +470,7 @@ class ItemDelete(LoginRequiredMixin, DeleteView):
     success_url = "/restaurants/{restaurant_id}/"
 
 
+#pay
 stripe.api_key = settings.STRIPE_SECRET_KEY
 
 
