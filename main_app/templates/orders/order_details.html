@@ -5,10 +5,11 @@
 <h3>Items:</h3>
 <ul>
   {% for i in items %}
-    <li>{{ i.item.name }} — Qty: {{ i.quantity }} — {{ i.price }} BD</li>
+    <li>{{ i.item.name }} — Qty: {{ i.quantity }} — {{ i.item.price }} BD</li>
   {% endfor %}
 </ul>
 
 <p>Total: {{ order.total_amount }} BD</p>
-
+<button><a href="{% url 'driver_orders' %}">back</a></button>
+<button><a href="{% url 'driver_orders' %}">Picked up</a></button>
 {%endblock%}

@@ -412,18 +412,21 @@ def order_details(request, order_id):
     order = Order.objects.get(id=order_id)
     cart=Cart.objects.get(order=order_id)
     items = CartDetails.objects.filter(cart_id=cart.id)
-    for i in items:
-        print(i.item.name)
     return render(
         request, "orders/order_details.html", {"order": order, "items": items}
     )
 
 
-def mark_order_ready(request, order_id):
+def change_order_status(request, order_id):
     order = Order.objects.get(id=order_id)
     if request.user != order.restaurant.user:
         return redirect("home")
-    order.order_status = "R"
+    if order.order_status == "P":
+        order.order_status = "R"
+    elif order.order_status == "R":
+        order.order_status = "PU"
+    else:
+        order.order_status = "D"
     order.save()
     return redirect("restaurant_orders")
 
