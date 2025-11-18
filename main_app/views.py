@@ -32,6 +32,7 @@ from django.contrib.messages.views import SuccessMessageMixin
 
 
 def home(request):
+    
     return render(request, "home.html")
 
 
