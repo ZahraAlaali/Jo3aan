@@ -213,7 +213,7 @@ def addToCart(request, user_id, item_id, restaurant_id):
                     newRecord.cart = cart
                     newRecord.item_id = item_id
                     newRecord.save()
-                return redirect("viewCart", user_id=user_id)
+                return redirect(f"/restaurants/{restaurant_id}/")
             elif cart and cart.restaurant_id != restaurant_id:
                 cart = cart = Cart.objects.get(
                     customer_id=user_id, cart_status="active"
@@ -250,7 +250,7 @@ def addToCart(request, user_id, item_id, restaurant_id):
                     comment=form.cleaned_data.get("comment"),
                 )
                 newRecord.save()
-                return redirect("viewCart", user_id=user_id)
+                return redirect(f"/restaurants/{restaurant_id}/")
         return redirect("/restaurants/{restaurant_id}/", pk=item_id)
     return redirect("/restaurants/{restaurant_id}/", pk=item_id)
 
@@ -299,7 +299,7 @@ def createNewCart(request, user_id, item_id, restaurant_id):
                 comment=request.POST.get("comment"),
             )
             newRecord.save()
-            return redirect("viewCart", user_id=user_id)
+            return redirect(f"/restaurants/{restaurant_id}/")
         else:
             return redirect(f"/restaurants/{restaurant_id}/")
 
@@ -447,6 +447,8 @@ class ItemDelete(LoginRequiredMixin, DeleteView):
     model = Item
     success_url = "/restaurants/{restaurant_id}/"
 
+
+#pay
 stripe.api_key = settings.STRIPE_SECRET_KEY
 
 

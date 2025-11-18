@@ -32,6 +32,7 @@ urlpatterns = [
         ),
         name="password_reset_complete",
     ),
+
     # Restaurant
     path("restaurants/", views.restaurants_index, name="restaurants_index"),
     path(
@@ -55,8 +56,8 @@ urlpatterns = [
         name="restaurant_delete",
     ),
     # item
-    path("item/<int:pk>/", views.ItemDetail.as_view(), name="item_detail"),
-    path("item/create/", views.ItemCreat.as_view(), name="item_create"),
+    # path("item/<int:pk>/", views.ItemDetail.as_view(), name="item_detail"),
+    # path("item/create/", views.ItemCreat.as_view(), name="item_create"),
     path("item/<int:pk>/update/", views.ItemUpdate.as_view(), name="item_update"),
     path("item/<int:pk>/delete/", views.ItemDelete.as_view(), name="item_delete"),
     path("restaurants/<int:restaurant_id>/add_item", views.add_item, name="add_item"),
