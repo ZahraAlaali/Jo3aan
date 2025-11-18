@@ -251,8 +251,8 @@ def addToCart(request, user_id, item_id, restaurant_id):
                 )
                 newRecord.save()
                 return redirect("viewCart", user_id=user_id)
-        return redirect("item_detail", pk=item_id)
-    return redirect("item_detail", pk=item_id)
+        return redirect("/restaurants/{restaurant_id}/", pk=item_id)
+    return redirect("/restaurants/{restaurant_id}/", pk=item_id)
 
 
 class ItemDetail(LoginRequiredMixin, DetailView):
