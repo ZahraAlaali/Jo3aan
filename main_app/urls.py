@@ -1,14 +1,12 @@
 from django.urls import path, include
 from . import views
-
 from .views import ResetPasswordView
 from django.contrib.auth import views as auth_views
-
 urlpatterns = [
     # Sign Up
     path("accounts/signup/", views.signup, name="signup"),
     #
-    path("", views.restaurants_index, name="home"),
+    path("", views.home, name="home"),
     # profile
     path("profile/", views.profile, name="profile"),
     path("profile/create/", views.ProfileCreate.as_view(), name="craete_profile"),
@@ -32,7 +30,6 @@ urlpatterns = [
         ),
         name="password_reset_complete",
     ),
-
     # Restaurant
     path("restaurants/", views.restaurants_index, name="restaurants_index"),
     path(
@@ -56,8 +53,8 @@ urlpatterns = [
         name="restaurant_delete",
     ),
     # item
-    # path("item/<int:pk>/", views.ItemDetail.as_view(), name="item_detail"),
-    # path("item/create/", views.ItemCreat.as_view(), name="item_create"),
+    path("item/<int:pk>/", views.ItemDetail.as_view(), name="item_detail"),
+    path("item/create/", views.ItemCreat.as_view(), name="item_create"),
     path("item/<int:pk>/update/", views.ItemUpdate.as_view(), name="item_update"),
     path("item/<int:pk>/delete/", views.ItemDelete.as_view(), name="item_delete"),
     path("restaurants/<int:restaurant_id>/add_item", views.add_item, name="add_item"),
@@ -94,6 +91,6 @@ urlpatterns = [
     ),
     path("orders/restaurant/", views.restaurantOrders, name="restaurant_orders"),
     path("orders/ready/<int:order_id>/", views.change_order_status, name="change_order_status"),
-    path('orders/driver/',views.driver_orders.as_view(), name='driver_orders')
-
+    path('orders/driver/',views.orders_list.as_view(), name='orders_list'),
+    path('orders/driver/<int:order_id>', views.order_details,name='order_details')
 ]
