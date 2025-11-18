@@ -19,4 +19,72 @@
 <button><a href="{% url 'change_order_status' order.id %}">Delivered</a></button>
 {%endif%}
 
+
+{% if user.profile.role == 'driver' %}
+
+<script>
+  function sendLocation() {
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(async (pos) => {
+            const data = {
+                lat: pos.coords.latitude,
+                lng: pos.coords.longitude
+            };
+
+            await fetch(`/api/driver/{{ order.driver.id }}/update-location/`, {
+                method: "POST",
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify(data)
+            });
+        });
+    }
+  }
+  // send update every 4 seconds
+  setInterval(sendLocation, 4000);
+</script>
+{% endif %}
+{% if user.profile.role in 'owner customer' %}
+<div id="map" style="height: 300px;"></div>
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+<script>
+// Start map centered on Bahrain
+let map = L.map("map").setView([26.0667, 50.5577], 12);
+
+L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+    maxZoom: 19,
+}).addTo(map);
+
+let marker = null;
+let firstUpdate = true;
+
+async function updateDriverMarker() {
+    const res = await fetch(`/api/driver/{{ order.driver.id }}/location/`);
+    const loc = await res.json();
+
+    if (!loc.lat || !loc.lng) return;
+
+    // Place marker if first time
+    if (!marker) {
+        marker = L.marker([loc.lat, loc.lng]).addTo(map);
+    } else {
+        marker.setLatLng([loc.lat, loc.lng]);
+    }
+
+    // Center map only ONCE when driver first appears
+    if (firstUpdate) {
+        map.setView([loc.lat, loc.lng], 15); // zoom in on driver
+        firstUpdate = false;
+    }
+}
+
+// Update every 3 seconds
+setInterval(updateDriverMarker, 3000);
+</script>
+
+
+{% endif %}
+
 {%endblock%}
