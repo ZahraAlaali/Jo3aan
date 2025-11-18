@@ -72,8 +72,9 @@ CITIES = (
 )
 ORDER_STATUS = (
     ("P", "Pending"),
-    ("R","Ready"),
+    ("R", "Ready"),
 )
+
 
 # Create your models here.
 class Category(models.Model):
@@ -111,14 +112,18 @@ class Restaurant(models.Model):
     def __str__(self):
         return self.name
 
-class Order(models.Model):
-        restaurant = models.ForeignKey(Restaurant, on_delete=models.CASCADE)
-        customer = models.ForeignKey(User, on_delete=models.CASCADE)
-        total_amount=models.FloatField(default=0.0)
-        order_status=models.CharField(max_length=1, choices=ORDER_STATUS, default=ORDER_STATUS[0][0])
 
-        def __str__(self):
-            return f"{self.id} {self.get_order_status_display()}"
+class Order(models.Model):
+    restaurant = models.ForeignKey(Restaurant, on_delete=models.CASCADE)
+    customer = models.ForeignKey(User, on_delete=models.CASCADE)
+    total_amount = models.FloatField(default=0.0)
+    order_status = models.CharField(
+        max_length=1, choices=ORDER_STATUS, default=ORDER_STATUS[0][0]
+    )
+
+    def __str__(self):
+        return f"{self.id} {self.get_order_status_display()}"
+
 
 class Item(models.Model):
     name = models.CharField(max_length=50)
@@ -150,8 +155,9 @@ class Cart(models.Model):
             total += item.item.price * item.quantity
         self.total_amount = total
         Cart.objects.filter(pk=self.pk).update(total_amount=total)
+
     def get_display_total_amount(self):
-        return "{0:.2f}".format(self.total_amount / 100)
+        return f"{self.total_amount:.2f}"
 
 
 class CartDetails(models.Model):
@@ -169,5 +175,3 @@ class CartDetails(models.Model):
         super().delete(*args, **kwargs)
         cart.total_amount = 0.0
         cart.save()
-
-
