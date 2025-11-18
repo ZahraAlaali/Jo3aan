@@ -4,7 +4,7 @@ from django.contrib.auth.models import User
 
 # from phonenumber_field.modelfields import PhoneNumberField
 
-ROLE = (("customer", "Customer"), ("owner", "Owner"))
+ROLE = (("customer", "Customer"), ("owner", "Owner"), ('driver','Driver'))
 
 STATUS = (("active", "active"), ("ordered", "ordered"))
 
@@ -73,6 +73,8 @@ CITIES = (
 ORDER_STATUS = (
     ("P", "Pending"),
     ("R","Ready"),
+    ('PU','Picked up'),
+    ('D','Delivered')
 )
 
 # Create your models here.
@@ -114,6 +116,7 @@ class Restaurant(models.Model):
 class Order(models.Model):
         restaurant = models.ForeignKey(Restaurant, on_delete=models.CASCADE)
         customer = models.ForeignKey(User, on_delete=models.CASCADE)
+
         total_amount=models.FloatField(default=0.0)
         order_status=models.CharField(max_length=1, choices=ORDER_STATUS, default=ORDER_STATUS[0][0])
 
