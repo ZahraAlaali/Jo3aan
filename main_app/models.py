@@ -115,19 +115,6 @@ class Restaurant(models.Model):
         return self.name
 
 
-class Order(models.Model):
-    restaurant = models.ForeignKey(Restaurant, on_delete=models.CASCADE)
-    customer = models.ForeignKey(User, on_delete=models.CASCADE)
-    # driver=models.ForeignKey(User, on_delete=models.CASCADE)
-    total_amount = models.FloatField(default=0.0)
-    order_status = models.CharField(
-        max_length=1, choices=ORDER_STATUS, default=ORDER_STATUS[0][0]
-    )
-
-    def __str__(self):
-        return f"{self.id} {self.get_order_status_display()}"
-
-
 class Item(models.Model):
     name = models.CharField(max_length=50)
     description = models.TextField(max_length=500)
@@ -178,3 +165,27 @@ class CartDetails(models.Model):
         super().delete(*args, **kwargs)
         cart.total_amount = 0.0
         cart.save()
+
+
+class Order(models.Model):
+    restaurant = models.ForeignKey(Restaurant, on_delete=models.CASCADE)
+    customer = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name="customer_orders",
+    )
+    driver = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="driver_orders",
+    )
+    total_amount = models.FloatField(default=0.0)
+    order_status = models.CharField(
+        max_length=2, choices=ORDER_STATUS, default=ORDER_STATUS[0][0]
+    )
+    cart = models.ForeignKey(Cart, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f"{self.id} {self.get_order_status_display()}"
