@@ -433,7 +433,7 @@ def add_item(request, restaurant_id):
         new_Item = form.save(commit=False)
         new_Item.restaurant_id = restaurant_id
         new_Item.save()
-    return redirect("restaurant_details", restaurant_id)
+    return redirect(f"/restaurants/{restaurant_id}/", restaurant_id)
 
 
 class ItemUpdate(LoginRequiredMixin, UpdateView):
