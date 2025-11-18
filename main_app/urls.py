@@ -92,8 +92,13 @@ urlpatterns = [
         "orders/customer/<int:user_id>/", views.customerOrders, name="customer_orders"
     ),
     path("orders/restaurant/", views.restaurantOrders, name="restaurant_orders"),
-    path("orders/ready/<int:order_id>/", views.change_order_status, name="change_order_status"),
-    path('orders/driver/',views.orders_list.as_view(), name='orders_list'),
-    path('orders/driver/<int:order_id>', views.order_details,name='order_details')
-
+    path(
+        "orders/ready/<int:order_id>/",
+        views.change_order_status,
+        name="change_order_status",
+    ),
+    path("orders/driver/", views.orders_list.as_view(), name="orders_list"),
+    path("orders/driver/<int:order_id>", views.order_details, name="order_details"),
+    path("api/driver/<int:driver_id>/update-location/", views.update_driver_location),
+    path("api/driver/<int:driver_id>/location/", views.get_driver_location),
 ]

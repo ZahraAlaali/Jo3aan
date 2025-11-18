@@ -13,6 +13,64 @@
 <button><a href="{% url 'orders_list' %}">back</a></button>
 {%if user.profile.role=='owner' and order.order_status=='P'%}
 <button><a href="{% url 'change_order_status' order.id %}">Ready</a></button>
-{%%}
+{% endif %}
+
+{% if user.profile.role == 'driver' %}
+
+
+<script>
+  function sendLocation() {
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(async (pos) => {
+            const data = {
+                lat: pos.coords.latitude,
+                lng: pos.coords.longitude
+            };
+
+            await fetch(`/api/driver/{{ order.driver.id }}/update-location/`, {
+                method: "POST",
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify(data)
+            });
+        });
+    }
+  }
+  // send update every 4 seconds
+  setInterval(sendLocation, 4000);
+</script>
+{% endif %}
+{% if user.profile.role in 'owner customer' %}
+
+  <div id="map" style="height: 300px;"></div>
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+<script>
+const map = L.map("map").setView([26.0667, 50.5577], 13);
+
+L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+    maxZoom: 19,
+}).addTo(map);
+
+let marker = null;
+
+async function updateDriverMarker() {
+    const res = await fetch(`/api/driver/{{ order.driver.id }}/location/`);
+    const loc = await res.json();
+
+    if (!loc.lat || !loc.lng) return;
+
+    if (!marker) {
+        marker = L.marker([loc.lat, loc.lng]).addTo(map);
+    } else {
+        marker.setLatLng([loc.lat, loc.lng]);
+    }
+}
+
+setInterval(updateDriverMarker, 3000);
+</script>
+
+{% endif %}
 
 {%endblock%}

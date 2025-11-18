@@ -22,6 +22,9 @@ from .forms import (
 )
 import datetime
 from django import forms
+from django.views.decorators.csrf import csrf_exempt
+from django.utils.decorators import method_decorator
+from .models import DriverLocation
 
 # reset password
 from django.urls import reverse_lazy
@@ -530,3 +533,30 @@ class StripeIntentView(View):
             return JsonResponse({"clientSecret": intent["client_secret"]})
         except Exception as e:
             return JsonResponse({"error": str(e)})
+
+
+@csrf_exempt
+def update_driver_location(request, driver_id):
+    if request.method == "POST":
+        data = json.loads(request.body)
+        lat = data.get("lat")
+        lng = data.get("lng")
+
+        driver = User.objects.get(id=driver_id)
+
+        obj, created = DriverLocation.objects.get_or_create(driver=driver)
+        obj.lat = lat
+        obj.lng = lng
+        obj.save()
+
+        return JsonResponse({"status": "updated"})
+
+    return JsonResponse({"error": "POST only"}, status=400)
+
+
+def get_driver_location(request, driver_id):
+    try:
+        obj = DriverLocation.objects.get(driver_id=driver_id)
+        return JsonResponse({"lat": obj.lat, "lng": obj.lng})
+    except DriverLocation.DoesNotExist:
+        return JsonResponse({"lat": None, "lng": None})

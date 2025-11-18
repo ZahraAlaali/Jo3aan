@@ -38,10 +38,10 @@
 ***
 
 ### ***Future Updates***
-- [ ] Delivery Side (Driver role)
+- [x] Delivery Side (Driver role)
 - [ ] Live Tracking
 - [ ] Location-based Feature
-- [ ] Payment
+- [x] Payment
 
 ***
 
