@@ -1,5 +1,13 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import Profile
+import json
+import stripe
+from django.core.mail import send_mail
+from django.conf import settings
+from django.views.generic import TemplateView
+from django.views.decorators.csrf import csrf_exempt
+from django.http import JsonResponse, HttpResponse
+from django.views import View
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.views.generic import ListView, DetailView
 from django.contrib.auth.forms import UserCreationForm
@@ -380,7 +388,7 @@ def createOrder(request, user_id):
 
     cart.cart_status = "ordered"
     cart.save()
-    return redirect(f"/cart/viewCart/{user_id}/")
+    return redirect(f"/orders/customer/{user_id}/")
 
 
 def customerOrders(request, user_id):
@@ -416,7 +424,7 @@ class ItemCreat(LoginRequiredMixin, CreateView):
 def add_item(request, restaurant_id):
     form = ItemForm(
         request.POST, request.FILES
-    )  # nextttt time do not forgotttttt to adddddddddddddd request.FILE so it worksssss okay??????
+    )
     if form.is_valid():
         print("here")
         new_Item = form.save(commit=False)
@@ -435,3 +443,139 @@ class ItemUpdate(LoginRequiredMixin, UpdateView):
 class ItemDelete(LoginRequiredMixin, DeleteView):
     model = Item
     success_url = "/restaurants/{restaurant_id}/"
+
+stripe.api_key = settings.STRIPE_SECRET_KEY
+
+
+class SuccessView(TemplateView):
+    template_name = "success.html"
+
+
+class CancelView(TemplateView):
+    template_name = "cancel.html"
+
+
+class cartLandingPageView(TemplateView):
+    template_name = "landing.html"
+
+    def get_context_data(self, **kwargs):
+        cart = Cart.objects.get(customer_id=self.request.user.id, cart_status='active')
+        context = super(cartLandingPageView, self).get_context_data(**kwargs)
+        context.update({
+            "cart": cart,
+            "STRIPE_PUBLIC_KEY": settings.STRIPE_PUBLIC_KEY
+        })
+        return context
+
+
+class CreateCheckoutSessionView(View):
+    def post(self, request, *args, **kwargs):
+        cart_id = self.kwargs["pk"]
+        cart = Cart.objects.get(id=cart_id)
+        YOUR_DOMAIN = "http://127.0.0.1:8000"
+        checkout_session = stripe.checkout.Session.create(
+            payment_method_types=['card'],
+            line_items=[
+                {
+                    'price_data': {
+                        'currency': 'usd',
+                        'unit_amount': cart.total_amount,
+                        'cart_data': {
+                            'name': cart.name,
+                            # 'images': ['https://i.imgur.com/EHyR2nP.png'],
+                        },
+                    },
+                    'quantity': 1,
+                },
+            ],
+            metadata={
+                "cart_id": cart.id
+            },
+            mode='payment',
+            success_url=YOUR_DOMAIN + '/success/',
+            cancel_url=YOUR_DOMAIN + '/cancel/',
+        )
+        return JsonResponse({
+            'id': checkout_session.id
+        })
+
+
+@csrf_exempt
+def stripe_webhook(request):
+    payload = request.body
+    sig_header = request.META['HTTP_STRIPE_SIGNATURE']
+    event = None
+
+    try:
+        event = stripe.Webhook.construct_event(
+            payload, sig_header, settings.STRIPE_WEBHOOK_SECRET
+        )
+    except ValueError as e:
+        # Invalid payload
+        return HttpResponse(status=400)
+    except stripe.error.SignatureVerificationError as e:
+        # Invalid signature
+        return HttpResponse(status=400)
+
+    # Handle the checkout.session.completed event
+    if event['type'] == 'checkout.session.completed':
+        session = event['data']['object']
+
+        customer_email = session["customer_details"]["email"]
+        cart_id = session["metadata"]["cart_id"]
+
+        cart = Cart.objects.get(id=cart_id)
+
+        send_mail(
+            subject="Here is your cart",
+            message=f"Thanks for your purchase. Here is the cart you ordered. The URL is {cart.url}",
+            recipient_list=[customer_email],
+            from_email="matt@test.com"
+        )
+
+
+
+    elif event["type"] == "payment_intent.succeeded":
+        intent = event['data']['object']
+
+        stripe_customer_id = intent["customer"]
+        stripe_customer = stripe.Customer.retrieve(stripe_customer_id)
+
+        customer_email = stripe_customer['email']
+        cart_id = intent["metadata"]["cart_id"]
+
+        cart = Cart.objects.get(id=cart_id)
+
+        send_mail(
+            subject="Here is your cart",
+            message=f"Thanks for your purchase. Here is the cart you ordered. The URL is {cart.url}",
+            recipient_list=[customer_email],
+            from_email="matt@test.com"
+        )
+
+    return HttpResponse(status=200)
+
+
+class StripeIntentView(View):
+    def post(self, request, *args, **kwargs):
+        try:
+            req_json = json.loads(request.body)
+            customer = stripe.Customer.create(email=req_json['email'])
+            cart_id = self.kwargs["pk"]
+            cart = Cart.objects.get(id=cart_id)
+            intent = stripe.PaymentIntent.create(
+                amount=cart.total_amount,
+                currency='usd',
+                customer=customer['id'],
+                metadata={
+                    "cart_id": cart.id
+                }
+            )
+            return JsonResponse({
+                'clientSecret': intent['client_secret']
+            })
+        except Exception as e:
+            return JsonResponse({ 'error': str(e) })
+
+
+

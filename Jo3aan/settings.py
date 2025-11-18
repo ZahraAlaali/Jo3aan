@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 
 from pathlib import Path
 import os
+import stripe
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -126,6 +127,11 @@ STATIC_URL = "static/"
 # PHONENUMBER_DEFAULT_REGION = "BH"
 LOGIN_REDIRECT_URL = "/"
 LOGOUT_REDIRECT_URL = "/"
+
+STRIPE_SECRET_KEY= ""
+STRIPE_PUBLIC_KEY= ""
+STRIPE_WEBHOOK_SECRET= ""
+
 
 # email configs
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"

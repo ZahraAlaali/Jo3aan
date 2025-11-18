@@ -150,6 +150,8 @@ class Cart(models.Model):
             total += item.item.price * item.quantity
         self.total_amount = total
         Cart.objects.filter(pk=self.pk).update(total_amount=total)
+    def get_display_total_amount(self):
+        return "{0:.2f}".format(self.total_amount / 100)
 
 
 class CartDetails(models.Model):
@@ -167,3 +169,5 @@ class CartDetails(models.Model):
         super().delete(*args, **kwargs)
         cart.total_amount = 0.0
         cart.save()
+
+
