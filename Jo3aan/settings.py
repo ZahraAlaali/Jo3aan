@@ -26,6 +26,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = "django-insecure-2+q&ff*(gb+smbcphf*+8e+a8cf0$0+=vdu0n7ni4jw((@#7@-"
+
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
@@ -126,6 +127,12 @@ STATIC_URL = "static/"
 # PHONENUMBER_DEFAULT_REGION = "BH"
 LOGIN_REDIRECT_URL = "/"
 LOGOUT_REDIRECT_URL = "/"
+
+STRIPE_SECRET_KEY= ""
+STRIPE_PUBLIC_KEY= ""
+STRIPE_WEBHOOK_SECRET= ""
+
+
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
