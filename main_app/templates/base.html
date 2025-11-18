@@ -31,6 +31,9 @@
         <li>
           <a href="{% url 'customer_orders' user.id %}">Orders</a>
         </li>
+        <li>
+          <a href="{% url 'restaurants_index' %}">Restaurants</a>
+        </li>
 
         {% elif user.profile.role == 'owner' %}
         <li>

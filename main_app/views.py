@@ -375,7 +375,6 @@ def decreaseQty(request, user_id, cartDetail_id):
 
 
 def createOrder(request, user_id):
-
     cart = Cart.objects.get(customer_id=user_id, cart_status="active")
 
     order = Order.objects.create(
@@ -383,6 +382,7 @@ def createOrder(request, user_id):
         customer_id=user_id,
         total_amount=cart.total_amount,
         order_status="P",
+        cart=cart,
     )
 
     cart.cart_status = "ordered"
@@ -400,17 +400,37 @@ def restaurantOrders(request):
     orders = Order.objects.filter(restaurant__in=restaurants).order_by("-id")
     return render(request, "orders/restaurant_orders.html", {"orders": orders})
 
-class driver_orders(ListView):
+
+class orders_list(ListView):
     # orders=Order.objects.filter(order_status='R')
     # return render(request, 'orders/driver_orders.html',{"orders":orders})
-    model=Order
-def mark_order_ready(request, order_id):
+    model = Order
+
+
+def order_details(request, order_id):
     order = Order.objects.get(id=order_id)
-    if request.user != order.restaurant.user:
-        return redirect("home")
-    order.order_status = "R"
+    cart = Cart.objects.get(order=order_id)
+    items = CartDetails.objects.filter(cart_id=cart.id)
+    return render(
+        request, "orders/order_details.html", {"order": order, "items": items}
+    )
+
+
+def change_order_status(request, order_id):
+    order = Order.objects.get(id=order_id)
+    # if request.user != order.restaurant.user:
+    #     return redirect("home")
+    if order.order_status == "P":
+        order.order_status = "R"
+    elif order.order_status == "R":
+        order.order_status = "PU"
+    else:
+        order.order_status = "D"
     order.save()
-    return redirect("orders/restaurant_orders.html")
+    if request.user.profile.role == "owner":
+        return redirect("restaurant_orders")
+    else:
+        return redirect("order_details", order_id)
 
 
 # Items
