@@ -10,6 +10,9 @@
 </ul>
 
 <p>Total: {{ order.total_amount }} BD</p>
-<button><a href="{% url 'driver_orders' %}">back</a></button>
-<button><a href="{% url 'driver_orders' %}">Picked up</a></button>
+<button><a href="{% url 'orders_list' %}">back</a></button>
+{%if user.profile.role=='owner' and order.order_status=='P'%}
+<button><a href="{% url 'change_order_status' order.id %}">Ready</a></button>
+{%%}
+
 {%endblock%}

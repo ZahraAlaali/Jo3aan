@@ -402,7 +402,7 @@ def restaurantOrders(request):
     return render(request, "orders/restaurant_orders.html", {"orders": orders})
 
 
-class driver_orders(ListView):
+class orders_list(ListView):
     # orders=Order.objects.filter(order_status='R')
     # return render(request, 'orders/driver_orders.html',{"orders":orders})
     model = Order
@@ -419,8 +419,8 @@ def order_details(request, order_id):
 
 def change_order_status(request, order_id):
     order = Order.objects.get(id=order_id)
-    if request.user != order.restaurant.user:
-        return redirect("home")
+    # if request.user != order.restaurant.user:
+    #     return redirect("home")
     if order.order_status == "P":
         order.order_status = "R"
     elif order.order_status == "R":
@@ -428,7 +428,10 @@ def change_order_status(request, order_id):
     else:
         order.order_status = "D"
     order.save()
-    return redirect("restaurant_orders")
+    if request.user.profile.role == "owner":
+        return redirect("restaurant_orders")
+    else:
+        return redirect("order_details",order_id)
 
 # Items
 class ItemDetail(LoginRequiredMixin, DetailView):
