@@ -1,141 +1,252 @@
-{%extends 'base.html'%}
-{%block content%}
-<h2>Order #{{ order.id }}</h2>
+{% extends 'base.html' %} {% block content %}
+<div class="order-page">
+  <h2>Order #{{ order.id }}</h2>
 
-<h3>Items:</h3>
-<ul>
-  {% for i in items %}
-    <li>{{ i.item.name }} — Qty: {{ i.quantity }} — {{ i.item.price }} BD</li>
-  {% endfor %}
-</ul>
+  <h3>Items:</h3>
+  <ul>
+    {% for i in items %}
+    <li>
+      {{ i.item.name }} <br />Qty: {{ i.quantity }} <br />
+      Price: {{ i.item.price }} BD
+    </li>
+    {% endfor %}
+  </ul>
 
-<p>Total: {{ order.total_amount }} BD</p>
-<button><a href="{% url 'orders_list' %}">back</a></button>
-{%if user.profile.role == 'owner' and order.order_status == 'P'%}
-<button><a href="{% url 'change_order_status' order.id %}">Ready</a></button>
-{%elif user.profile.role == 'driver' and order.order_status == 'R'%}
-<button><a href="{% url 'change_order_status' order.id %}">Picked up</a></button>
-{%elif user.profile.role == 'driver' and order.order_status == 'PU'%}
-<button><a href="{% url 'change_order_status' order.id %}">Delivered</a></button>
-{%endif%}
+  <p>Total: {{ order.total_amount }} BD</p>
 
+  <div class="buttons-row">
+    <a href="{% url 'orders_list' %}" class="btn">Back</a>
 
-{% if user.profile.role == 'driver' %}
-<div id="map-driver" style="height: 300px;"></div>
+    {% if user.profile.role == 'owner' and order.order_status == 'P' %}
+    <a href="{% url 'change_order_status' order.id %}" class="btn action-btn"
+      >Ready</a
+    >
+    {% elif user.profile.role == 'driver' and order.order_status == 'R' %}
+    <a href="{% url 'change_order_status' order.id %}" class="btn action-btn"
+      >Picked up</a
+    >
+    {% elif user.profile.role == 'driver' and order.order_status == 'PU' %}
+    <a href="{% url 'change_order_status' order.id %}" class="btn action-btn"
+      >Delivered</a
+    >
+    {% endif %}
+  </div>
 
+  {% if user.profile.role == 'driver' %}
+  <div id="map-driver"></div>
+  {% endif %} {% if user.profile.role in 'owner customer' %}
+  <div id="map-customer"></div>
+  {% endif %}
+</div>
+
+<!-- ======= LEAFLET MAP STYLING AND SCRIPTS ======= -->
 <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 
 <script>
-let mapDriver = L.map("map-driver").setView([26.0667, 50.5577], 12);
+  {% if user.profile.role == 'driver' %}
+  let mapDriver = L.map("map-driver").setView([26.0667, 50.5577], 12);
+  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png").addTo(mapDriver);
 
-L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png").addTo(mapDriver);
+  let driverMarker = null;
+  let customerMarker = null;
+  let firstUpdate = true;
 
-let driverMarker = null;
-let customerMarker = null;
-let firstUpdate = true;
+  const redIcon = L.icon({
+      iconUrl: "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png",
+      shadowUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png",
+      iconSize: [25, 41],
+      iconAnchor: [12, 41],
+      popupAnchor: [1, -34],
+      shadowSize: [41, 41]
+  });
 
-const redIcon = L.icon({
-    iconUrl: "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png",
-    shadowUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png",
-    iconSize: [25, 41],
-    iconAnchor: [12, 41],
-    popupAnchor: [1, -34],
-    shadowSize: [41, 41]
-});
+  {% if order.customer_lat and order.customer_lng %}
+  customerMarker = L.marker(
+      [{{ order.customer_lat }}, {{ order.customer_lng }}],
+      {icon: redIcon, title:"Customer"}
+  ).addTo(mapDriver);
+  {% endif %}
 
-{% if order.customer_lat and order.customer_lng %}
-customerMarker = L.marker(
-    [{{ order.customer_lat }}, {{ order.customer_lng }}],
-    {icon: redIcon, title:"Customer"}
-).addTo(mapDriver);
-{% endif %}
+  function updateDriverPosition() {
+      if (navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition(async (pos) => {
+              const lat = pos.coords.latitude;
+              const lng = pos.coords.longitude;
 
-function updateDriverPosition() {
-    if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(async (pos) => {
-            const lat = pos.coords.latitude;
-            const lng = pos.coords.longitude;
+              await fetch(`/api/driver/{{ order.driver.id }}/update-location/`, {
+                  method: "POST",
+                  headers: {"Content-Type": "application/json"},
+                  body: JSON.stringify({ lat, lng })
+              });
 
-            // send to backend
-            await fetch(`/api/driver/{{ order.driver.id }}/update-location/`, {
-                method: "POST",
-                headers: {"Content-Type": "application/json"},
-                body: JSON.stringify({ lat, lng })
-            });
+              if (!driverMarker) {
+                  driverMarker = L.marker([lat, lng], {title:"You (Driver)"}).addTo(mapDriver);
+              } else {
+                  driverMarker.setLatLng([lat, lng]);
+              }
 
-            if (!driverMarker) {
-                driverMarker = L.marker([lat, lng], {title:"You (Driver)"}).addTo(mapDriver);
-            } else {
-                driverMarker.setLatLng([lat, lng]);
-            }
+              if (firstUpdate && customerMarker) {
+                  const group = L.featureGroup([driverMarker, customerMarker]);
+                  mapDriver.fitBounds(group.getBounds(), { padding: [50, 50] });
+                  firstUpdate = false;
+              }
+          });
+      }
+  }
 
-            if (firstUpdate && customerMarker) {
-                const group = L.featureGroup([driverMarker, customerMarker]);
-                mapDriver.fitBounds(group.getBounds(), { padding: [50, 50] });
-                firstUpdate = false;
-            }
-        });
-    }
-}
+  setInterval(updateDriverPosition, 4000);
+  {% endif %}
 
-setInterval(updateDriverPosition, 4000);
+  {% if user.profile.role in 'owner customer' %}
+  let mapCustomer = L.map("map-customer").setView([26.0667, 50.5577], 12);
+  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png").addTo(mapCustomer);
+
+  let driverMarkerC = null;
+  let customerMarkerC = null;
+  let firstUpdateC = true;
+
+  const redIconC = L.icon({
+      iconUrl: "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png",
+      shadowUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png",
+      iconSize: [25, 41],
+      iconAnchor: [12, 41],
+      popupAnchor: [1, -34],
+      shadowSize: [41, 41]
+  });
+
+  {% if order.customer_lat and order.customer_lng %}
+    customerMarkerC = L.marker(
+        [{{ order.customer_lat }}, {{ order.customer_lng }}],
+        {icon: redIconC, title:"Your Location"}
+     ).addTo(mapCustomer);
+  {% endif %}
+
+  async function updateDriverMarkerC() {
+      const res = await fetch(`/api/driver/{{ order.driver.id }}/location/`);
+      const loc = await res.json();
+
+      if (!loc.lat || !loc.lng) return;
+
+      if (!driverMarkerC) {
+          driverMarkerC = L.marker([loc.lat, loc.lng], {title:"Driver"}).addTo(mapCustomer);
+      } else {
+          driverMarkerC.setLatLng([loc.lat, loc.lng]);
+      }
+
+      if (firstUpdateC && customerMarkerC) {
+          const group = L.featureGroup([driverMarkerC, customerMarkerC]);
+          mapCustomer.fitBounds(group.getBounds(), { padding: [50, 50] });
+          firstUpdateC = false;
+      }
+  }
+
+  setInterval(updateDriverMarkerC, 3000);
+  {% endif %}
 </script>
-{% endif %}
 
+<!-- ======= ORDER PAGE STYLING ======= -->
+<style>
+  .order-page {
+    max-width: 900px;
+    margin: 2rem auto;
+    padding: 2rem;
+    background-color: var(--white);
+    border-radius: 1rem;
+    box-shadow: 0 4px 20px rgba(15, 23, 42, 0.1);
+  }
 
-{% if user.profile.role in 'owner customer' %}
-<div id="map-customer" style="height: 300px;"></div>
+  .order-page h2 {
+    color: var(--primary);
+    font-size: 1.8rem;
+    margin-bottom: 1rem;
+  }
 
-<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
-<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  .order-page h3 {
+    color: var(--text-main);
+    font-size: 1.2rem;
+    margin-top: 1.5rem;
+  }
 
-<script>
-let mapCustomer = L.map("map-customer").setView([26.0667, 50.5577], 12);
+  .order-page ul {
+    list-style: none;
+    padding: 0;
+    margin: 1rem 0;
+  }
 
-L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png").addTo(mapCustomer);
+  .order-page ul li {
+    padding: 0.75rem 1rem;
+    margin-bottom: 0.5rem;
+    border: 1px solid var(--border-soft);
+    border-radius: 0.8rem;
+    display: flex;
+    justify-content: space-between;
+    background-color: var(--primary-soft);
+    font-size: 0.95rem;
+  }
 
-let driverMarkerC = null;
-let customerMarkerC = null;
-let firstUpdateC = true;
+  .order-page p {
+    font-weight: 600;
+    margin-top: 1rem;
+    font-size: 1rem;
+  }
 
-const redIconC = L.icon({
-    iconUrl: "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png",
-    shadowUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png",
-    iconSize: [25, 41],
-    iconAnchor: [12, 41],
-    popupAnchor: [1, -34],
-    shadowSize: [41, 41]
-});
+  .order-page .buttons-row {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1rem;
+    flex-wrap: wrap;
+  }
 
-{% if order.customer_lat and order.customer_lng %}
-customerMarkerC = L.marker(
-    [{{ order.customer_lat }}, {{ order.customer_lng }}],
-    {icon: redIconC, title:"Your Location"}
-).addTo(mapCustomer);
-{% endif %}
+  .order-page .buttons-row a.btn {
+    text-decoration: none;
+    color: var(--white);
+    display: inline-block;
+    padding: 0.5rem 1rem;
+    border-radius: 999px;
+    background-color: var(--primary);
+    font-weight: 600;
+    transition: all 0.2s ease;
+  }
 
-async function updateDriverMarkerC() {
-    const res = await fetch(`/api/driver/{{ order.driver.id }}/location/`);
-    const loc = await res.json();
+  .order-page .buttons-row a.btn:hover {
+    background-color: var(--primary-dark);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(15, 23, 42, 0.25);
+  }
 
-    if (!loc.lat || !loc.lng) return;
+  .order-page .buttons-row a.action-btn {
+    background-color: var(--accent);
+    color: #1f2933;
+  }
 
-    if (!driverMarkerC) {
-        driverMarkerC = L.marker([loc.lat, loc.lng], {title:"Driver"}).addTo(mapCustomer);
-    } else {
-        driverMarkerC.setLatLng([loc.lat, loc.lng]);
+  .order-page .buttons-row a.action-btn:hover {
+    background-color: #f59e0b;
+    color: var(--white);
+  }
+
+  #map-driver,
+  #map-customer {
+    margin-top: 1.5rem;
+    border-radius: 1rem;
+    border: 1px solid var(--border-soft);
+    height: 300px;
+  }
+
+  @media (max-width: 768px) {
+    .order-page {
+      padding: 1rem;
     }
 
-    if (firstUpdateC && customerMarkerC) {
-        const group = L.featureGroup([driverMarkerC, customerMarkerC]);
-        mapCustomer.fitBounds(group.getBounds(), { padding: [50, 50] });
-        firstUpdateC = false;
+    .order-page ul li {
+      flex-direction: column;
+      align-items: flex-start;
     }
-}
 
-setInterval(updateDriverMarkerC, 3000);
-</script>
-{% endif %}
-
-{%endblock%}
+    #map-driver,
+    #map-customer {
+      height: 250px;
+    }
+  }
+</style>
+{% endblock %}

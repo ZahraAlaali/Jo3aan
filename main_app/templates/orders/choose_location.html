@@ -6,14 +6,61 @@
   * {
     font-family: "Cal Sans", sans-serif;
   }
+/* Page title */
+h2 {
+    text-align: center;
+    color: #2c326a;
+    font-weight: 700;
+    margin-bottom: 10px;
+}
+
+/* Subtitle */
+p {
+    text-align: center;
+    color: #2c326a;
+    font-size: 16px;
+    margin-bottom: 20px;
+}
+
+/* Map container styled like a card */
+#map {
+    height: 350px;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(15, 23, 42, 0.18);
+    margin-bottom: 20px;
+}
+
+/* Confirm button */
+#confirmBtn {
+    display: block;
+    width: 100%;
+    max-width: 600px;
+    margin: 0 auto;
+    background: #2c326a;
+    color: white;
+    border: none;
+    padding: 14px;
+    font-size: 16px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: 0.2s;
+}
+
+#confirmBtn:hover {
+    background: #232751;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.25);
+}
 </style>
 
 <h2>Select Your Delivery Location</h2>
 <p>Move the marker if needed, then confirm.</p>
 
-<div id="map" style="height: 350px;"></div>
+<div id="map"></div>
 
-<button id="confirmBtn" style="margin-top: 20px;">Confirm Location</button>
+<button id="confirmBtn">Confirm Location</button>
 
 <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>

@@ -12,16 +12,17 @@
 ***
 
 ### ***Description***
-#### This project is a food ordering web application that connects restaurant owners and customers through a simple and interactive platform.
-#### Owners can manage their restaurants and menus, while customers can browse available items, add them to a cart, and place orders directly through the system.
+#### This project is a food ordering web application that connects restaurant owners, customers, and drivers through a simple and interactive platform.
+#### Restaurant owners can manage their restaurants and menus, customers can browse items, add them to a cart, confirm payment, place orders, and track them, and drivers can view ready orders and pick up the ones suitable for them.
 
 ***
 
 ### ***Technologies Used***
-* Python
-* PostgreSQL
-* HTML
-* CSS
+* Django
+* GitHub
+* GitBash
+* VS Code (Python, PostgreSQL, HTML, CSS)
+* Lucid chart
 ***
 
 ### ***Getting Started***
@@ -33,7 +34,7 @@
 
 ### ***Screenshots***
 #### ERD
-![ERD](/images/ERD.png)
+![ERD](/images/ERD2.png)
 
 ***
 
@@ -48,3 +49,4 @@
 ### ***Credits***
 #### Updating Image: [stackoverflow](https://stackoverflow.com/questions/73904902/image-not-updating-django)
 #### Tracking Map: [Leaflet](https://leafletjs.com/)
+#### Payment: [Django Stripe Tutorial](https://github.com/justdjango/django-stripe-tutorial)

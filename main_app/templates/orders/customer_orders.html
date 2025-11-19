@@ -1,17 +1,101 @@
-{% extends "base.html" %} {% block content %}
+{% extends "base.html" %}
+{% block content %}
 
-<h2>My Orders</h2>
-{% if orders.count %} {% for order in orders %}
-<a href="{% url 'order_details' order.id %}">
-  <div>
-    <p>Order ID: {{ order.id }}</p>
+<style>
+/* ===== MATCHED STYLING (same as Restaurant Orders page) ===== */
 
-    <p>Restaurant: {{ order.restaurant.name }}</p>
-    <p>status: {{ order.get_order_status_display}}</p>
-  </div>
-</a>
-<hr />
-{% endfor %} {% else %}
+.orders-container {
+  max-width: 600px;
+  margin: 2rem auto;
+  font-family: system-ui, sans-serif;
+}
 
-<p>You have no orders yet</p>
-{% endif %} {% endblock %}
+.page-title {
+  text-align: center;
+  margin-bottom: 25px;
+  color: #2c326a;
+}
+
+.order-card {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 1.2rem 1.4rem;
+  margin-bottom: 1rem;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+  transition: 0.2s ease;
+  text-decoration: none;
+  color: inherit;
+  display: block;
+}
+
+.order-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+}
+
+.order-card p {
+  margin: 0.3rem 0;
+  font-size: 0.95rem;
+  color: #2c326a;
+}
+
+.order-id {
+  font-weight: bold;
+  color: #2c326a;
+  font-size: 1.1rem;
+}
+
+/* Status badges (same style as restaurant orders page) */
+.status-badge {
+  display: inline-block;
+  margin-top: 0.3rem;
+  padding: 0.25rem 0.6rem;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+/* Pending */
+.status-P { background: #fef3c7; color: #b45309; }
+/* Ready */
+.status-R { background: #d1fae5; color: #065f46; }
+/* Picked Up */
+.status-PU { background: #dbeafe; color: #1e40af; }
+/* Delivered */
+.status-D { background: #e5e7eb; color: #374151; }
+
+.no-orders {
+  text-align: center;
+  margin-top: 2rem;
+  color: #6b7280;
+  font-size: 1rem;
+}
+</style>
+
+<div class="orders-container">
+
+  <h2 class="page-title">My Orders</h2>
+
+  {% if orders.count %}
+    {% for order in orders %}
+      <a href="{% url 'order_details' order.id %}" class="order-card">
+
+        <p class="order-id">Order #{{ order.id }}</p>
+
+        <p><strong>Restaurant:</strong> {{ order.restaurant.name }}</p>
+
+        <p><strong>Status:</strong></p>
+        <span class="status-badge status-{{ order.order_status }}">
+          {{ order.get_order_status_display }}
+        </span>
+
+      </a>
+    {% endfor %}
+  {% else %}
+    <p class="no-orders">You have no orders yet</p>
+  {% endif %}
+
+</div>
+
+{% endblock %}

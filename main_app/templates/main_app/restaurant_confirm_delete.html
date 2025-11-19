@@ -1,9 +1,90 @@
-{%extends 'base.html'%}{% block content %}
-<h1>Delete cat</h1>
-<h4>Are you sure you want to delete {{object.name}}?</h4>
-<form action="" method="post">
-  {%csrf_token%}
-  <input type="submit" value="Yes-delete" class="btn">
-  <a href="{%url 'restaurants_index'%}" class="btn red">Cancel</a>
-</form>
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="delete-page">
+  <h1>Delete Restaurant</h1>
+  <h4>Are you sure you want to delete {{ object.name }}?</h4>
+  <form action="" method="post">
+    {% csrf_token %}
+    <input type="submit" value="Yes delete">
+    <a href="{% url 'restaurants_index' %}" class="btn red">Cancel</a>
+  </form>
+</div>
+
+<!-- ======= DELETE PAGE STYLING ======= -->
+<style>
+/* Delete Confirmation Page */
+.delete-page {
+  max-width: 500px;
+  margin: 3rem auto;
+  padding: 2rem;
+  background-color: var(--white);
+  border-radius: 1rem;
+  box-shadow: 0 4px 20px rgba(15, 23, 42, 0.1);
+  text-align: center;
+}
+
+.delete-page h1 {
+  color: var(--primary);
+  font-size: 1.8rem;
+  margin-bottom: 0.5rem;
+}
+
+.delete-page h4 {
+  color: var(--text-main);
+  font-size: 1.1rem;
+  margin-bottom: 2rem;
+}
+
+.delete-page form {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.delete-page input[type="submit"],
+.delete-page a.btn {
+  text-decoration: none;
+  display: inline-block;
+  padding: 0.6rem 1.2rem;
+  font-weight: 600;
+  border-radius: 999px;
+  transition: all 0.2s ease;
+  font-size: 0.95rem;
+  cursor: pointer;
+}
+
+.delete-page input[type="submit"] {
+  border: none;
+  background-color: var(--accent);
+  color: #1f2933;
+}
+
+.delete-page input[type="submit"]:hover {
+  background-color: #f59e0b;
+  color: var(--white);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.25);
+}
+
+.delete-page a.btn.red {
+  background-color: #ef4444; /* red */
+  color: #ffffff;
+}
+
+.delete-page a.btn.red:hover {
+  background-color: #dc2626;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.25);
+}
+
+/* Responsive */
+@media (max-width: 500px) {
+  .delete-page form {
+    flex-direction: column;
+    gap: 0.8rem;
+  }
+}
+</style>
 {% endblock %}
