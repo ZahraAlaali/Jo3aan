@@ -10,7 +10,10 @@
     {% for i in items %}
     <li>
       {{ i.item.name }} <br />Qty: {{ i.quantity }} <br />
-      Price: {{ i.item.price }} BD
+      Price: {{ i.item.price }} BD <br />
+      {% if i.comment %}
+      Comment: {{i.comment}}<br />
+      {% endif %}
     </li>
     {% endfor %}
   </ul>
