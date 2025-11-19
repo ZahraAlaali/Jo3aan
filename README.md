@@ -12,16 +12,17 @@
 ***
 
 ### ***Description***
-#### This project is a food ordering web application that connects restaurant owners and customers through a simple and interactive platform.
-#### Owners can manage their restaurants and menus, while customers can browse available items, add them to a cart, and place orders directly through the system.
+#### This project is a food ordering web application that connects restaurant owners, customers, and drivers through a simple and interactive platform..
+#### Restaurant owners can manage their restaurants and menus, customers can browse items, add them to a cart, and place orders, and drivers can view ready orders and pick up the ones suitable for them.
 
 ***
 
 ### ***Technologies Used***
-* Python
-* PostgreSQL
-* HTML
-* CSS
+* Django
+* GitHub
+* GitBash
+* VS Code (Python, PostgreSQL, HTML, CSS)
+* Lucid chart
 ***
 
 ### ***Getting Started***
@@ -33,15 +34,15 @@
 
 ### ***Screenshots***
 #### ERD
-![ERD](/images/ERD.png)
+![ERD](/images/ERD2.png)
 
 ***
 
 ### ***Future Updates***
-- [ ] Delivery Side (Driver role)
-- [ ] Live Tracking
+- [X] Delivery Side (Driver role)
+- [X] Live Tracking
 - [ ] Location-based Feature
-- [ ] Payment
+- [X] Payment
 
 ***
 
