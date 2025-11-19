@@ -34,7 +34,7 @@
 
 ### ***Screenshots***
 #### ERD
-![ERD](/images/ERD2.png)
+![ERD](/main_app/static/images/ERD2.png)
 
 ***
 
