@@ -1,17 +1,161 @@
 {% extends "base.html" %}
-{% block content%}
-{%if object %}
-<h1>Edit {{object.name}}</h1>
-{%else%}
-<h1>Create restaurant</h1>
-{%endif%}
-<form action="" method="post" enctype="multipart/form-data">
-  {%csrf_token%}
-  <table>
-    {{form.as_table}}
-  </table>
-  <a href="{%url 'restaurants_index'%}">Back</a>
-  <input type="submit" value="submit">
-</form>
-<hr>
-{%endblock%}
+
+{% block content %}
+
+<style>
+/* ===== RESTAURANT FORM CARD ===== */
+.form-wrapper {
+  max-width: 480px;
+  margin: 3rem auto;
+  background: var(--white);
+  padding: 2rem 2.2rem;
+  border-radius: 1rem;
+  box-shadow: 0 8px 22px rgba(15, 23, 42, 0.12);
+  border: 1px solid var(--border-soft);
+  font-family: "Cal Sans", sans-serif;
+}
+
+.form-wrapper h1 {
+  text-align: center;
+  color: var(--primary);
+  font-size: 1.75rem;
+  margin-bottom: 1.5rem;
+}
+
+/* ===== BACK LINK ===== */
+.form-wrapper a.back-link {
+  display: inline-block;
+  margin-bottom: 1rem;
+  text-decoration: none;
+  background-color: var(--primary-soft);
+  color: var(--primary);
+  font-weight: 600;
+  padding: 0.5rem 1.2rem;
+  border-radius: 999px;
+  border: 1px solid var(--primary);
+  transition: all 0.18s ease;
+}
+
+.form-wrapper a.back-link:hover {
+  background-color: var(--primary);
+  color: var(--white);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(15, 23, 42, 0.25);
+  text-decoration: none;
+}
+
+/* ===== FORM ELEMENTS ===== */
+.form-wrapper form p {
+  margin-bottom: 1rem;
+}
+
+.form-wrapper label {
+  display: block;
+  margin-bottom: 0.35rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--primary-dark);
+}
+
+.form-wrapper input[type="text"],
+.form-wrapper input[type="email"],
+.form-wrapper input[type="file"],
+.form-wrapper select {
+  width: 100%;
+  padding: 0.65rem 0.85rem;
+  border-radius: 0.6rem;
+  border: 1px solid var(--border-soft);
+  background: var(--primary-soft);
+  color: var(--text-main);
+  font-size: 0.95rem;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.form-wrapper input:focus,
+.form-wrapper select:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(44, 50, 106, 0.15);
+}
+
+/* ===== SELECT DROPDOWN CUSTOM ARROW ===== */
+.form-wrapper select {
+  appearance: none;
+  -moz-appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml;utf8,<svg fill='%232c326a' height='80' width='80' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'><polygon points='5,7 15,7 10,13'/></svg>");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 20px;
+  padding-right: 2.2rem;
+}
+
+/* ===== SUBMIT BUTTON ===== */
+.form-wrapper input[type="submit"] {
+  width: 100%;
+  padding: 0.7rem 1rem;
+  background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+  color: var(--white);
+  font-size: 1rem;
+  font-weight: 600;
+  border-radius: 999px;
+  border: none;
+  cursor: pointer;
+  transition: transform 0.12s ease, box-shadow 0.18s ease;
+  margin-top: 0.5rem;
+}
+
+.form-wrapper input[type="submit"]:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(15, 23, 42, 0.28);
+}
+
+/* ===== ERROR MESSAGE ===== */
+.red-text {
+  color: #dc2626;
+  background: #fee2e2;
+  padding: 0.4rem 0.6rem;
+  border-radius: 0.5rem;
+  border-left: 4px solid #dc2626;
+  font-size: 0.85rem;
+  margin-top: 0.25rem;
+  display: inline-block;
+}
+
+/* ===== MOBILE ===== */
+@media (max-width: 480px) {
+  .form-wrapper {
+    padding: 1.5rem;
+  }
+  .form-wrapper h1 {
+    font-size: 1.5rem;
+  }
+}
+</style>
+
+<div class="form-wrapper">
+  {% if object %}
+    <h1>Edit {{ object.name }}</h1>
+  {% else %}
+    <a href="{% url 'restaurants_index' %}" class="back-link">&larr; Back</a>
+    <h1>Create Restaurant</h1>
+  {% endif %}
+
+  <form action="" method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+
+    {% for field in form %}
+      <p>
+        {{ field.label_tag }}
+        {{ field }}
+        {% if field.errors %}
+          <span class="red-text">{{ field.errors }}</span>
+        {% endif %}
+      </p>
+    {% endfor %}
+
+    <input type="submit" value="Submit">
+  </form>
+</div>
+
+{% endblock %}

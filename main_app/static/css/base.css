@@ -115,15 +115,6 @@ header.navbar-fixed nav {
   justify-content: center;
 }
 
-.brand-logo::before {
-  content: "";
-  width: 8px;
-  height: 8px;
-  border-radius: 999px;
-  background: var(--accent);
-  margin-right: 0.5rem;
-}
-
 .brand-logo:hover {
   background: rgba(255, 255, 255, 0.12);
 }

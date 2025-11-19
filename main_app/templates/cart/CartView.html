@@ -1,37 +1,185 @@
-{% extends 'base.html' %} {% block content %}
+{% extends 'base.html' %}
+{% block content %}
 
-<h2>CART</h2>
-{% if cart_details.count %}
-<div>
-  <h3>{{restaurant}}</h3>
-  {% for item in cart_details %} {% load static %}
-  <img
-    src="{% static item.itemImage|cut:'main_app/static/' %}"
-    alt=""
-    width="300px"
-  />
-  <h4>{{item.name}}</h4>
-  <h4>{{total_price}}</h4>
-  <div>
-    {% if item.quantity == 1 %}
-    <a href="{% url 'deleteItemFromCart' user.id item.id %}">delete</a>
-    {% else %}
-    <a href="{% url 'decreaseQty' user.id item.id %}">-</a>
-    {% endif %} {{item.quantity}}
-    <a href="{% url 'increaseQty' user.id item.id %}">+</a>
+<div class="cart-page">
+
+  <h2>CART</h2>
+
+  {% if cart_details.count %}
+  <div class="restaurant-section">
+    <h3>{{ restaurant }}</h3>
+
+    {% for item in cart_details %}
+    {% load static %}
+    <div class="cart-item">
+      <img
+        src="{% static item.itemImage|cut:'main_app/static/' %}"
+        alt="{{ item.name }}"
+        class="item-img"
+      />
+      <div class="item-details">
+        <h4>{{ item.name }}</h4>
+        <p>Price: BHD {{ item.price }}</p>
+        {% if item.comment %}
+        <p>Comment: {{ item.comment }}</p>
+        {% endif %}
+        <div class="quantity-controls">
+          {% if item.quantity == 1 %}
+          <a href="{% url 'deleteItemFromCart' user.id item.id %}" class="qty-btn">🗑️</a>
+          {% else %}
+          <a href="{% url 'decreaseQty' user.id item.id %}" class="qty-btn">-</a>
+          {% endif %}
+          <span class="quantity">{{ item.quantity }}</span>
+          <a href="{% url 'increaseQty' user.id item.id %}" class="qty-btn">+</a>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+
+    <div class="cart-summary">
+      <p>Subtotal: BHD {{ cart.total_amount }}</p>
+      <div class="cart-actions">
+        <a href="{% url 'landing-page' %}" class="btn secondary-btn">Continue Shopping</a>
+        <a href="{% url 'create_order' user.id %}" class="btn primary-btn">Place Order</a>
+      </div>
+    </div>
+
   </div>
-  {% if item.comment %}
-  <h4>Comment: {{item.comment}}</h4>
+
+  {% else %}
+  <p class="empty-cart">No items in the cart</p>
   {% endif %}
-  <a href="{% url 'deleteItemFromCart' user.id item.id %}">Delete</a>
-  <br />
-  {% endfor %}
-  <div>Subtotal &nbsp; BHD {{cart.total_amount}}</div>
-  <a href="{% url 'landing-page' %}">landing</a>
-  <a href="{% url 'create_order' user.id %}" class="btn btn-primary"
-    >Place Order</a
-  >
+
 </div>
-{% else %}
-<div>No Items In The Cart</div>
-{% endif %} {% endblock %}
+
+<style>
+/* Apply Cal Sans */
+.cart-page {
+  font-family: "Cal Sans", sans-serif;
+  max-width: 800px;
+  margin: 2rem auto;
+  padding: 1rem;
+}
+
+.cart-page h2 {
+  text-align: center;
+  color: var(--primary);
+  font-size: 1.8rem;
+  margin-bottom: 1.5rem;
+}
+
+.restaurant-section h3 {
+  color: var(--text-main);
+  margin-bottom: 1rem;
+}
+
+/* Cart item */
+.cart-item {
+  display: flex;
+  gap: 1rem;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  background: var(--primary-soft);
+  border-radius: 1rem;
+  border: 1px solid var(--border-soft);
+  align-items: center;
+}
+
+.item-img {
+  width: 120px;
+  height: 120px;
+  object-fit: cover;
+  border-radius: 0.8rem;
+  border: 2px solid var(--primary-soft);
+}
+
+.item-details h4 {
+  margin: 0 0 0.3rem 0;
+  font-weight: 600;
+  color: var(--primary-dark);
+}
+
+.item-details p {
+  margin: 0.2rem 0;
+  color: var(--text-main);
+  font-size: 0.95rem;
+}
+
+/* Quantity controls */
+.quantity-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.qty-btn {
+  background: var(--primary);
+  color: var(--white);
+  padding: 0.3rem 0.6rem;
+  border-radius: 999px;
+  text-decoration: none;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.qty-btn:hover {
+  background: var(--primary-dark);
+}
+
+.quantity {
+  min-width: 20px;
+  text-align: center;
+}
+
+/* Cart summary */
+.cart-summary {
+  text-align: right;
+  margin-top: 1rem;
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+.cart-actions {
+  margin-top: 0.5rem;
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+}
+
+.btn {
+  text-decoration: none;
+  padding: 0.5rem 1rem;
+  border-radius: 999px;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.primary-btn {
+  background-color: var(--primary);
+  color: var(--white);
+}
+
+.primary-btn:hover {
+  background-color: var(--primary-dark);
+}
+
+.secondary-btn {
+  background-color: var(--white);
+  color: var(--primary);
+  border: 1px solid var(--primary);
+}
+
+.secondary-btn:hover {
+  background-color: var(--primary-soft);
+}
+
+.empty-cart {
+  text-align: center;
+  margin-top: 2rem;
+  font-size: 1rem;
+  color: var(--text-muted);
+}
+</style>
+
+{% endblock %}

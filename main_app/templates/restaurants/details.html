@@ -1,229 +1,262 @@
 {% extends 'base.html' %}
 {% block content %}
-{% load static %}
 
 <style>
-/* ================== NARROW RESTAURANT CARD ================== */
 
-.restaurant-card {
-  max-width: 450px; /* made it narrower */
-  margin: 2rem auto;
-  padding: 1.8rem 2rem;
-  background-color: #f9fafb;
-  border-radius: 1rem;
-  border: 1px solid #e5e7eb;
-  text-align: center;
-  font-family: system-ui, sans-serif;
-  transition: transform 0.2s ease;
+/* ========= IMPORT CAL SANS FONT ========= */
+@import url("https://cdn.jsdelivr.net/gh/calcom/font/dist/cal-sans.css");
+
+* {
+  font-family: "Cal Sans", sans-serif !important;
 }
 
-.restaurant-card:hover {
-  transform: translateY(-2px);
+/* ========= PAGE LAYOUT ========= */
+.restaurant-page {
+  max-width: 1100px;
+  margin: 2rem auto;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+/* ========= RESTAURANT HEADER CARD ========= */
+.restaurant-card {
+  background: var(--white);
+  padding: 1.8rem;
+  border-radius: 1rem;
+  box-shadow: 0 6px 20px rgba(15,23,42,0.12);
+  border: 1px solid var(--border-soft);
+  display: flex;
+  gap: 1.5rem;
+  align-items: flex-start;
 }
 
 .restaurant-card img {
-  width: 180px;
-  height: 180px;
+  width: 220px;
+  height: 160px;
   object-fit: cover;
-  border-radius: 1rem;
-  margin-bottom: 1rem;
-  border: 2px solid #e5e7eb;
+  border-radius: 0.8rem;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.1);
 }
 
-.restaurant-card h1 {
-  font-size: 1.6rem;
-  color: #2c326a;
-  margin-bottom: 0.3rem;
+.restaurant-info h1 {
+  margin: 0;
+  font-size: 1.7rem;
+  color: var(--primary);
+  letter-spacing: -0.02em;
+}
+
+.restaurant-info h2 {
+  margin-top: 0.3rem;
+  font-size: 1.1rem;
+  color: var(--text-muted);
+}
+
+/* ========= CATEGORY PILL ========= */
+.category-pill {
+  display: inline-block;
+  padding: 0.35rem 0.75rem;
+  margin: 0.25rem;
+  background: var(--primary-soft);
+  border-radius: 999px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--primary-dark);
+}
+
+/* ========= BUTTONS ========= */
+.btn-solid {
+  display: inline-block;
+  padding: 0.55rem 1rem;
+  border-radius: 999px;
+  background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+  color: var(--white);
+  font-weight: 600;
+  font-size: 0.9rem;
+  text-decoration: none;
+  transition: 0.2s ease;
+  margin-right: 0.4rem;
+}
+
+.btn-solid:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(15,23,42,0.25);
+}
+
+.btn-danger {
+  background: #dc2626 !important;
+}
+
+.btn-danger:hover {
+  box-shadow: 0 6px 16px rgba(220,38,38,0.3);
+}
+
+/* ========= ITEMS SECTION ========= */
+.items-section {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.items-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 1.5rem;
+}
+
+.item-card {
+  background: var(--white);
+  padding: 1rem;
+  border-radius: 1rem;
+  border: 1px solid var(--border-soft);
+  box-shadow: 0 6px 16px rgba(15,23,42,0.1);
+}
+
+.item-card img {
+  width: 100%;
+  height: 150px;
+  object-fit: cover;
+  border-radius: 0.7rem;
+  margin-bottom: 0.7rem;
+}
+
+.item-card h3 {
+  margin: 0;
+  color: var(--primary);
   font-weight: 700;
 }
 
-.restaurant-card h2 {
-  font-size: 1rem;
-  color: #6b7280;
-  margin-bottom: 0.8rem;
+.item-card p {
+  margin: 0.25rem 0;
+  color: var(--text-muted);
+  font-size: 0.9rem;
 }
 
-.restaurant-card ul {
-  list-style: none;
-  padding: 0;
-  margin: 0.5rem 0 1rem 0;
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 0.6rem;
+/* ========= ADD ITEM FORM ========= */
+.add-item-card {
+  background: var(--white);
+  padding: 1.5rem;
+  border-radius: 1rem;
+  box-shadow: 0 6px 16px rgba(15,23,42,0.1);
+  border: 1px solid var(--border-soft);
 }
 
-.restaurant-card ul li {
-  background-color: #e5e7eb;
-  padding: 0.35rem 0.8rem;
+.add-item-card h2 {
+  margin-top: 0;
+  color: var(--primary);
+  letter-spacing: -0.02em;
+}
+
+.add-item-card table {
+  width: 100%;
+}
+
+.add-item-card input[type="submit"] {
+  margin-top: 0.7rem;
+}
+
+/* ========= CART BUTTON ========= */
+.add-cart-btn {
+  width: 100%;
+  margin-top: 0.5rem;
+  padding: 0.55rem;
   border-radius: 999px;
-  font-size: 0.85rem;
-  color: #111827;
-}
-
-.restaurant-card .status {
-  display: inline-block;
-  padding: 0.35rem 0.8rem;
-  border-radius: 0.6rem;
+  background: var(--accent);
+  color: #1f2937;
   font-weight: 600;
-  margin-bottom: 0.8rem;
-  font-size: 0.85rem;
+  border: none;
+  cursor: pointer;
+  transition: 0.2s ease;
 }
 
-.restaurant-card .status.open {
-  background-color: #d1fae5;
-  color: #065f46;
+.add-cart-btn:hover {
+  background: #f59e0b;
 }
 
-.restaurant-card .status.closed {
-  background-color: #fee2e2;
-  color: #991b1b;
-}
-
-.restaurant-card a {
-  display: inline-block;
-  padding: 0.45rem 1rem;
-  margin: 0.3rem;
-  border-radius: 999px;
-  text-decoration: none;
-  font-weight: 600;
-  font-size: 0.85rem;
-  transition: all 0.2s ease;
-}
-
-.restaurant-card a.update {
-  background-color: #2c326a;
-  color: white;
-}
-
-.restaurant-card a.update:hover {
-  background-color: #1f244f;
-}
-
-.restaurant-card a.delete {
-  background-color: #dc2626;
-  color: white;
-}
-
-.restaurant-card a.delete:hover {
-  background-color: #991b1b;
-}
-
-.restaurant-card a.back {
-  background-color: #fbbf24;
-  color: #1f2933;
-}
-
-.restaurant-card a.back:hover {
-  background-color: #f59e0b;
-}
-
-/* Responsive */
-@media (max-width: 480px) {
-  .restaurant-card {
-    padding: 1.5rem;
-  }
-
-  .restaurant-card img {
-    width: 150px;
-    height: 150px;
-  }
-
-  .restaurant-card h1 {
-    font-size: 1.4rem;
-  }
-
-  .restaurant-card h2 {
-    font-size: 0.95rem;
-  }
-
-  .restaurant-card ul li {
-    font-size: 0.8rem;
-    padding: 0.3rem 0.6rem;
-  }
-
-  .restaurant-card a {
-    font-size: 0.8rem;
-    padding: 0.4rem 0.9rem;
-  }
-}
 </style>
 
-<div class="restaurant-card">
+<div class="restaurant-page">
 
-  <img src="{% static restaurant.image|cut:'main_app/static/' %}" alt="Restaurant Image">
+  <!-- ========= RESTAURANT HEADER ========= -->
+  <div class="restaurant-card">
+    {% load static %}
+    <img src="{% static restaurant.image|cut:'main_app/static/' %}" alt="Restaurant Image">
 
-  <h1>{{ restaurant.name }} in {{ restaurant.get_city_display }}</h1>
-  <h2>{{ restaurant.description }}</h2>
+    <div class="restaurant-info">
+      <h1>{{ restaurant.name }} · {{ restaurant.get_city_display }}</h1>
+      <h2>{{ restaurant.description }}</h2>
 
-  <ul>
-    {% for category in restaurant.categories.all %}
-      <li>{{ category.name }}</li>
-    {% endfor %}
-  </ul>
+      <div>
+        {% for category in restaurant.categories.all %}
+          <span class="category-pill">{{ category.name }}</span>
+        {% endfor %}
+      </div>
 
-  {% if user.profile.role == 'owner' %}
-    {% if not restaurant.is_open %}
-      <p class="status closed">Opens at {{ restaurant.open_at|time:"h:i A" }}</p>
-      <p class="status closed">Closes at {{ restaurant.close_at|time:"h:i A" }}</p>
-    {% endif %}
-    <a class="update" href="{% url 'restaurant_update' restaurant.id %}">Update</a>
-    <a class="delete" href="{% url 'restaurant_delete' restaurant.id %}">Delete</a>
-
-  {% else %}
-    {% if not restaurant.is_open %}
-      <p class="status closed">{{ restaurant.name }} is closed — opens at {{ restaurant.open_at|time:"h:i A" }}</p>
-    {% else %}
-      <p class="status open">Closes at {{ restaurant.close_at|time:"h:i A" }}</p>
-    {% endif %}
-  {% endif %}
-
-  <a class="back" href="{% url 'restaurants_index' %}">Back</a>
-
-</div>
- <hr />
-  <!-- for Items -->
-  <div>
-    {%if user.profile.role == 'owner'%}
-    <h1>Add A New Item</h1>
-     {% if object %}
-  <h1>Edit {{object.name}}</h1>
-  {% else %}
-  <h1>Add item </h1>
-  {% endif %}
-  <form action="{% url 'add_item' restaurant.id %}" method="post" enctype="multipart/form-data">
-    {% csrf_token %}
-    <table>
-      {{ item_form.as_table }}
-    </table>
-    <input type="submit" name="submit" class="btn">
-  </form>
-    {% endif %}
-  </div>
-  <div>
-    {% for item in restaurant.item_set.all %}
-    <h3>{{ item.name }}</h3>
-    <p>Description: {{item.description }}</p>
-    <p>price: {{ item.price }}BD</p>
-    <div>
-      {% load static %}
-      <img src="{%static item.itemImage|cut:'main_app/static/' %}"alt="Item image"/>
-    </div>
-    <div>
-      {% if user.profile.role == "owner" %}
-      <a href="{% url 'item_update' item.id %}">Edit</a>
-      <a href="{% url 'item_delete' item.id%}">Delete</a>
+      {% if not restaurant.is_open %}
+        <p style="margin-top:1rem;">Opens at {{ restaurant.open_at|time:"h:i A" }}</p>
+      {% else %}
+        <p style="margin-top:1rem;">Closes at {{ restaurant.close_at|time:"h:i A" }}</p>
       {% endif %}
-    </div>
-    <!-- for customer Cart -->
-    <div>
-      {% if user.profile.role == "customer" %}
-      <form action="{% url 'addToCart' user.id item.id restaurant.id %}" method="post">
-        {% csrf_token %} {{ add_to_cart_form.as_p }}
-        <input type="submit" value="Add To Cart" />
-      </form>
-      {% endif %} {% endfor%}
+
+      {% if user.profile.role == 'owner' %}
+        <a class="btn-solid" href="{% url 'restaurant_update' restaurant.id %}">Edit Restaurant</a>
+        <a class="btn-solid btn-danger" href="{% url 'restaurant_delete' restaurant.id %}">Delete Restaurant</a>
+      {% endif %}
+
+      <a class="btn-solid" style="margin-top:0.5rem;" href="{% url 'restaurants_index' %}">Back</a>
     </div>
   </div>
+
+  <!-- ========= OWNER: ADD ITEM FORM ========= -->
+  {% if user.profile.role == 'owner' %}
+  <div class="add-item-card">
+    {% if object %}
+      <h2>Edit Item</h2>
+    {% else %}
+      <h2>Add New Item</h2>
+    {% endif %}
+
+    <form action="{% url 'add_item' restaurant.id %}" method="post" enctype="multipart/form-data">
+      {% csrf_token %}
+      <table>
+        {{ item_form.as_table }}
+      </table>
+      <input type="submit" value="Save Item" class="btn-solid">
+    </form>
+  </div>
+  {% endif %}
+
+  <!-- ========= ITEMS SECTION ========= -->
+  <div class="items-section">
+    <h2 style="color:var(--primary); margin-bottom:0;">Menu</h2>
+
+    <div class="items-grid">
+      {% for item in restaurant.item_set.all %}
+      <div class="item-card">
+        {% load static %}
+        <img src="{% static item.itemImage|cut:'main_app/static/' %}" alt="Item Image">
+
+        <h3>{{ item.name }}</h3>
+        <p>{{ item.description }}</p>
+        <p><strong>{{ item.price }} BD</strong></p>
+
+        {% if user.profile.role == "owner" %}
+          <a class="btn-solid" href="{% url 'item_update' item.id %}">Edit</a>
+          <a class="btn-solid btn-danger" href="{% url 'item_delete' item.id %}">Delete</a>
+        {% endif %}
+
+        {% if user.profile.role == "customer" %}
+        <form action="{% url 'addToCart' user.id item.id restaurant.id %}" method="post">
+          {% csrf_token %}
+          {{ add_to_cart_form.as_p }}
+          <button class="add-cart-btn" type="submit">Add to Cart</button>
+        </form>
+        {% endif %}
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+
 </div>
-{%endblock%}
+
+{% endblock %}
