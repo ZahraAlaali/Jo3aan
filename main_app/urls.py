@@ -1,9 +1,7 @@
 from django.urls import path, include
 from . import views
-
 from .views import ResetPasswordView
 from django.contrib.auth import views as auth_views
-
 urlpatterns = [
     # Sign Up
     path("accounts/signup/", views.signup, name="signup"),

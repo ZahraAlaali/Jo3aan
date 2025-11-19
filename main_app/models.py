@@ -138,7 +138,7 @@ class Item(models.Model):
         return self.name
 
     def get_absolute_url(self):
-        return reverse("item_detail", kwargs={"pk": self.id})
+        return reverse("/restaurants/{restaurant_id}/", kwargs={"pk": self.id})
 
 
 class Cart(models.Model):
@@ -196,6 +196,9 @@ class Order(models.Model):
         max_length=2, choices=ORDER_STATUS, default=ORDER_STATUS[0][0]
     )
     cart = models.ForeignKey(Cart, on_delete=models.CASCADE)
+    # customer location
+    customer_lat = models.FloatField(null=True, blank=True)
+    customer_lng = models.FloatField(null=True, blank=True)
 
     def __str__(self):
         return f"{self.id} {self.get_order_status_display()}"
