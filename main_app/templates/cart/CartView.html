@@ -39,8 +39,8 @@
     <div class="cart-summary">
       <p>Subtotal: BHD {{ cart.total_amount }}</p>
       <div class="cart-actions">
-        <a href="{% url 'landing-page' %}" class="btn secondary-btn">Continue Shopping</a>
-        <a href="{% url 'create_order' user.id %}" class="btn primary-btn">Place Order</a>
+        <a href="{% url 'landing-page' %}" class="btn primary-btn">Checkout</a>
+        {% comment %} <a href="{% url 'create_order' user.id %}" class="btn primary-btn">Place Order</a> {% endcomment %}
       </div>
     </div>
 
