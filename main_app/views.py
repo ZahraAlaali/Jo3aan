@@ -1,17 +1,15 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from .models import Profile
 import json
 import stripe
 from django.conf import settings
-from django.views.generic import TemplateView
 from django.http import JsonResponse
 from django.views import View
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
-from django.views.generic import ListView, DetailView
+from django.views.generic import ListView, DetailView, TemplateView
 from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
-from .models import Restaurant, User, Profile, Cart, CartDetails, Item, Order
+from .models import Restaurant, User, Profile, Cart, CartDetails, Item, Order, DriverLocation
 from .forms import (
     CustomUserCreationForm,
     UpdateProfileForm,
@@ -23,10 +21,6 @@ from .forms import (
 import datetime
 from django import forms
 from django.views.decorators.csrf import csrf_exempt
-from django.utils.decorators import method_decorator
-from .models import DriverLocation
-
-# reset password
 from django.urls import reverse_lazy
 from django.contrib.auth.views import PasswordResetView
 from django.contrib.messages.views import SuccessMessageMixin
@@ -190,7 +184,7 @@ class ProfileCreate(LoginRequiredMixin, CreateView):
 class ProfileUpdate(LoginRequiredMixin, UpdateView):
     model = Profile
     fields = ["phone", "role", "profileImage"]
-    
+
 
 
 def addToCart(request, user_id, item_id, restaurant_id):
@@ -315,8 +309,8 @@ def profile_user_update(request, user_id, profile_id):
         user_form = UpdateUserForm(request.POST, instance=user)
 
         if profile_form.is_valid() and user_form.is_valid():
-            profile_data = profile_form.save()
-            user_data = user_form.save()
+            profile_form.save()
+            user_form.save()
             return redirect("/profile")
     else:
         profile_form = UpdateProfileForm(instance=profile)
@@ -392,7 +386,6 @@ def createOrder(request, user_id):
     cart.cart_status = "ordered"
     cart.save()
     return redirect("choose_location", order.id)
-    # return redirect(f"/orders/customer/{user_id}/")
 
 
 def customerOrders(request, user_id):
@@ -407,8 +400,6 @@ def restaurantOrders(request):
 
 
 class orders_list(ListView):
-    # orders=Order.objects.filter(order_status='R')
-    # return render(request, 'orders/driver_orders.html',{"orders":orders})
     model = Order
 
 
@@ -423,8 +414,6 @@ def order_details(request, order_id):
 
 def change_order_status(request, order_id):
     order = Order.objects.get(id=order_id)
-    # if request.user != order.restaurant.user:
-    #     return redirect("home")
     if order.order_status == "P":
         order.order_status = "R"
     elif order.order_status == "R":
@@ -440,10 +429,6 @@ def change_order_status(request, order_id):
 
 
 # Items
-class ItemDetail(LoginRequiredMixin, DetailView):
-    model = Item
-
-
 class ItemCreat(LoginRequiredMixin, CreateView):
     model = Item
     fields = ["name", "description", "itemImage", "price"]
