@@ -1,34 +1,48 @@
-{%extends 'base.html'%}
-{%block content%}
-<h2>Order #{{ order.id }}</h2>
+{% extends 'base.html' %}
 
-<h3>Items:</h3>
-<ul>
-  {% for i in items %}
-    <li>{{ i.item.name }} — Qty: {{ i.quantity }} — {{ i.item.price }} BD</li>
-  {% endfor %}
-</ul>
+{% block content %}
+<div class="order-page">
 
-<p>Total: {{ order.total_amount }} BD</p>
-<button><a href="{% url 'orders_list' %}">back</a></button>
-{%if user.profile.role == 'owner' and order.order_status == 'P'%}
-<button><a href="{% url 'change_order_status' order.id %}">Ready</a></button>
-{%elif user.profile.role == 'driver' and order.order_status == 'R'%}
-<button><a href="{% url 'change_order_status' order.id %}">Picked up</a></button>
-{%elif user.profile.role == 'driver' and order.order_status == 'PU'%}
-<button><a href="{% url 'change_order_status' order.id %}">Delivered</a></button>
-{%endif%}
+  <h2>Order #{{ order.id }}</h2>
 
+  <h3>Items:</h3>
+  <ul>
+    {% for i in items %}
+      <li>{{ i.item.name }} <br>Qty: {{ i.quantity }} <br> Price: {{ i.item.price }} BD</li>
+    {% endfor %}
+  </ul>
 
-{% if user.profile.role == 'driver' %}
-<div id="map-driver" style="height: 300px;"></div>
+  <p>Total: {{ order.total_amount }} BD</p>
 
+  <div class="buttons-row">
+    <a href="{% url 'orders_list' %}" class="btn">Back</a>
+
+    {% if user.profile.role == 'owner' and order.order_status == 'P' %}
+      <a href="{% url 'change_order_status' order.id %}" class="btn action-btn">Ready</a>
+    {% elif user.profile.role == 'driver' and order.order_status == 'R' %}
+      <a href="{% url 'change_order_status' order.id %}" class="btn action-btn">Picked up</a>
+    {% elif user.profile.role == 'driver' and order.order_status == 'PU' %}
+      <a href="{% url 'change_order_status' order.id %}" class="btn action-btn">Delivered</a>
+    {% endif %}
+  </div>
+
+  {% if user.profile.role == 'driver' %}
+  <div id="map-driver"></div>
+  {% endif %}
+
+  {% if user.profile.role in 'owner customer' %}
+  <div id="map-customer"></div>
+  {% endif %}
+
+</div>
+
+<!-- ======= LEAFLET MAP STYLING AND SCRIPTS ======= -->
 <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 
 <script>
+{% if user.profile.role == 'driver' %}
 let mapDriver = L.map("map-driver").setView([26.0667, 50.5577], 12);
-
 L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png").addTo(mapDriver);
 
 let driverMarker = null;
@@ -57,7 +71,6 @@ function updateDriverPosition() {
             const lat = pos.coords.latitude;
             const lng = pos.coords.longitude;
 
-            // send to backend
             await fetch(`/api/driver/{{ order.driver.id }}/update-location/`, {
                 method: "POST",
                 headers: {"Content-Type": "application/json"},
@@ -80,19 +93,10 @@ function updateDriverPosition() {
 }
 
 setInterval(updateDriverPosition, 4000);
-</script>
 {% endif %}
 
-
 {% if user.profile.role in 'owner customer' %}
-<div id="map-customer" style="height: 300px;"></div>
-
-<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
-<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-
-<script>
 let mapCustomer = L.map("map-customer").setView([26.0667, 50.5577], 12);
-
 L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png").addTo(mapCustomer);
 
 let driverMarkerC = null;
@@ -135,7 +139,109 @@ async function updateDriverMarkerC() {
 }
 
 setInterval(updateDriverMarkerC, 3000);
-</script>
 {% endif %}
+</script>
 
-{%endblock%}
+<!-- ======= ORDER PAGE STYLING ======= -->
+<style>
+.order-page {
+  max-width: 900px;
+  margin: 2rem auto;
+  padding: 2rem;
+  background-color: var(--white);
+  border-radius: 1rem;
+  box-shadow: 0 4px 20px rgba(15, 23, 42, 0.1);
+}
+
+.order-page h2 {
+  color: var(--primary);
+  font-size: 1.8rem;
+  margin-bottom: 1rem;
+}
+
+.order-page h3 {
+  color: var(--text-main);
+  font-size: 1.2rem;
+  margin-top: 1.5rem;
+}
+
+.order-page ul {
+  list-style: none;
+  padding: 0;
+  margin: 1rem 0;
+}
+
+.order-page ul li {
+  padding: 0.75rem 1rem;
+  margin-bottom: 0.5rem;
+  border: 1px solid var(--border-soft);
+  border-radius: 0.8rem;
+  display: flex;
+  justify-content: space-between;
+  background-color: var(--primary-soft);
+  font-size: 0.95rem;
+}
+
+.order-page p {
+  font-weight: 600;
+  margin-top: 1rem;
+  font-size: 1rem;
+}
+
+.order-page .buttons-row {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1rem;
+  flex-wrap: wrap;
+}
+
+.order-page .buttons-row a.btn {
+  text-decoration: none;
+  color: var(--white);
+  display: inline-block;
+  padding: 0.5rem 1rem;
+  border-radius: 999px;
+  background-color: var(--primary);
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.order-page .buttons-row a.btn:hover {
+  background-color: var(--primary-dark);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.25);
+}
+
+.order-page .buttons-row a.action-btn {
+  background-color: var(--accent);
+  color: #1f2933;
+}
+
+.order-page .buttons-row a.action-btn:hover {
+  background-color: #f59e0b;
+  color: var(--white);
+}
+
+#map-driver, #map-customer {
+  margin-top: 1.5rem;
+  border-radius: 1rem;
+  border: 1px solid var(--border-soft);
+  height: 300px;
+}
+
+@media (max-width: 768px) {
+  .order-page {
+    padding: 1rem;
+  }
+
+  .order-page ul li {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  #map-driver, #map-customer {
+    height: 250px;
+  }
+}
+</style>
+{% endblock %}
