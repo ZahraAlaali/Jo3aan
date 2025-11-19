@@ -12,8 +12,8 @@
 ***
 
 ### ***Description***
-#### This project is a food ordering web application that connects restaurant owners, customers, and drivers through a simple and interactive platform..
-#### Restaurant owners can manage their restaurants and menus, customers can browse items, add them to a cart, and place orders, and drivers can view ready orders and pick up the ones suitable for them.
+#### This project is a food ordering web application that connects restaurant owners, customers, and drivers through a simple and interactive platform.
+#### Restaurant owners can manage their restaurants and menus, customers can browse items, add them to a cart, confirm payment, place orders, and track them, and drivers can view ready orders and pick up the ones suitable for them.
 
 ***
 
@@ -49,3 +49,4 @@
 ### ***Credits***
 #### Updating Image: [stackoverflow](https://stackoverflow.com/questions/73904902/image-not-updating-django)
 #### Tracking Map: [Leaflet](https://leafletjs.com/)
+#### Payment: [Django Stripe Tutorial](https://github.com/justdjango/django-stripe-tutorial)

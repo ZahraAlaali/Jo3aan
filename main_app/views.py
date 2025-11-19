@@ -190,6 +190,7 @@ class ProfileCreate(LoginRequiredMixin, CreateView):
 class ProfileUpdate(LoginRequiredMixin, UpdateView):
     model = Profile
     fields = ["phone", "role", "profileImage"]
+    
 
 
 def addToCart(request, user_id, item_id, restaurant_id):
