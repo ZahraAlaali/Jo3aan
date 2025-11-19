@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h2>Select Your Delivery Location</h2>
+<p>Move the marker if needed, then confirm.</p>
+
+<div id="map" style="height: 350px;"></div>
+
+<button id="confirmBtn" style="margin-top: 20px;">Confirm Location</button>
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+<script>
+let map = L.map("map").setView([26.0667, 50.5577], 12);
+
+L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png").addTo(map);
+
+let marker;
+
+// 1️⃣ Try to get the user’s real GPS position
+if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition((pos) => {
+        const lat = pos.coords.latitude;
+        const lng = pos.coords.longitude;
+
+        map.setView([lat, lng], 16);
+
+        marker = L.marker([lat, lng], { draggable: true }).addTo(map);
+    }, () => {
+        // if GPS blocked → default center
+        marker = L.marker([26.0667, 50.5577], { draggable: true }).addTo(map);
+    });
+} else {
+    marker = L.marker([26.0667, 50.5577], { draggable: true }).addTo(map);
+}
+
+// 2️⃣ When confirm button clicked, send new marker position
+document.getElementById("confirmBtn").onclick = async function() {
+    const pos = marker.getLatLng(); // final chosen location
+
+    await fetch("/api/order/{{ order.id }}/save-location/", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({
+            lat: pos.lat,
+            lng: pos.lng
+        })
+    });
+
+    alert("Location saved!");
+    window.location.href = "/orders/customer/{{ order.customer.id }}/";
+}
+</script>
+
+{% endblock %}

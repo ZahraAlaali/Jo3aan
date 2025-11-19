@@ -1,13 +1,118 @@
-{% extends 'base.html' %}
+{% extends "base.html" %}
 {% block content %}
 
-<form method="post" action='' enctype="multipart/form-data">
-    {% csrf_token %}
-    {{ user_form.as_p }}
+<div class="update-wrapper">
 
-    {{ profile_form.as_p }}
+  <div class="update-card">
+    <h2 class="update-title">Update Profile</h2>
 
-    <button type="submit">Update</button>
-</form>
+    <form method="post" enctype="multipart/form-data" class="update-form">
+      {% csrf_token %}
+      <div class="form-fields">
+        {{ user_form.as_p }}
+        {{ profile_form.as_p }}
+      </div>
 
-{% endblock%}
+      <button type="submit" class="update-btn">Save Changes</button>
+    </form>
+  </div>
+
+</div>
+
+<style>
+/* Wrapper */
+.update-wrapper {
+  max-width: 500px;       /* smaller width */
+  margin: 1.5rem auto;    /* tighter vertical spacing */
+  padding: 0 1rem;
+}
+
+/* Card container */
+.update-card {
+  background: var(--white);
+  padding: 1.3rem 1.5rem;  /* smaller padding */
+  border-radius: 1rem;
+  box-shadow: 0 3px 14px rgba(15, 23, 42, 0.10);
+  border: 1px solid var(--border-soft);
+}
+
+/* Title */
+.update-title {
+  margin: 0 0 0.8rem 0;    /* reduced spacing */
+  font-size: 1.4rem;       /* smaller */
+  font-weight: 700;
+  color: var(--primary);
+  text-align: center;
+}
+
+/* Form layout */
+.update-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;             /* smaller gaps */
+}
+
+.update-form p {
+  margin: 0 0 0.5rem 0;    /* tighter spacing */
+}
+
+.update-form label {
+  font-weight: 600;
+  color: var(--text-main);
+  margin-bottom: 0.15rem;
+  font-size: 0.9rem;
+}
+
+/* Inputs */
+.update-form input,
+.update-form select,
+.update-form textarea {
+  width: 100%;
+  padding: 0.55rem 0.7rem;  /* smaller height */
+  border-radius: 0.5rem;
+  border: 1px solid var(--border-soft);
+  background: var(--primary-soft);
+  font-size: 0.9rem;
+  outline: none;
+}
+
+.update-form input:focus,
+.update-form select:focus,
+.update-form textarea:focus {
+  border-color: var(--primary);
+  background: #fff;
+}
+
+/* Submit button */
+.update-btn {
+  margin-top: 0.8rem;
+  padding: 0.55rem 1.3rem;  /* smaller button */
+  background: var(--primary);
+  color: var(--white);
+  border: none;
+  border-radius: 999px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.15s ease;
+}
+
+.update-btn:hover {
+  background: var(--primary-dark);
+  transform: translateY(-2px);
+  box-shadow: 0 3px 10px rgba(15, 23, 42, 0.23);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .update-wrapper {
+    margin: 1rem auto;
+  }
+
+  .update-card {
+    padding: 1.1rem;
+  }
+}
+</style>
+
+{% endblock %}

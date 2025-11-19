@@ -19,4 +19,123 @@
 <button><a href="{% url 'change_order_status' order.id %}">Delivered</a></button>
 {%endif%}
 
+
+{% if user.profile.role == 'driver' %}
+<div id="map-driver" style="height: 300px;"></div>
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+<script>
+let mapDriver = L.map("map-driver").setView([26.0667, 50.5577], 12);
+
+L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png").addTo(mapDriver);
+
+let driverMarker = null;
+let customerMarker = null;
+let firstUpdate = true;
+
+const redIcon = L.icon({
+    iconUrl: "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png",
+    shadowUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png",
+    iconSize: [25, 41],
+    iconAnchor: [12, 41],
+    popupAnchor: [1, -34],
+    shadowSize: [41, 41]
+});
+
+{% if order.customer_lat and order.customer_lng %}
+customerMarker = L.marker(
+    [{{ order.customer_lat }}, {{ order.customer_lng }}],
+    {icon: redIcon, title:"Customer"}
+).addTo(mapDriver);
+{% endif %}
+
+function updateDriverPosition() {
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(async (pos) => {
+            const lat = pos.coords.latitude;
+            const lng = pos.coords.longitude;
+
+            // send to backend
+            await fetch(`/api/driver/{{ order.driver.id }}/update-location/`, {
+                method: "POST",
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify({ lat, lng })
+            });
+
+            if (!driverMarker) {
+                driverMarker = L.marker([lat, lng], {title:"You (Driver)"}).addTo(mapDriver);
+            } else {
+                driverMarker.setLatLng([lat, lng]);
+            }
+
+            if (firstUpdate && customerMarker) {
+                const group = L.featureGroup([driverMarker, customerMarker]);
+                mapDriver.fitBounds(group.getBounds(), { padding: [50, 50] });
+                firstUpdate = false;
+            }
+        });
+    }
+}
+
+setInterval(updateDriverPosition, 4000);
+</script>
+{% endif %}
+
+
+{% if user.profile.role in 'owner customer' %}
+<div id="map-customer" style="height: 300px;"></div>
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+<script>
+let mapCustomer = L.map("map-customer").setView([26.0667, 50.5577], 12);
+
+L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png").addTo(mapCustomer);
+
+let driverMarkerC = null;
+let customerMarkerC = null;
+let firstUpdateC = true;
+
+const redIconC = L.icon({
+    iconUrl: "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png",
+    shadowUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png",
+    iconSize: [25, 41],
+    iconAnchor: [12, 41],
+    popupAnchor: [1, -34],
+    shadowSize: [41, 41]
+});
+
+{% if order.customer_lat and order.customer_lng %}
+customerMarkerC = L.marker(
+    [{{ order.customer_lat }}, {{ order.customer_lng }}],
+    {icon: redIconC, title:"Your Location"}
+).addTo(mapCustomer);
+{% endif %}
+
+async function updateDriverMarkerC() {
+    const res = await fetch(`/api/driver/{{ order.driver.id }}/location/`);
+    const loc = await res.json();
+
+    if (!loc.lat || !loc.lng) return;
+
+    if (!driverMarkerC) {
+        driverMarkerC = L.marker([loc.lat, loc.lng], {title:"Driver"}).addTo(mapCustomer);
+    } else {
+        driverMarkerC.setLatLng([loc.lat, loc.lng]);
+    }
+
+    if (firstUpdateC && customerMarkerC) {
+        const group = L.featureGroup([driverMarkerC, customerMarkerC]);
+        mapCustomer.fitBounds(group.getBounds(), { padding: [50, 50] });
+        firstUpdateC = false;
+    }
+}
+
+setInterval(updateDriverMarkerC, 3000);
+</script>
+{% endif %}
+
 {%endblock%}
