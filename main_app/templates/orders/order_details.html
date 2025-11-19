@@ -35,7 +35,6 @@ let driverMarker = null;
 let customerMarker = null;
 let firstUpdate = true;
 
-// 🔴 red icon for customer
 const redIcon = L.icon({
     iconUrl: "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png",
     shadowUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png",
@@ -45,7 +44,6 @@ const redIcon = L.icon({
     shadowSize: [41, 41]
 });
 
-// 1️⃣ Customer location
 {% if order.customer_lat and order.customer_lng %}
 customerMarker = L.marker(
     [{{ order.customer_lat }}, {{ order.customer_lng }}],
@@ -53,7 +51,6 @@ customerMarker = L.marker(
 ).addTo(mapDriver);
 {% endif %}
 
-// 2️⃣ Driver location sender + marker
 function updateDriverPosition() {
     if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(async (pos) => {
@@ -67,14 +64,12 @@ function updateDriverPosition() {
                 body: JSON.stringify({ lat, lng })
             });
 
-            // show driver
             if (!driverMarker) {
                 driverMarker = L.marker([lat, lng], {title:"You (Driver)"}).addTo(mapDriver);
             } else {
                 driverMarker.setLatLng([lat, lng]);
             }
 
-            // fit view once
             if (firstUpdate && customerMarker) {
                 const group = L.featureGroup([driverMarker, customerMarker]);
                 mapDriver.fitBounds(group.getBounds(), { padding: [50, 50] });
@@ -87,7 +82,6 @@ function updateDriverPosition() {
 setInterval(updateDriverPosition, 4000);
 </script>
 {% endif %}
-
 
 
 {% if user.profile.role in 'owner customer' %}
@@ -105,7 +99,6 @@ let driverMarkerC = null;
 let customerMarkerC = null;
 let firstUpdateC = true;
 
-// 🔴 red customer icon
 const redIconC = L.icon({
     iconUrl: "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png",
     shadowUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png",
@@ -115,7 +108,6 @@ const redIconC = L.icon({
     shadowSize: [41, 41]
 });
 
-// 1️⃣ Customer marker
 {% if order.customer_lat and order.customer_lng %}
 customerMarkerC = L.marker(
     [{{ order.customer_lat }}, {{ order.customer_lng }}],
@@ -123,7 +115,6 @@ customerMarkerC = L.marker(
 ).addTo(mapCustomer);
 {% endif %}
 
-// 2️⃣ Driver marker live update
 async function updateDriverMarkerC() {
     const res = await fetch(`/api/driver/{{ order.driver.id }}/location/`);
     const loc = await res.json();
