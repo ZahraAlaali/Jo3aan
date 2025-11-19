@@ -249,21 +249,6 @@ def addToCart(request, user_id, item_id, restaurant_id):
         return redirect(f"/restaurants/{restaurant_id}/")
     return redirect(f"/restaurants/{restaurant_id}/")
 
-
-class ItemDetail(LoginRequiredMixin, DetailView):
-    model = Item
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["add_to_cart_form"] = AddToCartForm()
-        return context
-
-
-class ItemCreate(LoginRequiredMixin, CreateView):
-    model = Item
-    fields = "__all__"
-
-
 class ItemUpdate(LoginRequiredMixin, UpdateView):
     model = Item
     fields = ["name", "description", "image", "price"]
@@ -429,11 +414,6 @@ def change_order_status(request, order_id):
 
 
 # Items
-class ItemCreat(LoginRequiredMixin, CreateView):
-    model = Item
-    fields = ["name", "description", "itemImage", "price"]
-
-
 def add_item(request, restaurant_id):
     form = ItemForm(request.POST, request.FILES)
     if form.is_valid():
