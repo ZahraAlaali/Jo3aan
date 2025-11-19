@@ -15,7 +15,13 @@
   <p>Total: {{ order.total_amount }} BD</p>
 
   <div class="buttons-row">
-    <a href="{% url 'orders_list' %}" class="btn">Back</a>
+  {% if user.profile.role == 'owner' %}
+  <a href="{% url 'restaurant_orders' %}" class="btn">Back</a>
+  {% elif user.profile.role == 'customer' %}
+  <a href="{% url 'customer_orders' user.id %}" class="btn">Back</a>
+  {% else %}
+  <a href="{% url 'orders_list' %}" class="btn">Back</a>
+  {% endif %}
 
     {% if user.profile.role == 'owner' and order.order_status == 'P' %}
     <a href="{% url 'change_order_status' order.id %}" class="btn action-btn"
