@@ -39,7 +39,7 @@
 
 ### ***Future Updates***
 - [x] Delivery Side (Driver role)
-- [ ] Live Tracking
+- [x] Live Tracking
 - [ ] Location-based Feature
 - [x] Payment
 
@@ -47,3 +47,4 @@
 
 ### ***Credits***
 #### Updating Image: [stackoverflow](https://stackoverflow.com/questions/73904902/image-not-updating-django)
+#### Tracking Map: [Leaflet](https://leafletjs.com/)
