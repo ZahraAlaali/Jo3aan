@@ -3,6 +3,13 @@
 {% block content %}
 
 <style>
+/* ===== IMPORT CAL SANS ===== */
+@import url("https://cdn.jsdelivr.net/gh/calcom/font/dist/cal-sans.css");
+
+* {
+  font-family: "Cal Sans", sans-serif !important;
+}
+
 /* ===== AUTH PAGE WRAPPER ===== */
 
 .auth-wrapper {
@@ -69,7 +76,7 @@
   box-shadow: 0 0 0 3px rgba(44, 50, 106, 0.15);
 }
 
-/* ===== SELECT DROPDOWN (ROLE) — CLEAN ARROW ===== */
+/* ===== SELECT DROPDOWN (ROLE) ===== */
 
 .auth-form select {
   width: 100%;
@@ -81,12 +88,10 @@
   cursor: pointer;
   transition: border-color 0.15s ease, box-shadow 0.15s ease;
 
-  /* Remove default arrow */
   appearance: none;
   -moz-appearance: none;
   -webkit-appearance: none;
 
-  /* Custom arrow ▼ */
   background-image: url("data:image/svg+xml;utf8,<svg fill='rgb(44,50,106)' height='80' width='80' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'><polygon points='5,7 15,7 10,13'/></svg>");
   background-repeat: no-repeat;
   background-position: right 12px center;

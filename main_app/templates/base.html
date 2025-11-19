@@ -5,80 +5,104 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Jo3aan</title>
-    <link rel="stylesheet" href="{% static 'css/base.css' %}">
+
+    <!-- Base CSS -->
+    <link rel="stylesheet" href="{% static 'css/base.css' %}" />
+
+    <!-- Cal Sans Font -->
+    <link
+      href="https://cdn.jsdelivr.net/gh/calcom/font/dist/cal-sans.css"
+      rel="stylesheet"
+    />
+
+    <!-- Apply Cal Sans globally + Logo style -->
+    <style>
+      * {
+        font-family: "Cal Sans", sans-serif !important;
+      }
+
+      /* Clean Text Logo (no background) */
+      .brand-logo {
+        font-family: "Cal Sans", sans-serif;
+        font-size: 1.9rem;
+        font-weight: 700;
+        color: white;
+        letter-spacing: -0.5px;
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        padding: 0.25rem 0;
+        background: none !important;
+        border-radius: 0;
+      }
+
+      .brand-logo:hover {
+        background: none !important;
+      }
+      .logo {
+        list-style: none;
+      }
+    </style>
   </head>
+
   <body>
-  <header class="navbar-fixed">
-  <nav>
-    <div class="nav-wrapper">
-      <ul>
-        <li>
-          <a href="{% url 'home' %}" class="left brand-logo"
-            >&nbsp;&nbsp;Jo3aan</a
-          >
-        </li>
-      </ul>
-      <ul class="right">
-        {% if user.is_authenticated %}
-        <li>
-          <a href="{% url 'profile' %}">Profile</a>
-        </li>
+    <header class="navbar-fixed">
+      <nav>
+        <div class="nav-wrapper">
+          <ul class="logo">
+              <a href="{% url 'home' %}" class="left brand-logo"
+                >Jo3aan</a
+              >
+          </ul>
 
-        {% if user.profile.role == 'customer' %}
-        <li>
-          <a href="{% url 'viewCart' user.id %}">Cart</a>
-        </li>
-        <li>
-          <a href="{% url 'customer_orders' user.id %}">Orders</a>
-        </li>
-        <li>
-          <a href="{% url 'restaurants_index' %}">Restaurants</a>
-        </li>
+          <ul class="right">
+            {% if user.is_authenticated %}
+            <li><a href="{% url 'profile' %}">Profile</a></li>
 
-        {% elif user.profile.role == 'owner' %}
-        <li>
-          <a href="{% url 'restaurant_orders' %}">Orders</a>
-        </li>
-        <li>
-          <a href="{% url 'restaurant_create' %}">Create restaurant</a>
-        </li>
-        <li>
-          <a href="{% url 'restaurants_index' %}">Restaurants</a>
-        </li>
+            {% if user.profile.role == 'customer' %}
+            <li><a href="{% url 'viewCart' user.id %}">Cart</a></li>
+            <li><a href="{% url 'customer_orders' user.id %}">Orders</a></li>
+            <li><a href="{% url 'restaurants_index' %}">Restaurants</a></li>
 
-        {% elif user.profile.role == 'driver' %}
-        <li>
-          <a href="{% url 'orders_list' %}">Orders</a>
-        </li>
-        {% endif %}
+            {% elif user.profile.role == 'owner' %}
+            <li><a href="{% url 'restaurant_orders' %}">Orders</a></li>
+            <li>
+              <a href="{% url 'restaurant_create' %}">Create restaurant</a>
+            </li>
+            <li><a href="{% url 'restaurants_index' %}">Restaurants</a></li>
 
-        <li>
-          <form action="{% url 'logout' %}" method="post">
-            {% csrf_token %}
-            <button type="submit">Logout</button>
-          </form>
-        </li>
-        {% else %}
-        <li><a href="{% url 'login' %}">Login</a></li>
-        <li><a href="{% url 'signup' %}">Sign Up</a></li>
-        {% endif %}
-      </ul>
-    </div>
-  </nav>
-</header>
+            {% elif user.profile.role == 'driver' %}
+            <li><a href="{% url 'orders_list' %}">Orders</a></li>
+            {% endif %}
+
+            <li>
+              <form action="{% url 'logout' %}" method="post">
+                {% csrf_token %}
+                <button type="submit">Logout</button>
+              </form>
+            </li>
+
+            {% else %}
+            <li><a href="{% url 'login' %}">Login</a></li>
+            <li><a href="{% url 'signup' %}">Sign Up</a></li>
+            {% endif %}
+          </ul>
+        </div>
+      </nav>
+    </header>
 
     {% if messages %}
-  <div class="container mt-3">
-    {% for message in messages %}
-      <div class="alert alert-{{ message.tags }}">
-        {{ message }}
-      </div>
-    {% endfor %}
-  </div>
-{% endif %}
-    <main class="container">{% block content %} {% endblock %}</main>
+    <div class="container mt-3">
+      {% for message in messages %}
+      <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    <main class="container">{% block content %}{% endblock %}</main>
+
     <footer class="page-footer">
-      <div class="right">All Rights Reserved, &copy, 2025 Jo3aan &nbsp;</div>
+      <div class="right">All Rights Reserved, &copy; 2025 Jo3aan &nbsp;</div>
     </footer>
   </body>
 </html>
