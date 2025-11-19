@@ -2,8 +2,6 @@
 {% block content %}
 {% load static %}
 
-{% comment %} <h1 class="page-title">Restaurants</h1> {% endcomment %}
-
 <div class="restaurants-grid">
 
   {% for restaurant in restaurants %}
@@ -49,6 +47,11 @@
 </div>
 
 <style>
+/* Apply Cal Sans globally */
+.restaurants-grid {
+  font-family: "Cal Sans", sans-serif;
+}
+
 /* Page title */
 .page-title {
   text-align: center;
@@ -90,6 +93,7 @@
   width: 100%;
   height: 170px;
   object-fit: cover;
+  border-bottom: 1px solid var(--border-soft);
 }
 
 /* Info section */
