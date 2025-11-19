@@ -1,20 +1,94 @@
-<h2>Start new Cart?</h2>
-<p>
-  You already have Items from {{restaurantInCart.name}} <br />Would You like to
-  empty the Cart for new Items from {{restaurantRequested.name}}
-</p>
-<form
-  action="{% url 'createNewCart' user_id item_id restaurantRequested.id %}"
-  method="post"
->
-  {% csrf_token %}
-  <input type="hidden" name="quantity" value="{{quantity}}" />
-  <input type="hidden" name="comment" value="{{comment}}" />
-  <button type="submit" name="decision" value="new">
-    Create new cart and add this item
-  </button>
+{% extends 'base.html' %}
+{% block content %}
 
-  <button type="submit" name="decision" value="keep">
-    Keep current cart (don't change anything)
-  </button>
-</form>
+<div class="new-cart-page">
+  <h2>Start a New Cart?</h2>
+
+  <p>
+    You already have items from <strong>{{ restaurantInCart.name }}</strong>.<br>
+    Would you like to empty the cart for new items from <strong>{{ restaurantRequested.name }}</strong>?
+  </p>
+
+  <form
+    action="{% url 'createNewCart' user_id item_id restaurantRequested.id %}"
+    method="post"
+    class="new-cart-form"
+  >
+    {% csrf_token %}
+    <input type="hidden" name="quantity" value="{{ quantity }}" />
+    <input type="hidden" name="comment" value="{{ comment }}" />
+
+    <button type="submit" name="decision" value="new" class="btn primary-btn">
+      Create New Cart and Add This Item
+    </button>
+
+    <button type="submit" name="decision" value="keep" class="btn secondary-btn">
+      Keep Current Cart
+    </button>
+  </form>
+</div>
+
+<style>
+/* Apply Cal Sans */
+.new-cart-page {
+  font-family: "Cal Sans", sans-serif;
+  max-width: 600px;
+  margin: 3rem auto;
+  padding: 2rem;
+  background: var(--white);
+  border-radius: 1rem;
+  box-shadow: 0 4px 20px rgba(15, 23, 42, 0.1);
+  border: 1px solid var(--border-soft);
+  text-align: center;
+}
+
+.new-cart-page h2 {
+  color: var(--primary);
+  margin-bottom: 1rem;
+  font-size: 1.6rem;
+}
+
+.new-cart-page p {
+  color: var(--text-main);
+  font-size: 1rem;
+  margin-bottom: 2rem;
+}
+
+.new-cart-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.btn {
+  padding: 0.6rem 1.2rem;
+  border-radius: 999px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 0.95rem;
+  border: none;
+  width: 100%;
+}
+
+.primary-btn {
+  background-color: var(--primary);
+  color: var(--white);
+}
+
+.primary-btn:hover {
+  background-color: var(--primary-dark);
+}
+
+.secondary-btn {
+  background-color: var(--white);
+  color: var(--primary);
+  border: 1px solid var(--primary);
+}
+
+.secondary-btn:hover {
+  background-color: var(--primary-soft);
+}
+</style>
+
+{% endblock %}
