@@ -244,13 +244,15 @@
           <a class="btn-solid" href="{% url 'item_update' item.id %}">Edit</a>
           <a class="btn-solid btn-danger" href="{% url 'item_delete' item.id %}">Delete</a>
         {% endif %}
-
+        {% if restaurant.is_open %}
         {% if user.profile.role == "customer" %}
         <form action="{% url 'addToCart' user.id item.id restaurant.id %}" method="post">
           {% csrf_token %}
           {{ add_to_cart_form.as_p }}
           <button class="add-cart-btn" type="submit">Add to Cart</button>
+
         </form>
+        {% endif %}
         {% endif %}
       </div>
       {% endfor %}

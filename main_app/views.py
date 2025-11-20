@@ -154,6 +154,11 @@ def restaurant_details(request, restaurant_id):
     restaurant = Restaurant.objects.get(id=restaurant_id)
     item_form = ItemForm()
     add_to_cart_form = AddToCartForm()
+    now = datetime.datetime.now().time()
+    if restaurant.close_at < restaurant.open_at:
+        restaurant.is_open = now >= restaurant.open_at or now <= restaurant.close_at
+    else:
+        restaurant.is_open = restaurant.open_at <= now < restaurant.close_at
     return render(
         request,
         "restaurants/details.html",
@@ -161,6 +166,7 @@ def restaurant_details(request, restaurant_id):
             "restaurant": restaurant,
             "item_form": item_form,
             "add_to_cart_form": add_to_cart_form,
+
         },
     )
 
