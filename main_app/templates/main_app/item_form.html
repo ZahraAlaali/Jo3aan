@@ -1,13 +1,77 @@
-{% extends 'base.html' %} {% block content %} {% if object %}
-<h1>Edit {{object.name}}</h1>
-{% else %}
-<h1>Add item</h1>
-{% endif %}
-<form action="" method="post" enctype="multipart/form-data">
-  {% csrf_token %}
-  <table>
-    {{ form.as_table }}
-  </table>
-  <input type="submit" name="submit" class="btn" />
-</form>
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="form-container">
+
+    {% if object %}
+        <h1>Edit {{ object.name }}</h1>
+    {% else %}
+        <h1>Add Item</h1>
+    {% endif %}
+
+    <form action="" method="post" enctype="multipart/form-data" class="item-form">
+        {% csrf_token %}
+        <div class="form-table">
+            {{ form.as_p }}
+        </div>
+
+        <button type="submit" class="submit-btn">Save</button>
+    </form>
+</div>
+
+
+<style>
+    .form-container {
+        max-width: 600px;
+        margin: 2rem auto;
+        padding: 2rem;
+        background: var(--white);
+        border-radius: 1rem;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        font-family: "Cal Sans", sans-serif;
+    }
+
+    h1 {
+        text-align: center;
+        margin-bottom: 1.5rem;
+        color: var(--primary);
+        font-weight: 700;
+    }
+
+    .item-form label {
+        font-weight: 600;
+        margin-top: 10px;
+        display: block;
+    }
+
+    .item-form input,
+    .item-form select,
+    .item-form textarea {
+        width: 100%;
+        padding: 10px;
+        border-radius: 8px;
+        border: 1px solid var(--border-soft);
+        margin-bottom: 15px;
+    }
+
+    .submit-btn {
+        width: 100%;
+        padding: 0.7rem;
+        background: var(--primary);
+        border-radius: 999px;
+        border: none;
+        color: white;
+        font-weight: 600;
+        font-size: 1rem;
+        transition: 0.2s ease;
+    }
+
+    .submit-btn:hover {
+        background: var(--primary-dark);
+        cursor: pointer;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    }
+</style>
+
 {% endblock %}
