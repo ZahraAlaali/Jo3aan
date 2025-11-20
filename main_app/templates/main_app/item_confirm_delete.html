@@ -1,10 +1,87 @@
 {% extends 'base.html' %}
 {% block content %}
-  <h1>Delete item</h1>
-  <h4>Are you sure you want to delete <span class="teal-text">{{ object.name }}</span>?</h4>
-  <form action="" method="POST">
+
+<div class="delete-page">
+  <h1>Delete Item</h1>
+  <h4>
+    Are you sure you want to delete
+    <span class="teal-text">{{ object.name }}</span>?
+  </h4>
+
+  <form action="" method="POST" class="delete-form">
     {% csrf_token %}
-    <input type="submit" value="Yes - Delete!" class="btn">
-    <a href="{% url 'restaurant_details' object.id %}">Cancel</a>
+    <button type="submit" class="btn primary-btn">Yes - Delete!</button>
+    <a href="{% url 'restaurant_details' object.id %}" class="btn secondary-btn">Cancel</a>
   </form>
+</div>
+
+<style>
+.delete-page {
+  font-family: "Cal Sans", sans-serif;
+  max-width: 500px;
+  margin: 4rem auto;
+  padding: 2rem;
+  background: var(--white);
+  border-radius: 1rem;
+  box-shadow: 0 4px 20px rgba(15, 23, 42, 0.1);
+  border: 1px solid var(--border-soft);
+  text-align: center;
+}
+
+.delete-page h1 {
+  color: var(--primary);
+  margin-bottom: 1rem;
+  font-size: 1.6rem;
+}
+
+.delete-page h4 {
+  margin-bottom: 2rem;
+  color: var(--text-main);
+  font-weight: 500;
+}
+
+.delete-page .teal-text {
+  color: #0d9488; /* Teal accent */
+  font-weight: 600;
+}
+
+.delete-form {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.btn {
+  padding: 0.6rem 1.2rem;
+  border-radius: 999px;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 0.95rem;
+  transition: all 0.2s ease;
+  text-decoration: none;
+  display: inline-block;
+  border: none;
+}
+
+.primary-btn {
+  background-color: #dc2626; /* red for delete */
+  color: var(--white);
+}
+
+.primary-btn:hover {
+  background-color: #b91c1c;
+}
+
+.secondary-btn {
+  background-color: var(--white);
+  color: var(--primary);
+  border: 1px solid var(--primary);
+}
+
+.secondary-btn:hover {
+  background-color: var(--primary-soft);
+}
+</style>
+
 {% endblock %}

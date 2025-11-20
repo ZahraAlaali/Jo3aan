@@ -154,6 +154,11 @@ def restaurant_details(request, restaurant_id):
     restaurant = Restaurant.objects.get(id=restaurant_id)
     item_form = ItemForm()
     add_to_cart_form = AddToCartForm()
+    now = datetime.datetime.now().time()
+    if restaurant.close_at < restaurant.open_at:
+        restaurant.is_open = now >= restaurant.open_at or now <= restaurant.close_at
+    else:
+        restaurant.is_open = restaurant.open_at <= now < restaurant.close_at
     return render(
         request,
         "restaurants/details.html",
@@ -161,6 +166,7 @@ def restaurant_details(request, restaurant_id):
             "restaurant": restaurant,
             "item_form": item_form,
             "add_to_cart_form": add_to_cart_form,
+
         },
     )
 
@@ -186,7 +192,7 @@ class ProfileUpdate(LoginRequiredMixin, UpdateView):
     fields = ["phone", "role", "profileImage"]
 
 
-
+@login_required
 def addToCart(request, user_id, item_id, restaurant_id):
     if request.method == "POST":
         form = AddToCartForm(request.POST)
@@ -259,6 +265,7 @@ class ItemDelete(LoginRequiredMixin, DeleteView):
     success_url = "/item"
 
 
+@login_required
 def createNewCart(request, user_id, item_id, restaurant_id):
     if request.method == "POST":
         buttonValue = request.POST.get("decision")
@@ -309,6 +316,7 @@ def profile_user_update(request, user_id, profile_id):
 
 
 # Cart
+@login_required
 def viewCart(request, user_id):
     cart = Cart.objects.filter(customer_id=user_id, cart_status="active").first()
     cart_details = CartDetails.objects.filter(cart=cart).select_related("item")
@@ -332,6 +340,7 @@ def viewCart(request, user_id):
         )
 
 
+@login_required
 def deleteItemFromCart(request, user_id, cartDetail_id):
     cart = Cart.objects.filter(customer_id=user_id, cart_status="active").first()
     itemDeleted = get_object_or_404(
@@ -341,6 +350,7 @@ def deleteItemFromCart(request, user_id, cartDetail_id):
     return redirect(f"/cart/viewCart/{user_id}/")
 
 
+@login_required
 def increaseQty(request, user_id, cartDetail_id):
     cart = cart = Cart.objects.filter(customer_id=user_id, cart_status="active").first()
     updateItem = CartDetails.objects.filter(cart=cart, id=cartDetail_id).first()
@@ -348,7 +358,7 @@ def increaseQty(request, user_id, cartDetail_id):
     updateItem.save()
     return redirect(f"/cart/viewCart/{user_id}/")
 
-
+@login_required
 def decreaseQty(request, user_id, cartDetail_id):
     cart = cart = Cart.objects.filter(customer_id=user_id, cart_status="active").first()
     updateItem = CartDetails.objects.filter(cart=cart, id=cartDetail_id).first()
@@ -357,6 +367,7 @@ def decreaseQty(request, user_id, cartDetail_id):
     return redirect(f"/cart/viewCart/{user_id}/")
 
 
+@login_required
 def createOrder(request, user_id):
     cart = Cart.objects.get(customer_id=user_id, cart_status="active")
 
@@ -373,21 +384,23 @@ def createOrder(request, user_id):
     return redirect("choose_location", order.id)
 
 
+@login_required
 def customerOrders(request, user_id):
     orders = Order.objects.filter(customer_id=user_id).order_by("-id")
     return render(request, "orders/customer_orders.html", {"orders": orders})
 
 
+@login_required
 def restaurantOrders(request):
     restaurants = Restaurant.objects.filter(user=request.user)
     orders = Order.objects.filter(restaurant__in=restaurants).order_by("-id")
     return render(request, "orders/restaurant_orders.html", {"orders": orders})
 
 
-class orders_list(ListView):
+class orders_list(LoginRequiredMixin,ListView):
     model = Order
 
-
+@login_required
 def order_details(request, order_id):
     order = Order.objects.get(id=order_id)
     cart = Cart.objects.get(order=order_id)
@@ -397,6 +410,7 @@ def order_details(request, order_id):
     )
 
 
+@login_required
 def change_order_status(request, order_id):
     order = Order.objects.get(id=order_id)
     if order.order_status == "P":
@@ -414,6 +428,7 @@ def change_order_status(request, order_id):
 
 
 # Items
+@login_required
 def add_item(request, restaurant_id):
     form = ItemForm(request.POST, request.FILES)
     if form.is_valid():
@@ -440,15 +455,15 @@ class ItemDelete(LoginRequiredMixin, DeleteView):
 stripe.api_key = settings.STRIPE_SECRET_KEY
 
 
-class SuccessView(TemplateView):
+class SuccessView(LoginRequiredMixin,TemplateView):
     template_name = "success.html"
 
 
-class CancelView(TemplateView):
+class CancelView(LoginRequiredMixin,TemplateView):
     template_name = "cancel.html"
 
 
-class cartLandingPageView(TemplateView):
+class cartLandingPageView(LoginRequiredMixin,TemplateView):
     template_name = "landing.html"
 
     def get_context_data(self, **kwargs):
@@ -458,7 +473,7 @@ class cartLandingPageView(TemplateView):
         return context
 
 
-class CreateCheckoutSessionView(View):
+class CreateCheckoutSessionView(LoginRequiredMixin,View):
     def post(self, request, *args, **kwargs):
         cart_id = self.kwargs["pk"]
         cart = Cart.objects.get(id=cart_id)
@@ -486,7 +501,7 @@ class CreateCheckoutSessionView(View):
         return JsonResponse({"id": checkout_session.id})
 
 
-class StripeIntentView(View):
+class StripeIntentView(LoginRequiredMixin,View):
     def post(self, request, *args, **kwargs):
         try:
             req_json = json.loads(request.body)
@@ -505,6 +520,7 @@ class StripeIntentView(View):
 
 
 @csrf_exempt
+@login_required
 def update_driver_location(request, driver_id):
     if request.method == "POST":
         data = json.loads(request.body)
@@ -523,6 +539,7 @@ def update_driver_location(request, driver_id):
     return JsonResponse({"error": "POST only"}, status=400)
 
 
+@login_required
 def get_driver_location(request, driver_id):
     try:
         obj = DriverLocation.objects.get(driver_id=driver_id)
@@ -531,12 +548,14 @@ def get_driver_location(request, driver_id):
         return JsonResponse({"lat": None, "lng": None})
 
 
+@login_required
 def choose_location(request, order_id):
     order = Order.objects.get(id=order_id)
     return render(request, "orders/choose_location.html", {"order": order})
 
 
 @csrf_exempt
+@login_required
 def save_location(request, order_id):
     if request.method == "POST":
         data = json.loads(request.body)

@@ -172,7 +172,7 @@
     <section>
       <div class="cart">
         <div class="description">
-          <h3>{{ cart.id }}</h3>
+          <h3>Order #{{ cart.id }}</h3>
           <h5>BHD {{ cart.get_display_total_amount }}</h5>
         </div>
       </div>
@@ -185,6 +185,8 @@
           <div class="spinner hidden" id="spinner"></div>
           <span id="button-text">Pay</span>
         </button>
+        <br>
+        <a id="button-text" href="{%url 'viewCart' user.id %}">Back</a>
         <p id="card-error" role="alert"></p>
         <p class="result-message hidden">
           Payment succeeded, see the result in your
